@@ -1,0 +1,23 @@
+{
+   "name": "itfest-backend",
+   "version": "0.0.1",
+   "description": "Sistem backend untuk IT Festival Arkavidia 6.0.",
+   "devDependencies": {
+      "@types/node": "^12.7.4",
+      "@types/cors": "^2.8.6",
+      "@types/jsonwebtoken": "^8.3.3",
+      "ts-node": "3.3.0",
+      "typescript": "3.3.3333"
+   },
+   "dependencies": {
+      "cors": "^2.8.5",
+      "express": "^4.15.4",
+      "jsonwebtoken": "^8.5.1",
+      "reflect-metadata": "^0.1.13",
+      "sqlite3": "^4.0.3",
+      "typeorm": "0.2.18"
+   },
+   "scripts": {
+      "start": "ts-node src/index.ts"
+   }
+}
