@@ -3,9 +3,10 @@
    "version": "0.0.1",
    "description": "Sistem backend untuk IT Festival Arkavidia 6.0.",
    "devDependencies": {
-      "@types/node": "^12.7.4",
       "@types/cors": "^2.8.6",
       "@types/jsonwebtoken": "^8.3.3",
+      "@types/node": "^12.7.4",
+      "@types/readline-sync": "^1.4.3",
       "ts-node": "3.3.0",
       "typescript": "3.3.3333"
    },
@@ -15,6 +16,7 @@
       "express": "^4.15.4",
       "jsonwebtoken": "^8.5.1",
       "mysql2": "^1.7.0",
+      "readline-sync": "^1.4.10",
       "reflect-metadata": "^0.1.13",
       "sqlite3": "^4.0.3",
       "typeorm": "0.2.18"
