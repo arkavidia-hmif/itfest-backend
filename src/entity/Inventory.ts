@@ -10,7 +10,7 @@ export class Inventory {
 
   @OneToOne(type => Item)
   @JoinColumn()
-  item: string;
+  item: Item;
 
   @Column()
   @IsPositive()
