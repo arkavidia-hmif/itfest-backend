@@ -20,6 +20,7 @@ function getConfig() {
   if (process.env.DB_URL) {
     return {
       "type": process.env.DB_TYPE,
+      "database": process.env.DB_NAME,
       "url": process.env.DB_URL,
       ...config
     }
