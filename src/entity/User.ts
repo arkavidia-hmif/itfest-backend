@@ -1,4 +1,11 @@
-import {Entity, PrimaryGeneratedColumn, Column} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, UpdateDateColumn, CreateDateColumn } from "typeorm";
+import { IsEmail } from "class-validator";
+
+export enum UserRole {
+    ADMIN = "admin",
+    TENANT = "tenant",
+    VISITOR = "visitor"
+}
 
 @Entity()
 export class User {
@@ -7,12 +14,24 @@ export class User {
     id: number;
 
     @Column()
-    firstName: string;
+    @IsEmail()
+    email: string;
 
     @Column()
-    lastName: string;
+    name: string;
+
+    @Column({
+        type: "enum",
+        enum: UserRole,
+        default: UserRole.VISITOR
+    })
+    type: UserRole;
 
     @Column()
-    age: number;
+    @CreateDateColumn()
+    createdAt: Date;
 
+    @Column()
+    @UpdateDateColumn()
+    updatedAt: Date;
 }

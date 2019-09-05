@@ -10,9 +10,11 @@
       "typescript": "3.3.3333"
    },
    "dependencies": {
+      "class-validator": "^0.10.0",
       "cors": "^2.8.5",
       "express": "^4.15.4",
       "jsonwebtoken": "^8.5.1",
+      "mysql2": "^1.7.0",
       "reflect-metadata": "^0.1.13",
       "sqlite3": "^4.0.3",
       "typeorm": "0.2.18"
