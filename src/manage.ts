@@ -1,5 +1,6 @@
 import { createConnection } from "typeorm";
-import { User } from "./entity/User";
+import { UserRole } from "./entity/User";
+import { UserController } from "./controller/UserController";
 
 const argv = process.argv;
 const argc = argv.length;
@@ -20,10 +21,10 @@ async function createAdmin() {
   const connection = await createConnection();
 
   try {
+    const controller = new UserController();
 
-    await connection.manager.save(connection.manager.create(User, {
-      name, username, password
-    }));
+    await controller.createUser(name, username, null, UserRole.ADMIN, password);
+
     console.log(`Successfully created ${username}(${name})`);
   } catch (error) {
     console.error(error);
