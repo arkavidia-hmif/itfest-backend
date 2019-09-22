@@ -6,7 +6,7 @@ const argv = process.argv;
 const argc = argv.length;
 const readline = require('readline-sync');
 
-console.log(argv);
+// console.log(argv);
 
 async function printHelp() {
   console.log('Avaiable command');

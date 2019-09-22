@@ -33,7 +33,7 @@ export class User {
     enum: UserRole,
     type: "enum",
   })
-  type: UserRole;
+  role: UserRole;
 
   @Column({
     nullable: true,
