@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { UserController } from "../controller/UserController";
-import { checkJWT } from "../middleware/auth";
-import { limitAccess } from "../middleware/role";
+import { checkJWT } from "../middleware/checkJWT";
+import { limitAccess } from "../middleware/limitAccess";
 import { UserRole } from "../entity/User";
 
 export default () => {
