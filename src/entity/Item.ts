@@ -1,6 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, UpdateDateColumn, CreateDateColumn, OneToOne, JoinColumn } from "typeorm";
+import { IsPositive } from "class-validator";
+import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { User } from "./User";
-import { IsPositive, Length } from "class-validator";
 
 @Entity()
 export class Item {
@@ -11,7 +11,7 @@ export class Item {
   @Column()
   name: string;
 
-  @OneToOne(type => User)
+  @OneToOne((type) => User)
   @JoinColumn()
   owner: User;
 

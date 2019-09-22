@@ -1,6 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToOne, JoinColumn, ManyToOne } from "typeorm";
-import { User, Tenant, Customer } from "./User";
 import { IsPositive } from "class-validator";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Customer, Tenant } from "./User";
 
 @Entity()
 export class Feedback {
@@ -8,10 +8,10 @@ export class Feedback {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(type => Customer)
+  @ManyToOne((type) => Customer)
   from: Customer;
 
-  @ManyToOne(type => Tenant)
+  @ManyToOne((type) => Tenant)
   to: Tenant;
 
   @Column()

@@ -1,5 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, UpdateDateColumn, CreateDateColumn, OneToOne, JoinColumn } from "typeorm";
 import { IsPositive } from "class-validator";
+import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Item } from "./Item";
 
 @Entity()
@@ -8,13 +8,13 @@ export class Inventory {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToOne(type => Item)
+  @OneToOne((type) => Item)
   @JoinColumn()
   item: Item;
 
   @Column()
   @IsPositive()
-  qty: number
+  qty: number;
 
   @Column()
   @CreateDateColumn()

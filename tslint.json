@@ -1,9 +1,21 @@
 {
-    "defaultSeverity": "error",
-    "extends": [
-        "tslint:recommended"
-    ],
-    "jsRules": {},
-    "rules": {},
-    "rulesDirectory": []
+  "defaultSeverity": "error",
+  "extends": [
+    "tslint:recommended"
+  ],
+  "jsRules": {},
+  "rules": {
+    "member-access": false,
+    "max-classes-per-file": [
+      true,
+      5
+    ]
+  },
+  "rulesDirectory": [],
+  "linterOptions": {
+    "exclude": [
+      "src/controller/*.ts",
+      "src/*.ts"
+    ]
+  }
 }

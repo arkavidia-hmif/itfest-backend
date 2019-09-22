@@ -1,10 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, UpdateDateColumn, CreateDateColumn, Unique, JoinColumn, OneToOne, PrimaryColumn } from "typeorm";
-import { IsEmail, IsAlphanumeric } from "class-validator";
+import { IsAlphanumeric, IsEmail } from "class-validator";
+import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 export enum UserRole {
   ADMIN = "admin",
   TENANT = "tenant",
-  VISITOR = "visitor"
+  VISITOR = "visitor",
 }
 
 @Entity()
@@ -13,8 +13,8 @@ export class User {
   id: number;
 
   @Column({
+    nullable: true,
     unique: true,
-    nullable: true
   })
   @IsEmail()
   email: string;
@@ -29,19 +29,19 @@ export class User {
   name: string;
 
   @Column({
-    type: "enum",
+    default: UserRole.VISITOR,
     enum: UserRole,
-    default: UserRole.VISITOR
+    type: "enum",
   })
   type: UserRole;
 
   @Column({
-    nullable: true
+    nullable: true,
   })
-  salt: string
+  salt: string;
 
   @Column({
-    nullable: true
+    nullable: true,
   })
   password: string;
 
@@ -55,22 +55,22 @@ export class User {
 }
 @Entity()
 export class Customer {
-  @OneToOne(type => User, { primary: true })
-  @JoinColumn({ name: 'userId' })
+  @OneToOne((type) => User, { primary: true })
+  @JoinColumn({ name: "userId" })
   userId: User;
 
   @Column()
-  point: Number;
+  point: number;
 }
 
 @Entity()
 export class Tenant {
-  @OneToOne(type => User, { primary: true })
-  @JoinColumn({ name: 'userId' })
+  @OneToOne((type) => User, { primary: true })
+  @JoinColumn({ name: "userId" })
   userId: User;
 
   @Column()
-  point: Number;
+  point: number;
 
   @Column()
   emailVerified: boolean;
