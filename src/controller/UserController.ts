@@ -25,7 +25,39 @@ export class UserController {
     });
   }
 
-  async login(request: Request, response: Response, next: NextFunction) {
+  async getUser(request: Request, response: Response) {
+    const user = await this.userRepository.findOne(request.params.id)
+    if (user) {
+      return response.json({
+        status: 200,
+        code: "ok",
+        data: user
+      });
+    } else {
+      return response.status(404).json({
+        status: 404,
+        code: "user-not-found"
+      });
+    }
+  }
+
+  async getMe(request: Request, response: Response) {
+    const user = await this.userRepository.findOne(response.locals.auth.id)
+    if (user) {
+      return response.json({
+        status: 200,
+        code: "ok",
+        data: user
+      });
+    } else {
+      return response.status(404).json({
+        status: 404,
+        code: "user-not-found"
+      });
+    }
+  }
+
+  async login(request: Request, response: Response) {
     const { username, email, password } = request.body;
 
     const userByUsername = await this.userRepository.findOne({
@@ -47,6 +79,7 @@ export class UserController {
 
     if (bcrypt.compareSync(password, user.password)) {
       const token = jwt.sign({
+        id: user.id,
         username: user.username,
         email: user.email,
         role: user.role,
