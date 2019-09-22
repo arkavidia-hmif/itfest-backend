@@ -5,6 +5,7 @@
   ],
   "jsRules": {},
   "rules": {
+    "object-literal-sort-keys": false,
     "member-access": false,
     "max-classes-per-file": [
       true,

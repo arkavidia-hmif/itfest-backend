@@ -2,6 +2,7 @@ import { getRepository } from "typeorm";
 import { NextFunction, Request, Response } from "express";
 import { User, UserRole } from "../entity/User";
 import * as  bcrypt from "bcrypt";
+import * as jwt from "jsonwebtoken";
 
 import config from "../config";
 
@@ -25,7 +26,7 @@ export class UserController {
   }
 
   async login(request: Request, response: Response, next: NextFunction) {
-    const { username, email, password, pin } = request.body;
+    const { username, email, password } = request.body;
 
     const userByUsername = await this.userRepository.findOne({
       username
@@ -45,11 +46,16 @@ export class UserController {
     }
 
     if (bcrypt.compareSync(password, user.password)) {
+      const token = jwt.sign({
+        username: user.username,
+        email: user.email,
+        role: user.role,
+      }, config.jwt.secret)
       return response.status(200).json({
         status: 200,
         code: "ok",
         data: {
-          jwt: ""
+          jwt: token
         }
       });
     } else {
