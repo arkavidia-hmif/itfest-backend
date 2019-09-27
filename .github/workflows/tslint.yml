@@ -1,4 +1,4 @@
-name: Perform TSLint Checks
+name: Perform Lint
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    name: TSLint on ${{ matrix.node-version }}
+    name: TSLint on Node ${{ matrix.node-version }}
     runs-on: ubuntu-latest
 
     strategy:
