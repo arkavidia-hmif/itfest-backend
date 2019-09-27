@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { UserController } from "../controller/UserController";
+import { UserRole } from "../entity/User";
 import { checkJWT } from "../middleware/checkJWT";
 import { limitAccess } from "../middleware/limitAccess";
-import { UserRole } from "../entity/User";
 
 export default () => {
   const router = Router();
@@ -11,7 +11,7 @@ export default () => {
 
   router.post("/login", uc.login.bind(uc));
 
-  router.use("/user", checkJWT)
+  router.use("/user", checkJWT);
   router.get("/user/me", uc.getMe.bind(uc));
   router.get("/user/:id", limitAccess([UserRole.ADMIN]), uc.getUser.bind(uc));
 
@@ -27,7 +27,6 @@ export default () => {
       code: "access-allowed",
     });
   });
-
 
   return router;
 };
