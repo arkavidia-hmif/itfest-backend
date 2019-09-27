@@ -43,5 +43,5 @@ if (argc > 2) {
       break;
   }
 } else {
-  console.log('Invalid param');
+  console.log('Invalid param, run help for avaiable commands');
 }

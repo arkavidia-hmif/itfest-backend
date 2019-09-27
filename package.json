@@ -26,6 +26,7 @@
   },
   "scripts": {
     "start": "ts-node src/index.ts",
-    "lint": "tslint -c tslint.json 'src/**/*.ts'"
+    "lint": "tslint -c tslint.json 'src/**/*.ts'",
+    "manage": "ts-node src/manage.ts"
   }
 }
