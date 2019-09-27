@@ -2,7 +2,7 @@ import { getRepository } from "typeorm";
 import { NextFunction, Request, Response } from "express";
 import { Inventory } from "../entity/Inventory";
 
-export class UserController {
+export class InventoryController {
 
   private Inventory = getRepository(Inventory);
 
