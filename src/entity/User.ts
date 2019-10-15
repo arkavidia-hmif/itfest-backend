@@ -54,7 +54,7 @@ export class User {
   updatedAt: Date;
 }
 @Entity()
-export class Customer {
+export class Visitor {
   @OneToOne((type) => User, { primary: true })
   @JoinColumn({ name: "userId" })
   userId: User;
