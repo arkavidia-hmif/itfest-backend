@@ -4,7 +4,8 @@ import config from "../config";
 
 export function checkJWT(request: Request, response: Response, next: NextFunction) {
   const authHeader = request.headers.authorization;
-  if (!authHeader.startsWith("Bearer")) {
+
+  if (!authHeader || !authHeader.startsWith("Bearer")) {
     return response.status(400).json({
       status: 400,
       code: "no-bearer",
