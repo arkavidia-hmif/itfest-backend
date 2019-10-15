@@ -1,6 +1,6 @@
 import { IsPositive } from "class-validator";
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { Visitor, Tenant } from "./User";
+import { Tenant, Visitor } from "./User";
 
 @Entity()
 export class Feedback {

@@ -4,6 +4,6 @@ export function responseGenerator(response: Response, status: number, code: stri
   return response.status(status).json({
     status,
     code,
-    data
+    data,
   });
 }

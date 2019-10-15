@@ -1,7 +1,7 @@
 import { IsPositive } from "class-validator";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, Tree, RelationId } from "typeorm";
-import { User } from "./User";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, RelationId } from "typeorm";
 import { Item } from "./Item";
+import { User } from "./User";
 
 @Entity()
 export class Transaction {

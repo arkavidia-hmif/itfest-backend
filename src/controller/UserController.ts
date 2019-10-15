@@ -1,10 +1,12 @@
-import { getRepository } from "typeorm";
-import { NextFunction, Request, Response } from "express";
-import { User, UserRole, Visitor, Tenant } from "../entity/User";
 import * as  bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
 
+import { NextFunction, Request, Response } from "express";
+import { Tenant, User, UserRole, Visitor } from "../entity/User";
+
+import { TransactionController } from "./TransactionController";
 import config from "../config";
+import { getRepository } from "typeorm";
 import { responseGenerator } from "../utils/responseGenerator";
 
 export class UserController {
@@ -12,6 +14,7 @@ export class UserController {
   private userRepository = getRepository(User);
   private visitorRepository = getRepository(Visitor);
   private tenantRepository = getRepository(Tenant);
+  private tc = new TransactionController();
 
   async createUser(name: string, username: string, email: string, role: UserRole, password: string) {
     const salt = bcrypt.genSaltSync(config.password.saltRounds);
@@ -31,7 +34,6 @@ export class UserController {
   async getUser(request: Request, response: Response) {
     const user = await this.userRepository.findOne(request.params.id);
 
-
     if (user) {
       let additionalData = {};
       if (user.role === UserRole.VISITOR) {
@@ -50,6 +52,27 @@ export class UserController {
     request.params.id = response.locals.auth.id;
     return this.getUser(request, response);
   }
+
+  async getTransaction(request: Request, response: Response) {
+    const userId = request.params.id;
+    const page = parseInt(request.query.page, 10) || 1;
+    const itemPerPage = parseInt(request.query.itemPerPage, 10) || 10;
+
+    const [transactions, total] = await this.tc.getTransaction([{ from: userId }, { to: userId }])
+
+    return responseGenerator(response, 200, "ok", {
+      array: transactions,
+      page,
+      itemPerPage,
+      total
+    });
+  }
+
+  async getMeTransaction(request: Request, response: Response) {
+    request.params.id = response.locals.auth.id;
+    return this.getTransaction(request, response);
+  }
+
 
   async login(request: Request, response: Response) {
     const { username, email, password } = request.body;

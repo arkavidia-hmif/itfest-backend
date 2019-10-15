@@ -1,8 +1,8 @@
 import { Router } from "express";
+import { TransactionController } from "../controller/TransactionController";
 import { UserRole } from "../entity/User";
 import { checkJWT } from "../middleware/checkJWT";
 import { limitAccess } from "../middleware/limitAccess";
-import { TransactionController } from "../controller/TransactionController";
 
 export default () => {
   const router = Router();
