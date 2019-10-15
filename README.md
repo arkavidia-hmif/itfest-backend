@@ -8,3 +8,6 @@ Steps to run this project:
 
 Some admin setting will be provided at
 `npm run manage`
+
+## API Doc
+[Postman documenter](https://documenter.getpostman.com/view/8029552/SVtYR6LZ?version=latest)
