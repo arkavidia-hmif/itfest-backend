@@ -1,15 +1,13 @@
 import { NextFunction, Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
 import config from "../config";
+import { responseGenerator } from "../utils/responseGenerator";
 
 export function checkJWT(request: Request, response: Response, next: NextFunction) {
   const authHeader = request.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer")) {
-    return response.status(400).json({
-      status: 400,
-      code: "no-bearer",
-    });
+    return responseGenerator(response, 400, "no-bearer");
   }
 
   const token = authHeader.substr(7);
@@ -20,15 +18,9 @@ export function checkJWT(request: Request, response: Response, next: NextFunctio
     return next();
   } catch (error) {
     if (error instanceof jwt.JsonWebTokenError) {
-      return response.status(401).json({
-        status: 401,
-        code: "invalid-jwt",
-      });
+      return responseGenerator(response, 401, "invalid-jwt");
     }
   }
 
-  return response.status(401).json({
-    status: 401,
-    code: "invalid-auth",
-  });
+  return responseGenerator(response, 401, "invalid-auth");
 }

@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { UserRole } from "../entity/User";
+import { responseGenerator } from "../utils/responseGenerator";
 
 export function limitAccess(allowedRole: UserRole[]) {
 
@@ -9,10 +10,7 @@ export function limitAccess(allowedRole: UserRole[]) {
     if (allowedRole.includes(auth.role)) {
       return next();
     } else {
-      return response.status(403).json({
-        status: 403,
-        code: "forbidden",
-      });
+      return responseGenerator(response, 403, "forbidden");
     }
   };
 }

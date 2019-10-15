@@ -65,10 +65,7 @@ export class UserController {
     const user = userByEmail || userByUsername;
 
     if (!user) {
-      return response.status(404).json({
-        status: 404,
-        code: "user-not-found"
-      });
+      return responseGenerator(response, 404, "user-not-found");
     }
 
     if (bcrypt.compareSync(password, user.password)) {
@@ -78,18 +75,12 @@ export class UserController {
         email: user.email,
         role: user.role,
       }, config.jwt.secret)
-      return response.status(200).json({
-        status: 200,
-        code: "ok",
-        data: {
-          jwt: token
-        }
+
+      return responseGenerator(response, 200, "ok", {
+        jwt: token
       });
     } else {
-      return response.status(401).json({
-        status: 401,
-        code: "invalid-auth"
-      });
+      return responseGenerator(response, 401, "invalid-auth");
     }
   }
 
