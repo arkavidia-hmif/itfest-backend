@@ -37,11 +37,13 @@ export class User {
 
   @Column({
     nullable: true,
+    select: false
   })
   salt: string;
 
   @Column({
     nullable: true,
+    select: false
   })
   password: string;
 
