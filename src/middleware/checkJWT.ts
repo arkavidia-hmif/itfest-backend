@@ -7,7 +7,7 @@ export function checkJWT(request: Request, response: Response, next: NextFunctio
   const authHeader = request.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer")) {
-    return responseGenerator(response, 400, "no-bearer");
+    return responseGenerator(response, 401, "no-bearer");
   }
 
   const token = authHeader.substr(7);

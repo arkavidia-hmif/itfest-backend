@@ -42,7 +42,7 @@ export class UserController {
         additionalData = await this.tenantRepository.findOne(user.id);
       }
 
-      return responseGenerator(response, 200, "OK", { ...user, ...additionalData });
+      return responseGenerator(response, 200, "ok", { ...user, ...additionalData });
     } else {
       return responseGenerator(response, 404, "user-not-found");
     }
@@ -58,13 +58,13 @@ export class UserController {
     const page = parseInt(request.query.page, 10) || 1;
     const itemPerPage = parseInt(request.query.itemPerPage, 10) || 10;
 
-    const [transactions, total] = await this.tc.getTransaction([{ from: userId }, { to: userId }])
+    const [transactions, totalItem] = await this.tc.getTransaction([{ from: userId }, { to: userId }])
 
     return responseGenerator(response, 200, "ok", {
       array: transactions,
       page,
       itemPerPage,
-      total
+      totalItem
     });
   }
 
