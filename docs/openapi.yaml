@@ -1,0 +1,486 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: 'Backend IT-Fest'
+  description: 'Ini adalah dokumentasi backend untuk acara IT Festival Arkavidia 6.0'
+servers:
+  - url: http://localhost:3000
+tags: 
+  - name: user
+    description: 'Everything about user'
+  - name: auth
+    description: 'Everything about authentication'
+security: 
+  - bearerAuth: []
+paths:
+  /user/me:
+    get:
+      tags: 
+        - user
+      summary: 'Get profile of self'
+      responses:
+        '200':
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/UserData'
+              example: 
+                status: 200
+                code: 'ok'
+                data:
+                  id: 15
+                  email: null
+                  username: 'admin'
+                  name: 'Joshua'
+                  role: 'admin'
+                  createdAt: '2019-09-22T10:53:44.199Z'
+                  updatedAt: '2019-09-22T10:53:44.199Z'
+        '401':
+          $ref: '#/components/responses/InvalidBearer'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /user/me/transaction:
+    get:
+      tags: 
+        - user
+      summary: 'Get list of transaction of self'
+      responses:
+        '200':
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response'
+                  - properties:
+                      data:
+                        allOf:
+                          - properties:
+                              array:
+                                type: array
+                                items:
+                                  $ref: '#/components/schemas/TransactionData'
+                          - $ref: '#/components/schemas/Pagination'
+                        
+              example: 
+                status: 200
+                code: 'ok'
+                data:
+                  array:
+                    - id: 1
+                      amount: 123121
+                      transfer: true
+                      fromId: 15
+                      toId: 19
+                    - id: 2
+                      amount: 123
+                      transfer: false
+                      fromId: 15
+                      toId: 19
+                      itemId: 1
+                  page: 1
+                  itemPerPage: 10
+                  totalItem: 2
+        '401':
+          $ref: '#/components/responses/InvalidBearer'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /user/me/qrid:
+    get:
+      tags:
+        - user
+      summary: 'Get id for qr code generation'
+      responses:
+        '200':
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response'
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          qrid:
+                            type: string
+              example: 
+                status: 200
+                code: 'ok'
+                data:
+                  qrid: ''
+  /user/{id}:
+    get:
+      tags:
+        - user
+      summary: 'Get user profile of specified id'
+      description: |
+        **Only allowed for admin**
+      parameters:
+        - name: id
+          in: path
+          description: 'ID of user to get'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response'
+                  - properties:
+                      data:
+                        $ref: '#/components/schemas/UserData'
+              example: 
+                status: 200
+                code: 'ok'
+                data:
+                  id: 15
+                  email: null
+                  username: 'admin'
+                  name: 'Joshua'
+                  role: 'admin'
+                  createdAt: '2019-09-22T10:53:44.199Z'
+                  updatedAt: '2019-09-22T10:53:44.199Z'
+        '401':
+          $ref: '#/components/responses/InvalidBearer'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /user/{id}/transaction:
+    get:
+      tags:
+        - user
+      summary: 'Get list of transaction of user with specified id'
+      description: |
+        **Only allowed for admin**
+      parameters:
+        - name: id
+          in: path
+          description: 'ID of user to get'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response'
+                  - properties:
+                      data:
+                        allOf:
+                          - properties:
+                              array:
+                                type: array
+                                items:
+                                  $ref: '#/components/schemas/TransactionData'
+                          - $ref: '#/components/schemas/Pagination'
+                        
+              example: 
+                status: 200
+                code: 'ok'
+                data:
+                  array:
+                    - id: 1
+                      amount: 123121
+                      transfer: true
+                      fromId: 15
+                      toId: 19
+                    - id: 2
+                      amount: 123
+                      transfer: false
+                      fromId: 15
+                      toId: 19
+                      itemId: 1
+                  page: 1
+                  itemPerPage: 10
+                  totalItem: 2
+        '401':
+          $ref: '#/components/responses/InvalidBearer'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /user/{qrid}/give:
+    post:
+      tags:
+        - user
+      summary: 'Transfer point to user with specified id'
+      parameters:
+        - name: qrid
+          in: path
+          description: 'QRid of user to give'
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: 'Amount to be transfered'
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: integer
+            example: 
+              amount: 100
+      responses:
+        '200':
+          $ref: '#/components/responses/OK'
+        '404':
+          description: 'User not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+              example: 
+                status: 404
+                code: 'user-not-found'
+        '400':
+          description: 'Bad request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+              examples:
+                'Not enough point':
+                  value:
+                    status: 400
+                    code: 'not-enough-point'
+                'Transfer to same user':
+                  value:
+                    status: 400
+                    code: 'same-user-transfer'
+        '401':
+          $ref: '#/components/responses/InvalidBearer'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /login:
+    post:
+      security: []
+      tags:
+        - auth
+      requestBody:
+        description: |
+          User credential
+          
+          Email and username field are interchangeable
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  nullable: true
+                  type: string
+                username:
+                  nullable: true
+                  type: string
+                password:
+                  type: string
+            examples:
+              'With email':
+                value:
+                  email: 'admin@email.com'
+                  password: 'password1234'
+              'With username':
+                value:
+                  username: 'admin'
+                  password: 'password1234'
+      responses:
+        '200':
+          $ref: '#/components/responses/OKAuth'
+        '401':
+          description: 'Invalid credential'
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+              example: 
+                status: 401
+                code: 'invalid-auth'
+        '404':
+          description: 'User not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+              example: 
+                status: 404
+                code: 'user-not-found'
+                
+  /activate:
+    post:
+      security: []
+      description: 'Activate (register) an user'
+      tags:
+        - auth
+      requestBody:
+        description: 'Activation information'
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+                voucher:
+                  type: string
+            example: 
+              email: 'visitor@email.com'
+              password: 'password1234'
+              voucher: 'abc123'
+      responses:
+        '200':
+          $ref: '#/components/responses/OKAuth'
+        '400':
+          description: 'Bad request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+              examples:
+                'Invalid voucher':
+                  value:
+                    status: 400
+                    code: 'invalid-voucher'
+                'Invalid email':
+                  value:
+                    status: 400
+                    code: 'invalid-email'
+                'Invalid password':
+                  value:
+                    status: 400
+                    code: 'invalid-password'              
+components:
+  schemas:
+    Response:
+      type: object
+      properties:
+        status:
+          type: integer
+        code:
+          type: string
+    UserData:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          nullable: true
+          type: string
+          format: email
+        username:
+          type: string
+        name: 
+          type: string
+        role:
+          type: string
+          enum: [admin, tenant, visitor]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    TransactionData:
+      type: object
+      properties:
+        id:
+          type: integer
+        amount:
+          type: integer
+        transfer:
+          type: boolean
+          description: 'Is transaction a transfer or buy'
+        fromId:
+          type: integer
+        toId:
+          type: integer
+        itemId:
+          type: integer
+          description: 'Null on transfer transaction'
+          nullable: true
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        itemPerPage:
+          type: integer
+        totalItem:
+          type: integer
+  responses:
+    OKAuth:
+      description: 'Success'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Response'
+              - properties:
+                  data:
+                    type: object
+                    properties:
+                      jwt:
+                        type: string
+          example: 
+            status: 200
+            code: 'ok'
+            data:
+              jwt: 'a jwt token'
+    OK:
+      description: 'Success'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Response'
+          example: 
+            status: 200
+            code: 'ok'
+        
+    InvalidBearer:
+      description: 'JWT token is missing or invalid'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Response'
+          examples:
+            invalid:
+              value:
+                status: 401
+                code: 'invalid-jwt'
+            missing:
+              value:
+                status: 401
+                code: 'no-bearer'
+            
+    Forbidden:
+      description: "User doesn't have enough permission"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Response'
+          example: 
+            status: 403
+            code: 'forbidden'
+          
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT 
+          
+          
