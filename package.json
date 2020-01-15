@@ -17,6 +17,7 @@
     "class-validator": "^0.10.0",
     "cors": "^2.8.5",
     "express": "^4.15.4",
+    "express-validator": "^6.2.0",
     "jsonwebtoken": "^8.5.1",
     "mysql2": "^1.7.0",
     "readline-sync": "^1.4.10",
