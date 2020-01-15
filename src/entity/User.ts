@@ -7,6 +7,11 @@ export enum UserRole {
   VISITOR = "visitor",
 }
 
+export enum Gender {
+  FEMALE = 0,
+  MALE = 1
+}
+
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
@@ -60,6 +65,15 @@ export class Visitor {
   @OneToOne((type) => User, { primary: true })
   @JoinColumn({ name: "userId" })
   userId: User;
+
+  @Column()
+  dob: Date;
+
+  @Column()
+  gender: Gender;
+
+  @Column("simple-array")
+  interest: string[];
 
   @Column()
   point: number;
