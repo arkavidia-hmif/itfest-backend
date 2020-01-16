@@ -8,8 +8,8 @@ export enum UserRole {
 }
 
 export enum Gender {
-  FEMALE = 0,
-  MALE = 1
+  MALE = 1,
+  FEMALE = 2
 }
 
 @Entity()
