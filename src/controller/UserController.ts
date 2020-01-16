@@ -130,14 +130,23 @@ export class UserController {
 
     const encryptedHash = bcrypt.hashSync(password, salt);
 
-    await this.userRepository.save({
-      role: UserRole.VISITOR,
-      salt,
-      password: encryptedHash,
-      username,
-      name,
-      ...request.body
-    });
+    try {
+      await this.userRepository.save({
+        role: UserRole.VISITOR,
+        salt,
+        password: encryptedHash,
+        username,
+        name,
+        ...request.body
+      });
+    } catch (err) {
+      if (err.code === 'ER_DUP_ENTRY') {
+        return responseGenerator(response, 400, "user-exists");
+      } else {
+        console.error(err);
+        return responseGenerator(response, 500, "unknown-error");
+      }
+    }
 
     return responseGenerator(response, 200, "ok");
   }
