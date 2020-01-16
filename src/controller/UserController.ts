@@ -79,11 +79,11 @@ export class UserController {
 
     const userByUsername = await this.userRepository.findOne({
       username
-    });
+    }, { select: ["id", "username", "email", "role", "password"] });
 
     const userByEmail = await this.userRepository.findOne({
       email
-    });
+    }, { select: ["id", "username", "email", "role", "password"] });
 
     const user = userByEmail || userByUsername;
 
@@ -109,5 +109,36 @@ export class UserController {
 
   async register(request: Request, response: Response) {
 
+  }
+
+  async registerVisitor(request: Request, response: Response) {
+    const password: string = request.body.password;
+    const email: string = request.body.email;
+    const username: string = email.substring(0, email.indexOf('@'));
+
+    delete request.body.password;
+
+    let name = request.body.name;
+
+    if (!name) {
+      name = email;
+    } else {
+      delete request.body.name;
+    }
+
+    const salt = bcrypt.genSaltSync(config.password.saltRounds);
+
+    const encryptedHash = bcrypt.hashSync(password, salt);
+
+    await this.userRepository.save({
+      role: UserRole.VISITOR,
+      salt,
+      password: encryptedHash,
+      username,
+      name,
+      ...request.body
+    });
+
+    return responseGenerator(response, 200, "ok");
   }
 }
