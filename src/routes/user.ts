@@ -15,6 +15,10 @@ export default () => {
   const tc = new TransactionController();
 
   const emailCheck = check("email").isEmail().withMessage("must be a valid email address");
+  const nameCheck = check("name").isAlpha().withMessage("must only contain letter");
+  const genderCheck = check("gender").isInt({ "min": 1, "max": 2 }).withMessage("must be a valid gender (1=male, 2=female)");
+  const interestCheck = check("interest").isArray().withMessage("must be an array");
+  const dobCheck = check("dob").isISO8601().withMessage("must be a valid ISO8601 date");
 
   // Public user endpoint
   router.post("/login", [
@@ -37,30 +41,36 @@ export default () => {
     check("voucher")
       .isAlphanumeric().withMessage("must be alphanumeric")
       .isLength({ "min": 6, "max": 6 }).withMessage("must be 6 characters long"),
-    check("name")
-      .optional()
-      .isAlpha().withMessage("must only contain letter"),
-    check("gender")
-      .optional()
-      .isInt({ "min": 1, "max": 2 }).withMessage("must be a valid gender (1=male, 2=female)"),
-    check("interest")
-      .optional()
-      .isArray().withMessage("must be an array"),
-    check("dob")
-      .optional()
-      .isISO8601().withMessage("must be a valid ISO8601 date"),
+    nameCheck.optional(),
+    genderCheck.optional(),
+    interestCheck.optional(),
+    dobCheck.optional(),
     paramCheck
   ], uc.registerVisitor.bind(uc));
 
   // User endpoint
   router.use("/user", checkJWT);
   router.get("/user/me", uc.getMe.bind(uc));
-  router.put("/user/me", uc.editUser.bind(uc));
+  router.put("/user/me", [
+    emailCheck.optional(),
+    nameCheck.optional(),
+    dobCheck.optional(),
+    genderCheck.optional(),
+    interestCheck.optional(),
+    paramCheck
+  ], uc.editUserMe.bind(uc));
   router.get("/user/me/transaction", uc.getMeTransaction.bind(uc));
 
   router.use("/user/:id([0-9]+)", limitAccess([UserRole.ADMIN]));
   router.get("/user/:id([0-9]+)", uc.getUser.bind(uc));
-  router.put("/user/:id([0-9]+)", uc.editUser.bind(uc));
+  router.put("/user/:id([0-9]+)", [
+    emailCheck.optional(),
+    nameCheck.optional(),
+    dobCheck.optional(),
+    genderCheck.optional(),
+    interestCheck.optional(),
+    paramCheck
+  ], uc.editUser.bind(uc));
   router.get("/user/:id([0-9]+)/transaction", [
     ...paginationCheck,
     paramCheck

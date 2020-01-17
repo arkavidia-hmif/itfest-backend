@@ -150,4 +150,21 @@ export class UserController {
 
     return responseGenerator(response, 200, "ok");
   }
+
+  async editUserMe(request: Request, response: Response) {
+    request.params.id = response.locals.auth.id;
+    return this.editUser(request, response);
+  }
+
+  async editUser(request: Request, response: Response) {
+
+    try {
+      await this.userRepository.update(request.params.id, { ...request.body });
+    } catch (err) {
+      console.error(err);
+      return responseGenerator(response, 500, "unknown-error");
+    }
+
+    return responseGenerator(response, 200, "ok");
+  }
 }
