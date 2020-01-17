@@ -14,10 +14,12 @@ export default () => {
   const uc = new UserController();
   const tc = new TransactionController();
 
+  const emailCheck = check("email").isEmail().withMessage("must be a valid email address");
+
+  // Public user endpoint
   router.post("/login", [
     oneOf([
-      check("email")
-        .isEmail().withMessage("must be a valid email address"),
+      emailCheck,
       check("username")
         .isAlphanumeric().withMessage("must be an alphanumeric sequence")
     ]),
@@ -27,8 +29,7 @@ export default () => {
   ], uc.login.bind(uc));
 
   router.post("/activate", [
-    check("email")
-      .isEmail().withMessage("must be a valid email address"),
+    emailCheck,
     check("password")
       .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{0,}$/, "i")
       .withMessage("must include one lowercase character, one uppercase character, a number, and a special character")
@@ -51,12 +52,16 @@ export default () => {
     paramCheck
   ], uc.registerVisitor.bind(uc));
 
+  // User endpoint
   router.use("/user", checkJWT);
   router.get("/user/me", uc.getMe.bind(uc));
+  router.put("/user/me", uc.editUser.bind(uc));
   router.get("/user/me/transaction", uc.getMeTransaction.bind(uc));
-  router.get("/user/:id([0-9]+)", limitAccess([UserRole.ADMIN]), uc.getUser.bind(uc));
+
+  router.use("/user/:id([0-9]+)", limitAccess([UserRole.ADMIN]));
+  router.get("/user/:id([0-9]+)", uc.getUser.bind(uc));
+  router.put("/user/:id([0-9]+)", uc.editUser.bind(uc));
   router.get("/user/:id([0-9]+)/transaction", [
-    limitAccess([UserRole.ADMIN]),
     ...paginationCheck,
     paramCheck
   ], uc.getTransaction.bind(uc));
@@ -66,6 +71,10 @@ export default () => {
     paramCheck
   ], tc.give.bind(tc));
 
+
+
+
+  // Testing route
   router.get("/test-jwt", [checkJWT], (req, res) => {
     res.json({
       status: 200,
