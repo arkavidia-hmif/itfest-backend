@@ -9,7 +9,7 @@ export enum UserRole {
 
 export enum Gender {
   MALE = 1,
-  FEMALE = 2
+  FEMALE = 2,
 }
 
 @Entity()
@@ -42,13 +42,13 @@ export class User {
 
   @Column({
     nullable: true,
-    select: false
+    select: false,
   })
   salt: string;
 
   @Column({
     nullable: true,
-    select: false
+    select: false,
   })
   password: string;
 

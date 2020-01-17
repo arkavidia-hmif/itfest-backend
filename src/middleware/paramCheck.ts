@@ -11,8 +11,8 @@ export function paramCheck(request: Request, response: Response, next: NextFunct
 
     const errorResult = errorArray.map((data) => {
       return {
-        "part": data.param,
-        "message": data.msg
+        part: data.param,
+        message: data.msg,
       };
     });
 
