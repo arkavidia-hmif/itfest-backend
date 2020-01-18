@@ -8,6 +8,7 @@
     "@types/jsonwebtoken": "^8.3.3",
     "@types/node": "^12.7.4",
     "@types/readline-sync": "^1.4.3",
+    "@types/socket.io": "^2.1.4",
     "ts-node": "3.3.0",
     "ts-node-dev": "^1.0.0-pre.44",
     "tslint": "^5.19.0",
@@ -29,7 +30,7 @@
   },
   "scripts": {
     "start": "ts-node src/index.ts",
-    "watch": "ts-node-dev src/index.ts",
+    "watch": "ts-node-dev --no-notify src/index.ts",
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
     "manage": "ts-node src/manage.ts"
   }
