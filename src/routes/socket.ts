@@ -16,7 +16,7 @@ export default (server: Server) => {
     }
 
     try {
-      jwt.verify(token, config.jwt.secret);
+      jwt.verify(token, config.secret);
       return next();
     } catch (error) {
       if (error instanceof jwt.JsonWebTokenError) {

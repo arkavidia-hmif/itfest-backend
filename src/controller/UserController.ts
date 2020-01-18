@@ -1,13 +1,13 @@
-import * as  bcrypt from "bcrypt";
-import * as jwt from "jsonwebtoken";
-
+import * as bcrypt from "bcrypt";
 import { Request, Response } from "express";
-import { Tenant, User, UserRole, Visitor } from "../entity/User";
-
-import { TransactionController } from "./TransactionController";
-import config from "../config";
+import * as jwt from "jsonwebtoken";
 import { getRepository } from "typeorm";
+
+import config from "../config";
+import { Tenant, User, UserRole, Visitor } from "../entity/User";
+import { decodeQr, generateQr } from "../utils/qr";
 import { responseGenerator } from "../utils/responseGenerator";
+import { TransactionController } from "./TransactionController";
 
 export class UserController {
 
@@ -97,7 +97,7 @@ export class UserController {
         username: user.username,
         email: user.email,
         role: user.role,
-      }, config.jwt.secret)
+      }, config.secret)
 
       return responseGenerator(response, 200, "ok", {
         jwt: token

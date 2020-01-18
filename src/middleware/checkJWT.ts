@@ -13,7 +13,7 @@ export function checkJWT(request: Request, response: Response, next: NextFunctio
   const token = authHeader.substr(7);
 
   try {
-    const payload = jwt.verify(token, config.jwt.secret);
+    const payload = jwt.verify(token, config.secret);
     response.locals.auth = payload;
     return next();
   } catch (error) {
