@@ -67,8 +67,6 @@ export class InventoryController {
   async getItem(request: Request, response: Response) {
     const id = request.params.id;
 
-    console.log(request.params);
-
     const item = await this.itemRepository.findOne(id);
 
     if (item) {
@@ -76,6 +74,40 @@ export class InventoryController {
     } else {
       return responseGenerator(response, 404, "item-not-found");
     }
+  }
+
+  async editItem(request: Request, response: Response) {
+    const id = request.params.id;
+    const { name, price, qty } = request.body;
+
+    const item = await this.itemRepository.findOne(id);
+
+    if (!item) {
+      return responseGenerator(response, 404, "item-not-found");
+    }
+
+    const inventory = await this.inventoryRepository.findOne({ item: item })
+
+    try {
+      if (qty) {
+        await this.inventoryRepository.update(inventory.id, {
+          qty
+        });
+      }
+
+      if (name || price) {
+        await this.itemRepository.update(item.id, {
+          name,
+          price
+        })
+      }
+    } catch (error) {
+      console.error(error);
+      return responseGenerator(response, 500, "unknown-error");
+
+    }
+
+    return responseGenerator(response, 200, "ok");
   }
 
 }

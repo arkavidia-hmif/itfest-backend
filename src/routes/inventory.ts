@@ -30,6 +30,13 @@ export default () => {
   ], ic.createItem.bind(ic));
 
   router.get("/item/:id([0-9]+)", ic.getItem.bind(ic));
+  router.put("/item/:id([0-9]+)", [
+    limitAccess([UserRole.ADMIN, UserRole.TENANT]),
+    nameCheck.optional(),
+    priceCheck.optional(),
+    qtyCheck.optional(),
+    checkParam,
+  ], ic.editItem.bind(ic));
 
   return router;
 };
