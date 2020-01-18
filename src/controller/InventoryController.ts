@@ -64,4 +64,18 @@ export class InventoryController {
 
   }
 
+  async getItem(request: Request, response: Response) {
+    const id = request.params.id;
+
+    console.log(request.params);
+
+    const item = await this.itemRepository.findOne(id);
+
+    if (item) {
+      return responseGenerator(response, 200, "ok", item);
+    } else {
+      return responseGenerator(response, 404, "item-not-found");
+    }
+  }
+
 }

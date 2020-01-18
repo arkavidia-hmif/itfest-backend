@@ -19,7 +19,7 @@ export default () => {
   const qtyCheck = check("qty").isInt({ min: 0 }).withMessage("must be >= 0");
 
   router.use(checkJWT);
-  router.get("/item", [limitAccess([UserRole.ADMIN]), ...paginationCheck, checkParam], ic.listItem.bind(ic));
+  router.get("/item", [...paginationCheck, checkParam], ic.listItem.bind(ic));
   router.post("/item", [
     limitAccess([UserRole.ADMIN]),
     nameCheck,
@@ -28,6 +28,8 @@ export default () => {
     qtyCheck,
     checkParam,
   ], ic.createItem.bind(ic));
+
+  router.get("/item/:id([0-9]+)", ic.getItem.bind(ic));
 
   return router;
 };
