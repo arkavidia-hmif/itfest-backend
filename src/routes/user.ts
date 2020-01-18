@@ -8,6 +8,7 @@ import { checkJWT } from "../middleware/checkJWT";
 import { checkParam } from "../middleware/checkParam";
 import { limitAccess } from "../middleware/limitAccess";
 import { paginationCheck } from "../middleware/paginationCheck";
+import { globalSocket } from "./socket";
 
 export default () => {
   const router = Router();
