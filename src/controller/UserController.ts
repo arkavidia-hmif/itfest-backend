@@ -1,7 +1,7 @@
 import * as  bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
 
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import { Tenant, User, UserRole, Visitor } from "../entity/User";
 
 import { TransactionController } from "./TransactionController";
