@@ -23,6 +23,7 @@
     "mysql2": "^1.7.0",
     "readline-sync": "^1.4.10",
     "reflect-metadata": "^0.1.13",
+    "socket.io": "^2.3.0",
     "sqlite3": "^4.0.3",
     "typeorm": "0.2.18"
   },
