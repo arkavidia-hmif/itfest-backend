@@ -68,9 +68,11 @@ export class InventoryController {
     const id = request.params.id;
 
     const item = await this.itemRepository.findOne(id);
+    const inventory = await this.inventoryRepository.findOne({ item }, { select: ["qty"] });
 
-    if (item) {
-      return responseGenerator(response, 200, "ok", item);
+    if (item && inventory) {
+      inventory.item = item;
+      return responseGenerator(response, 200, "ok", inventory);
     } else {
       return responseGenerator(response, 404, "item-not-found");
     }
