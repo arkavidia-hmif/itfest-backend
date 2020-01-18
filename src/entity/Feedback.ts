@@ -1,6 +1,8 @@
 import { IsPositive } from "class-validator";
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { Tenant, Visitor } from "./User";
+
+import { Game } from "./Game";
+import { Visitor } from "./User";
 
 @Entity()
 export class Feedback {
@@ -11,8 +13,8 @@ export class Feedback {
   @ManyToOne((type) => Visitor)
   from: Visitor;
 
-  @ManyToOne((type) => Tenant)
-  to: Tenant;
+  @ManyToOne((type) => Game)
+  to: Game;
 
   @Column()
   @IsPositive()
