@@ -110,4 +110,25 @@ export class InventoryController {
     return responseGenerator(response, 200, "ok");
   }
 
+  async deleteItem(request: Request, response: Response) {
+    const id = request.params.id;
+
+    const item = await this.itemRepository.findOne(id);
+
+    if (!item) {
+      return responseGenerator(response, 404, "item-not-found");
+    }
+
+    try {
+      await this.inventoryRepository.delete({ item });
+      await this.itemRepository.delete(item.id);
+    } catch (error) {
+      console.error(error);
+      return responseGenerator(response, 500, "unknown-error");
+    }
+
+    return responseGenerator(response, 200, "ok");
+  }
+
 }
+
