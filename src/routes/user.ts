@@ -5,9 +5,9 @@ import { TransactionController } from "../controller/TransactionController";
 import { UserController } from "../controller/UserController";
 import { UserRole } from "../entity/User";
 import { checkJWT } from "../middleware/checkJWT";
+import { checkParam } from "../middleware/checkParam";
 import { limitAccess } from "../middleware/limitAccess";
 import { paginationCheck } from "../middleware/paginationCheck";
-import { paramCheck } from "../middleware/paramCheck";
 
 export default () => {
   const router = Router();
@@ -32,7 +32,7 @@ export default () => {
     ]),
     check("password")
       .not().isEmpty().withMessage("must be provided"),
-    paramCheck,
+    checkParam,
   ], uc.login.bind(uc));
 
   router.post("/activate", [
@@ -48,7 +48,7 @@ export default () => {
     genderCheck.optional(),
     interestCheck.optional(),
     dobCheck.optional(),
-    paramCheck,
+    checkParam,
   ], uc.registerVisitor.bind(uc));
 
   // User endpoint
@@ -60,7 +60,7 @@ export default () => {
     dobCheck.optional(),
     genderCheck.optional(),
     interestCheck.optional(),
-    paramCheck,
+    checkParam,
   ], uc.editUserMe.bind(uc));
   router.get("/user/me/transaction", uc.getMeTransaction.bind(uc));
 
@@ -72,16 +72,16 @@ export default () => {
     dobCheck.optional(),
     genderCheck.optional(),
     interestCheck.optional(),
-    paramCheck,
+    checkParam,
   ], uc.editUser.bind(uc));
   router.get("/user/:id([0-9]+)/transaction", [
     ...paginationCheck,
-    paramCheck,
+    checkParam,
   ], uc.getTransaction.bind(uc));
 
   router.post("/user/:id([0-9]+)/give", [
     check("amount").isInt({ min: 0 }),
-    paramCheck,
+    checkParam,
   ], tc.give.bind(tc));
 
   // Testing route
