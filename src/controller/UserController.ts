@@ -1,4 +1,5 @@
 import * as bcrypt from "bcrypt";
+import * as crypto from "crypto";
 import { Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
 import { getRepository } from "typeorm";
@@ -107,7 +108,46 @@ export class UserController {
     }
   }
 
-  async register(request: Request, response: Response) {
+  async registerTenant(request: Request, response: Response) {
+    const { email, password } = request.body;
+    const username: string = email.substring(0, email.indexOf('@'));
+    const name = request.body.name || email;
+
+    delete request.body.password;
+
+    const salt = bcrypt.genSaltSync(config.password.saltRounds);
+
+    const encryptedHash = bcrypt.hashSync(password, salt);
+
+    const emailKey = crypto.randomBytes(48).toString("hex");
+
+    try {
+      const savedUser = await this.userRepository.save({
+        role: UserRole.TENANT,
+        salt,
+        password: encryptedHash,
+        username,
+        name,
+        email,
+      });
+
+      await this.tenantRepository.save({
+        userId: savedUser,
+        emailVerified: false,
+        emailKey,
+        point: config.tenantInitial
+      });
+    } catch (err) {
+      if (err.code === 'ER_DUP_ENTRY') {
+        return responseGenerator(response, 400, "user-exists");
+      } else {
+        console.error(err);
+        return responseGenerator(response, 500, "unknown-error");
+      }
+    }
+
+    return responseGenerator(response, 200, "ok");
+
 
   }
 
@@ -131,13 +171,18 @@ export class UserController {
     const encryptedHash = bcrypt.hashSync(password, salt);
 
     try {
-      await this.userRepository.save({
+      const savedUser = await this.userRepository.save({
         role: UserRole.VISITOR,
         salt,
         password: encryptedHash,
         username,
         name,
-        ...request.body
+        email,
+      });
+
+      await this.visitorRepository.save({
+        userId: savedUser,
+        ...request.body,
       });
     } catch (err) {
       if (err.code === 'ER_DUP_ENTRY') {

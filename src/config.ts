@@ -2,5 +2,6 @@ export default {
   password: {
     saltRounds: 10,
   },
-  secret: "secret-key"
+  secret: "secret-key",
+  tenantInitial: 10000
 };
