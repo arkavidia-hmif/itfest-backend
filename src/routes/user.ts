@@ -22,6 +22,10 @@ export default () => {
     .withMessage("must be a valid gender (1=male, 2=female)");
   const interestCheck = check("interest").isArray().withMessage("must be an array");
   const dobCheck = check("dob").isISO8601().withMessage("must be a valid ISO8601 date");
+  const passwordCheck = check("password")
+    .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{0,}$/, "i")
+    .withMessage("must include one lowercase character, one uppercase character, a number, and a special character")
+    .isLength({ min: 8 }).withMessage("must be at least 8 characters long");
 
   // Public user endpoint
   router.post("/login", [
@@ -35,12 +39,9 @@ export default () => {
     checkParam,
   ], uc.login.bind(uc));
 
-  router.post("/activate", [
+  router.post("/register/visitor", [
     emailCheck,
-    check("password")
-      .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{0,}$/, "i")
-      .withMessage("must include one lowercase character, one uppercase character, a number, and a special character")
-      .isLength({ min: 8 }).withMessage("must be at least 8 characters long"),
+    passwordCheck,
     check("voucher")
       .isAlphanumeric().withMessage("must be alphanumeric")
       .isLength({ min: 6, max: 6 }).withMessage("must be 6 characters long"),
@@ -50,6 +51,12 @@ export default () => {
     dobCheck.optional(),
     checkParam,
   ], uc.registerVisitor.bind(uc));
+
+  router.post("/register/tenant", [
+    emailCheck,
+    passwordCheck,
+    nameCheck.optional(),
+  ], uc.registerTenant.bind(uc));
 
   // User endpoint
   router.use("/user", checkJWT);
