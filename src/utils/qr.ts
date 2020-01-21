@@ -1,4 +1,3 @@
-import * as bcrypt from "bcrypt";
 import * as crypto from "crypto";
 
 import config from "../config";

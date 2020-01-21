@@ -9,6 +9,7 @@ import inventoryRoutes from "./routes/inventory";
 import socketRoutes from "./routes/socket";
 import transactionRoutes from "./routes/transaction";
 import userRoutes from "./routes/user";
+import tenantRoutes from "./routes/tenant";
 
 createConnection().then(async connection => {
 
@@ -18,6 +19,7 @@ createConnection().then(async connection => {
   app.use(userRoutes());
   app.use(transactionRoutes());
   app.use(inventoryRoutes());
+  app.use(tenantRoutes());
 
   const server = http.createServer(app);
 

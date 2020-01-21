@@ -1,23 +1,26 @@
 import { getRepository } from "typeorm";
 import { NextFunction, Request, Response } from "express";
 import { Item } from "../entity/Item";
-import { Tenant, User } from "../entity/User";
+import { Tenant, User, UserRole } from "../entity/User";
 import { Game } from "../entity/Game";
 import { responseGenerator } from "../utils/responseGenerator";
 
 export class TenantController {
 
-  private userRepository = getRepository(User);
   private tenantRepository = getRepository(Tenant);
   private gameRepository = getRepository(Game);
 
   async listGame(request: Request, response: Response) {
-    const id = response.locals.auth.id;
+    const { id, role } = response.locals.auth;
 
-    const tenant = await this.tenantRepository.find(id);
+    let whereParam = {};
+    if (role === UserRole.TENANT) {
+      const tenant = await this.tenantRepository.find(id);
+      whereParam = { tenant };
+    }
 
     try {
-      const game = await this.gameRepository.find({ where: { tenant } });
+      const game = await this.gameRepository.find({ where: whereParam });
 
       return responseGenerator(response, 200, "ok", game);
     } catch (error) {
@@ -28,14 +31,28 @@ export class TenantController {
   }
 
   async registerGame(request: Request, response: Response) {
-    const id = response.locals.auth.id;
-    const { name, difficulty } = request.body;
+    const authId = response.locals.auth.id;
+    const role = response.locals.auth.role;
+    const { name, difficulty, tenant } = request.body;
 
-    const tenant = await this.tenantRepository.findOne(id);
+    let id = authId;
+
+    if (role === UserRole.ADMIN) {
+      if (!tenant) {
+        return responseGenerator(response, 400, "admin-no-tenant-id");
+      }
+      id = tenant;
+    }
+
+    const tenantObj = await this.tenantRepository.findOne(id);
+
+    if (!tenantObj) {
+      return responseGenerator(response, 404, "tenant-not-found");
+    }
 
     await this.gameRepository.save({
       name,
-      tenant,
+      tenant: tenantObj,
       difficulty,
     });
 
@@ -61,4 +78,31 @@ export class TenantController {
     return responseGenerator(response, 200, "ok");
   }
 
+  async getGame(request: Request, response: Response) {
+    const id = request.params.id;
+
+    const game = await this.gameRepository.findOne(id);
+
+    if (!game) {
+      return responseGenerator(response, 404, "game-not-found");
+    }
+
+    return responseGenerator(response, 200, "ok", game);
+  }
+
+  async updateGame(request: Request, response: Response) {
+    const id = request.params.id;
+    const { name, difficulty } = request.body;
+
+    try {
+      await this.gameRepository.update(id, {
+        name,
+        difficulty,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+
+    return responseGenerator(response, 200, "ok");
+  }
 }
