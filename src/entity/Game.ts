@@ -18,7 +18,7 @@ export class Game {
   })
   name: string;
 
-  @ManyToOne((type) => Tenant)
+  @ManyToOne((type) => Tenant, { nullable: false })
   @JoinColumn()
   tenant: Tenant;
 
