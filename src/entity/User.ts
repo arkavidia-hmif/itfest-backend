@@ -75,7 +75,7 @@ export class Visitor {
   @Column("simple-array")
   interest: string[];
 
-  @Column()
+  @Column({ nullable: false, default: 0 })
   point: number;
 }
 
@@ -85,12 +85,12 @@ export class Tenant {
   @JoinColumn({ name: "userId" })
   userId: User;
 
-  @Column()
+  @Column({ nullable: false })
   point: number;
 
-  @Column()
+  @Column({ nullable: false, default: false })
   emailVerified: boolean;
 
-  @Column()
+  @Column({ nullable: false })
   emailKey: string;
 }
