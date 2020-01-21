@@ -1,6 +1,7 @@
 import { Request, Response, Router } from "express";
 import { check, oneOf } from "express-validator";
 
+import config from "../config";
 import { TransactionController } from "../controller/TransactionController";
 import { UserController } from "../controller/UserController";
 import { UserRole } from "../entity/User";
@@ -23,9 +24,12 @@ export default () => {
   const interestCheck = check("interest").isArray().withMessage("must be an array");
   const dobCheck = check("dob").isISO8601().withMessage("must be a valid ISO8601 date");
   const passwordCheck = check("password")
-    .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{0,}$/, "i")
+    .matches(config.password.checkRegex, "i")
     .withMessage("must include one lowercase character, one uppercase character, a number, and a special character")
     .isLength({ min: 8 }).withMessage("must be at least 8 characters long");
+  const voucherCheck = check("voucher")
+    .isAlphanumeric().withMessage("must be alphanumeric")
+    .isLength({ min: 6, max: 6 }).withMessage("must be 6 characters long");
 
   // Public user endpoint
   router.post("/login", [
@@ -42,9 +46,7 @@ export default () => {
   router.post("/register/visitor", [
     emailCheck,
     passwordCheck,
-    check("voucher")
-      .isAlphanumeric().withMessage("must be alphanumeric")
-      .isLength({ min: 6, max: 6 }).withMessage("must be 6 characters long"),
+    voucherCheck,
     nameCheck.optional(),
     genderCheck.optional(),
     interestCheck.optional(),
