@@ -38,9 +38,9 @@ export class UserController {
     if (user) {
       let additionalData = {};
       if (user.role === UserRole.VISITOR) {
-        additionalData = await this.visitorRepository.findOne(user.id);
+        additionalData = await this.visitorRepository.findOne({ where: { userId: user.id } });
       } else if (user.role === UserRole.TENANT) {
-        additionalData = await this.tenantRepository.findOne(user.id);
+        additionalData = await this.tenantRepository.findOne({ where: { userId: user.id } });
       }
 
       return responseGenerator(response, 200, "ok", { ...user, ...additionalData });
