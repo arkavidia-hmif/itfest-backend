@@ -30,7 +30,9 @@ export default () => {
   ], ic.createItem.bind(ic));
 
   router.get("/item/:id([0-9]+)", ic.getItem.bind(ic));
-  router.delete("/item/:id([0-9]+)", ic.deleteItem.bind(ic));
+  router.delete("/item/:id([0-9]+)", [
+    limitAccess([UserRole.ADMIN, UserRole.TENANT])
+  ], ic.deleteItem.bind(ic));
   router.put("/item/:id([0-9]+)", [
     limitAccess([UserRole.ADMIN, UserRole.TENANT]),
     nameCheck.optional(),
