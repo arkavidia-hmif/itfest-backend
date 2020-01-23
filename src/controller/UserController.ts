@@ -2,19 +2,21 @@ import * as bcrypt from "bcrypt";
 import * as crypto from "crypto";
 import { Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
-import { getRepository } from "typeorm";
+import { getRepository, getConnection } from "typeorm";
 
 import config from "../config";
 import { Tenant, User, UserRole, Visitor } from "../entity/User";
 import { decodeQr, generateQr } from "../utils/qr";
 import { responseGenerator } from "../utils/responseGenerator";
 import { TransactionController } from "./TransactionController";
+import { Voucher } from "../entity/Voucher";
 
 export class UserController {
 
   private userRepository = getRepository(User);
   private visitorRepository = getRepository(Visitor);
   private tenantRepository = getRepository(Tenant);
+  private voucherRepository = getRepository(Voucher);
   private tc = new TransactionController();
 
   async createUser(name: string, username: string, email: string, role: UserRole, password: string) {
@@ -154,7 +156,8 @@ export class UserController {
   async registerVisitor(request: Request, response: Response) {
     const password: string = request.body.password;
     const email: string = request.body.email;
-    const username: string = email.substring(0, email.indexOf('@'));
+    const emailFrontPart: string = email.substring(0, email.indexOf('@'))
+    const username: string = request.body.username || emailFrontPart;
 
     delete request.body.password;
 
@@ -170,20 +173,31 @@ export class UserController {
 
     const encryptedHash = bcrypt.hashSync(password, salt);
 
-    try {
-      const savedUser = await this.userRepository.save({
-        role: UserRole.VISITOR,
-        salt,
-        password: encryptedHash,
-        username,
-        name,
-        email,
-      });
+    const voucher = request.body.voucher;
 
-      await this.visitorRepository.save({
-        userId: savedUser,
-        ...request.body,
-      });
+    const voucherItem = await this.voucherRepository.findOne({ where: { code: voucher } })
+
+    if (!voucherItem) {
+      return responseGenerator(response, 400, "invalid-voucher");
+    }
+
+    try {
+      await getConnection().transaction(async transactionManager => {
+        const savedUser = await transactionManager.save(User, {
+          role: UserRole.VISITOR,
+          salt,
+          password: encryptedHash,
+          username,
+          name,
+          email,
+        });
+        await transactionManager.save(Visitor, {
+          userId: savedUser,
+          ...request.body,
+        });
+        await transactionManager.delete(Voucher, voucherItem);
+      })
+
     } catch (err) {
       if (err.code === 'ER_DUP_ENTRY') {
         return responseGenerator(response, 400, "user-exists");
@@ -202,9 +216,26 @@ export class UserController {
   }
 
   async editUser(request: Request, response: Response) {
-
+    const id = request.params.id;
     try {
-      await this.userRepository.update(request.params.id, { ...request.body });
+
+      const user = await this.userRepository.findOne(id);
+
+      if (!user) {
+        return responseGenerator(response, 404, "user-not-found");
+      }
+
+      if (user.role === UserRole.VISITOR) {
+        // const changes = request.body.
+        // const { dob, gender, interest } = request.body
+        // await this.visitorRepository.update(id, {
+        //   dob, gender, interest,
+        // });
+      }
+
+      const { name, email, username } = request.body;
+      await this.userRepository.update(id, { name, email, username, });
+
     } catch (err) {
       console.error(err);
       return responseGenerator(response, 500, "unknown-error");
