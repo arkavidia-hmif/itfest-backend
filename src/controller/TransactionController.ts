@@ -124,8 +124,4 @@ export class TransactionController {
       return responseGenerator(response, 400, "invalid-qrid");
     }
   }
-
-  async transferPoint(request: Request, response: Response) {
-
-  }
 }
