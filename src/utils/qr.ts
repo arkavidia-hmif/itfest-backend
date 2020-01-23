@@ -4,7 +4,8 @@ import config from "../config";
 import { User } from "../entity/User";
 
 export function generateQr(user: User) {
-  const cipher = crypto.createCipheriv("aes-256-cbc", config.secret, null);
+  const iv = crypto.randomBytes(8).toString("hex");
+  const cipher = crypto.createCipheriv("aes256", config.qrKey, iv);
   const userString = JSON.stringify({
     id: user.id,
     username: user.username,
@@ -12,11 +13,13 @@ export function generateQr(user: User) {
   let cipherText = cipher.update(userString, "utf8", "hex");
   cipherText += cipher.final("hex");
 
-  return cipherText;
+  return `${iv}${cipherText}`;
 }
 
-export function decodeQr(code: string) {
-  const decipher = crypto.createDecipheriv("aes-256-cbc", config.secret, null);
+export function decodeQr(encryptedText: string) {
+  const iv = encryptedText.substring(0, 16);
+  const code = encryptedText.substring(16);
+  const decipher = crypto.createDecipheriv("aes256", config.qrKey, iv);
   let plain = decipher.update(code, "hex", "utf8");
   plain += decipher.final("utf8");
 

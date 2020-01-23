@@ -4,5 +4,6 @@ export default {
     saltRounds: 10,
   },
   secret: "secret-key",
+  qrKey: "ini_secret_untuk_enkripsi_qrcode",
   tenantInitial: 100000,
 };
