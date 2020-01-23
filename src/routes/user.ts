@@ -30,6 +30,9 @@ export default () => {
   const voucherCheck = check("voucher")
     .isAlphanumeric().withMessage("must be alphanumeric")
     .isLength({ min: 6, max: 6 }).withMessage("must be 6 characters long");
+  const usernameCheck = check("username")
+    .isAlphanumeric().withMessage("must be alphanumeric")
+    .isLength({ min: 6 }).withMessage("must be >= 6 characters long");
 
   // Public user endpoint
   router.post("/login", [
@@ -47,6 +50,7 @@ export default () => {
     emailCheck,
     passwordCheck,
     voucherCheck,
+    usernameCheck.optional(),
     nameCheck.optional(),
     genderCheck.optional(),
     interestCheck.optional(),
@@ -57,6 +61,7 @@ export default () => {
   router.post("/register/tenant", [
     emailCheck,
     passwordCheck,
+    usernameCheck.optional(),
     nameCheck.optional(),
   ], uc.registerTenant.bind(uc));
 
@@ -66,6 +71,7 @@ export default () => {
   router.put("/user/me", [
     emailCheck.optional(),
     nameCheck.optional(),
+    usernameCheck.optional(),
     dobCheck.optional(),
     genderCheck.optional(),
     interestCheck.optional(),
@@ -79,6 +85,7 @@ export default () => {
   router.put("/user/:id([0-9]+)", [
     emailCheck.optional(),
     nameCheck.optional(),
+    usernameCheck.optional(),
     dobCheck.optional(),
     genderCheck.optional(),
     interestCheck.optional(),
