@@ -1,9 +1,10 @@
-import { Request, Response } from "express";
+import { Request, Response, json } from "express";
 
 import { Transaction } from "../entity/Transaction";
 import { getRepository, getConnection } from "typeorm";
 import { responseGenerator } from "../utils/responseGenerator";
 import { User, UserRole, Visitor, Tenant } from "../entity/User";
+import { decodeQr } from "../utils/qr";
 
 export class TransactionController {
 
@@ -42,7 +43,7 @@ export class TransactionController {
 
   async give(request: Request, response: Response) {
     const fromId = response.locals.auth.id;
-    const toId = request.params.id;
+    const toId = request.params.id || -1;
 
     try {
       await getConnection().transaction(async transactionManager => {
@@ -107,6 +108,21 @@ export class TransactionController {
     }
 
     return responseGenerator(response, 200, "ok");
+  }
+
+  async giveQr(request: Request, response: Response) {
+    const userString = decodeQr(request.params.qrid);
+
+    try {
+      const userData = JSON.parse(userString);
+
+      request.params.id = userData.id;
+
+      return this.give(request, response);
+    } catch (error) {
+      console.error(error);
+      return responseGenerator(response, 400, "invalid-qrid");
+    }
   }
 
   async transferPoint(request: Request, response: Response) {

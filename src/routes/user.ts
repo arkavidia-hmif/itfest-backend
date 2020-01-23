@@ -72,6 +72,7 @@ export default () => {
     checkParam,
   ], uc.editUserMe.bind(uc));
   router.get("/user/me/transaction", uc.getMeTransaction.bind(uc));
+  router.get("/user/me/qrid", uc.getQrMe.bind(uc));
 
   router.use("/user/:id([0-9]+)", limitAccess([UserRole.ADMIN]));
   router.get("/user/:id([0-9]+)", uc.getUser.bind(uc));
@@ -92,6 +93,10 @@ export default () => {
     check("amount").isInt({ min: 0 }),
     checkParam,
   ], tc.give.bind(tc));
+  router.post("/user/:qrid([a-z0-9]+)/give", [
+    check("amount").isInt({ min: 0 }),
+    checkParam,
+  ], tc.giveQr.bind(tc));
 
   // Testing route
   router.get("/test-jwt", [checkJWT], (req: Request, res: Response) => {

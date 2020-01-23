@@ -212,4 +212,16 @@ export class UserController {
 
     return responseGenerator(response, 200, "ok");
   }
+
+  async getQrMe(request: Request, response: Response) {
+    const id = response.locals.auth.id;
+
+    const user = await this.userRepository.findOne(id);
+
+    const qrHash = generateQr(user);
+
+    return responseGenerator(response, 200, "ok", {
+      qrid: qrHash
+    });
+  }
 }
