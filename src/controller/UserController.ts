@@ -34,6 +34,24 @@ export class UserController {
     });
   }
 
+  async generateVoucher(qty: number) {
+
+    const promiseArr = [];
+    const codeList = [];
+
+    for (let i = 0; i < qty; i++) {
+      const code = crypto.randomBytes(3).toString("hex");
+      promiseArr.push(this.voucherRepository.save({
+        code
+      }));
+      codeList.push(code);
+    }
+
+    await Promise.all(promiseArr);
+
+    return codeList;
+  }
+
   async getUser(request: Request, response: Response) {
     const user = await this.userRepository.findOne(request.params.id);
 
