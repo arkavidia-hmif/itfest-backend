@@ -30,6 +30,7 @@
   },
   "scripts": {
     "start": "ts-node src/index.ts",
+    "serve": "ts-node -F src/index.ts",
     "watch": "ts-node-dev --no-notify src/index.ts",
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
     "manage": "ts-node src/manage.ts"

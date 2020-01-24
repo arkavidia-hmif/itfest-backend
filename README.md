@@ -1,4 +1,4 @@
-# Itfest Backend
+run# Itfest Backend
 
 Steps to run this project:
 
@@ -8,6 +8,19 @@ Steps to run this project:
 
 Some admin setting will be provided at
 `npm run manage`
+
+## Environment
+To run this project please specify the following environment variable
+```bash
+DB_TYPE #Type of database, this project support mysql or postgres
+DB_NAME #Name of database
+DB_URL #URL of database including auth
+
+SECRET #JWT secret
+QRKEY #32 character string for qr data encryption
+
+PORT #Service port
+```
 
 ## API Doc
 [OpenAPI](docs/openapi.yaml)

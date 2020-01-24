@@ -25,11 +25,8 @@ function getConfig() {
       ...config
     }
   } else {
-    return {
-      "type": "sqlite",
-      "database": "database.sqlite",
-      ...config
-    }
+    console.error("Please specify database (check Readme)");
+    process.exit(1);
   }
 }
 
