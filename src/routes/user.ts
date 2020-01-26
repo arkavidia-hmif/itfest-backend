@@ -18,29 +18,29 @@ export default () => {
   const tc = new TransactionController();
   const tec = new GameController();
 
-  const emailCheck = check("email").isEmail().withMessage("must be a valid email address");
-  const nameCheck = check("name").isAlpha().withMessage("must only contain letter");
-  const genderCheck = check("gender")
+  const emailCheck = () => check("email").isEmail().withMessage("must be a valid email address");
+  const nameCheck = () => check("name").isAlpha().withMessage("must only contain letter");
+  const genderCheck = () => check("gender")
     .isInt({ min: 1, max: 2 })
     .withMessage("must be a valid gender (1=male, 2=female)");
-  const interestCheck = check("interest").isArray().withMessage("must be an array");
-  const dobCheck = check("dob").isISO8601().withMessage("must be a valid ISO8601 date");
-  const passwordCheck = check("password")
+  const interestCheck = () => check("interest").isArray().withMessage("must be an array");
+  const dobCheck = () => check("dob").isISO8601().withMessage("must be a valid ISO8601 date");
+  const passwordCheck = () => check("password")
     .matches(config.password.checkRegex, "i")
     .withMessage("must include one lowercase character, one uppercase character, a number, and a special character")
     .isLength({ min: 8 }).withMessage("must be at least 8 characters long");
-  const voucherCheck = check("voucher")
+  const voucherCheck = () => check("voucher")
     .isAlphanumeric().withMessage("must be alphanumeric")
     .isLength({ min: 6, max: 6 }).withMessage("must be 6 characters long");
-  const usernameCheck = check("username")
+  const usernameCheck = () => check("username")
     .isAlphanumeric().withMessage("must be alphanumeric")
     .isLength({ min: 6 }).withMessage("must be >= 6 characters long");
 
   // Public user endpoint
   router.post("/login", [
     oneOf([
-      emailCheck,
-      usernameCheck,
+      emailCheck(),
+      usernameCheck(),
     ]),
     check("password")
       .not().isEmpty().withMessage("must be provided"),
@@ -48,22 +48,23 @@ export default () => {
   ], uc.login.bind(uc));
 
   router.post("/register/visitor", [
-    emailCheck,
-    passwordCheck,
-    voucherCheck,
-    usernameCheck.optional(),
-    nameCheck.optional(),
-    genderCheck.optional(),
-    interestCheck.optional(),
-    dobCheck.optional(),
+    emailCheck(),
+    passwordCheck(),
+    voucherCheck(),
+    usernameCheck().optional(),
+    nameCheck().optional(),
+    genderCheck().optional(),
+    interestCheck().optional(),
+    dobCheck().optional(),
     checkParam,
   ], uc.registerVisitor.bind(uc));
 
   router.post("/register/tenant", [
-    emailCheck,
-    passwordCheck,
-    usernameCheck.optional(),
-    nameCheck.optional(),
+    emailCheck(),
+    passwordCheck(),
+    usernameCheck().optional(),
+    nameCheck().optional(),
+    checkParam,
   ], uc.registerTenant.bind(uc));
 
   router.post("/verify/:code", [
@@ -75,12 +76,12 @@ export default () => {
   router.use("/user", checkJWT);
   router.get("/user/me", uc.getMe.bind(uc));
   router.put("/user/me", [
-    emailCheck.optional(),
-    nameCheck.optional(),
-    usernameCheck.optional(),
-    dobCheck.optional(),
-    genderCheck.optional(),
-    interestCheck.optional(),
+    emailCheck().optional(),
+    nameCheck().optional(),
+    usernameCheck().optional(),
+    dobCheck().optional(),
+    genderCheck().optional(),
+    interestCheck().optional(),
     checkParam,
   ], uc.editUserMe.bind(uc));
   router.get("/user/me/transaction", uc.getMeTransaction.bind(uc));
@@ -89,12 +90,12 @@ export default () => {
   router.use("/user/:id([0-9]+)", limitAccess([UserRole.ADMIN]));
   router.get("/user/:id([0-9]+)", uc.getUser.bind(uc));
   router.put("/user/:id([0-9]+)", [
-    emailCheck.optional(),
-    nameCheck.optional(),
-    usernameCheck.optional(),
-    dobCheck.optional(),
-    genderCheck.optional(),
-    interestCheck.optional(),
+    emailCheck().optional(),
+    nameCheck().optional(),
+    usernameCheck().optional(),
+    dobCheck().optional(),
+    genderCheck().optional(),
+    interestCheck().optional(),
     checkParam,
   ], uc.editUser.bind(uc));
   router.get("/user/:id([0-9]+)/transaction", [

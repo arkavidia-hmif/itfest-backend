@@ -12,25 +12,25 @@ export default () => {
 
   const gc = new GameController();
 
-  const nameCheck = check("name")
+  const nameCheck = () => check("name")
     .isLength({ min: 5 }).withMessage("must be >= 5 characters")
     .matches(/^[a-z0-9 ]+$/i).withMessage("must be alphanumeric or space");
-  const difficultyCheck = check("difficulty")
+  const difficultyCheck = () => check("difficulty")
     .isInt({ min: 1, max: 3 }).withMessage("must be an integer between 1 to 3");
 
   router.use(checkJWT);
   router.get("/game", [limitAccess([UserRole.ADMIN, UserRole.TENANT])], gc.listGame.bind(gc));
   router.post("/game", [
     limitAccess([UserRole.ADMIN, UserRole.TENANT]),
-    nameCheck,
-    difficultyCheck,
+    nameCheck(),
+    difficultyCheck(),
     checkParam,
   ], gc.registerGame.bind(gc));
   router.get("/game/:id([0-9]+)", [limitAccess([UserRole.ADMIN, UserRole.TENANT])], gc.getGame.bind(gc));
   router.put("/game/:id([0-9]+)", [
     limitAccess([UserRole.ADMIN, UserRole.TENANT]),
-    nameCheck.optional(),
-    difficultyCheck.optional(),
+    nameCheck().optional(),
+    difficultyCheck().optional(),
     checkParam,
   ], gc.updateGame.bind(gc));
   router.delete("/game/:id([0-9]+)", [limitAccess([UserRole.ADMIN, UserRole.TENANT])], gc.deleteGame.bind(gc));
