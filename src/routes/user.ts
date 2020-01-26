@@ -2,7 +2,7 @@ import { Request, Response, Router } from "express";
 import { check, oneOf } from "express-validator";
 
 import config from "../config";
-import { TenantController } from "../controller/TenantController";
+import { GameController } from "../controller/GameController";
 import { TransactionController } from "../controller/TransactionController";
 import { UserController } from "../controller/UserController";
 import { UserRole } from "../entity/User";
@@ -16,7 +16,7 @@ export default () => {
 
   const uc = new UserController();
   const tc = new TransactionController();
-  const tec = new TenantController();
+  const tec = new GameController();
 
   const emailCheck = check("email").isEmail().withMessage("must be a valid email address");
   const nameCheck = check("name").isAlpha().withMessage("must only contain letter");
