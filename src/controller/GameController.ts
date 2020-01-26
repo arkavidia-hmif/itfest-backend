@@ -259,4 +259,38 @@ export class GameController {
 
     return responseGenerator(response, 200, "ok");
   }
+
+  async getFeedback(request: Request, response: Response) {
+    const userId = response.locals.auth.id;
+    const userRole = response.locals.auth.role;
+    const gameId = request.params.id;
+
+    const game = await this.gameRepository.findOne(gameId, { relations: ["tenant", "tenant.userId"] });
+
+    if (!game) {
+      return responseGenerator(response, 404, "game-not-found");
+    }
+
+    if (userRole !== UserRole.ADMIN && game.tenant.userId.id !== userId) {
+      return responseGenerator(response, 403, "forbidden");
+    }
+
+    const feedback = await this.feedbackRepository.find({
+      where: {
+        to: game,
+      }
+    });
+
+    const reducer = (acc, current) => {
+      if (current.rated) {
+        acc += current.rating
+      }
+      return acc;
+    }
+
+    const total = feedback.reduce(reducer, 0);
+    const review = total / feedback.length;
+
+    return responseGenerator(response, 200, "ok", { review });
+  }
 }

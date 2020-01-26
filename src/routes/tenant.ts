@@ -42,5 +42,9 @@ export default () => {
     checkParam,
   ], gc.giveFeedback.bind(gc));
 
+  router.get("/game/:id([0-9]+)/review", [
+    limitAccess([UserRole.ADMIN, UserRole.TENANT]),
+  ], gc.getFeedback.bind(gc));
+
   return router;
 };
