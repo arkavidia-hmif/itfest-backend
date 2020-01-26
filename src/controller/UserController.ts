@@ -10,6 +10,7 @@ import { decodeQr, generateQr } from "../utils/qr";
 import { responseGenerator } from "../utils/responseGenerator";
 import { TransactionController } from "./TransactionController";
 import { Voucher } from "../entity/Voucher";
+import { partialUpdate } from "../utils/partialUpdateEntity";
 
 export class UserController {
 
@@ -244,16 +245,14 @@ export class UserController {
       }
 
       if (user.role === UserRole.VISITOR) {
-        // const changes = request.body.
-        // const { dob, gender, interest } = request.body
-        // await this.visitorRepository.update(id, {
-        //   dob, gender, interest,
-        // });
+        const visitor = new Visitor();
+        visitor.userId = user;
+        const changes = partialUpdate(visitor, request.body, ['dob', 'gender', 'interest']);
+        await this.visitorRepository.save(changes);
       }
 
-      const { name, email, username } = request.body;
-      await this.userRepository.update(id, { name, email, username, });
-
+      const changes = partialUpdate(user, request.body, ['name', 'email', 'username']);
+      await this.userRepository.save(changes);
     } catch (err) {
       console.error(err);
       return responseGenerator(response, 500, "unknown-error");
@@ -273,4 +272,9 @@ export class UserController {
       qrid: qrHash
     });
   }
+  // async playGame(request: Request, response: Response){
+  //   const qrid = request.params.qrid;
+
+
+  // }
 }
