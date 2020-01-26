@@ -19,6 +19,8 @@ export class GameController {
 
   async listGame(request: Request, response: Response) {
     const { id, role } = response.locals.auth;
+    const page = parseInt(request.query.page, 10) || 1;
+    const itemPerPage = parseInt(request.query.itemPerPage, 10) || 10;
 
     let whereParam = {};
     if (role === UserRole.TENANT) {
@@ -27,9 +29,18 @@ export class GameController {
     }
 
     try {
-      const game = await this.gameRepository.find({ where: whereParam });
+      const [game, total] = await this.gameRepository.findAndCount({
+        where: whereParam,
+        take: itemPerPage,
+        skip: (page - 1) * itemPerPage
+      });
 
-      return responseGenerator(response, 200, "ok", game);
+      return responseGenerator(response, 200, "ok", {
+        array: game,
+        page,
+        itemPerPage,
+        total
+      });
     } catch (error) {
       console.error(error);
       return responseGenerator(response, 500, "unknown-error");

@@ -716,6 +716,9 @@ paths:
       tags:
         - game
       summary: List all game owned by a tenant or everything (if loggedin as an admin)
+      parameters: 
+        - $ref: '#/components/parameters/itemPerPage'
+        - $ref: '#/components/parameters/page'
       responses:
         '200':
           description: 'Success'
@@ -1308,9 +1311,22 @@ paths:
           $ref: '#/components/responses/InvalidBearer'
         '403':
           $ref: '#/components/responses/Forbidden'
-  
+
 
 components:
+  parameters:
+    itemPerPage:
+      in: query
+      name: "itemPerPage"
+      schema:
+        type: integer
+      description: "Item returned per request for pagination"
+    page:
+      in: query
+      name: "page"
+      schema:
+        type: integer
+      description: "Page for pagination"
   schemas:
     Response:
       description: 'Standard response schema'
