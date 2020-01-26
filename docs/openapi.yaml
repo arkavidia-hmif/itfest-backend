@@ -998,9 +998,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
-              example: 
-                status: 404
-                code: 'game-not-found'
+              examples:
+                'Game not found':
+                  value:
+                    status: 404
+                    code: 'game-not-found'
         '401':
           $ref: '#/components/responses/InvalidBearer'
         '403':
@@ -1035,11 +1037,10 @@ paths:
                   items:
                     type: string
             example:
-              value:
-                score: 5
-                praise:
-                  - 'fun'
-                  - 'addicting'
+              score: 5
+              praise:
+                - 'fun'
+                - 'addicting'
       responses:
         '200':
           $ref: '#/components/responses/OK'
@@ -1057,6 +1058,10 @@ paths:
                     data:
                       - part: 'score'
                         message: 'must be between 1 to 5'
+                'Already reviewed':
+                  value:
+                    status: 400
+                    code: 'already-reviewed'
         '404':
           description: 'Game not found'
           content:
