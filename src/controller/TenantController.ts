@@ -4,9 +4,14 @@ import { Item } from "../entity/Item";
 import { Tenant, User, UserRole } from "../entity/User";
 import { Game } from "../entity/Game";
 import { responseGenerator } from "../utils/responseGenerator";
+import { decodeQr } from "../utils/qr";
+import { Feedback } from "../entity/Feedback";
+import { partialUpdate } from "../utils/partialUpdateEntity";
 
 export class TenantController {
 
+  private userRepository = getRepository(User);
+  private feedbackRepository = getRepository(Feedback);
   private tenantRepository = getRepository(Tenant);
   private gameRepository = getRepository(Game);
 
@@ -15,7 +20,7 @@ export class TenantController {
 
     let whereParam = {};
     if (role === UserRole.TENANT) {
-      const tenant = await this.tenantRepository.find(id);
+      const tenant = await this.tenantRepository.findOne(id, { relations: ["userId"] });
       whereParam = { tenant };
     }
 
@@ -44,7 +49,7 @@ export class TenantController {
       id = tenant;
     }
 
-    const tenantObj = await this.tenantRepository.findOne(id);
+    const tenantObj = await this.tenantRepository.findOne(id, { relations: ["userId"] });
 
     if (!tenantObj) {
       return responseGenerator(response, 404, "tenant-not-found");
@@ -61,15 +66,16 @@ export class TenantController {
 
   async deleteGame(request: Request, response: Response) {
     const id = response.locals.auth.id;
-    const gameId = request.body.game;
+    const role = response.locals.auth.role;
+    const gameId = request.params.id;
 
-    const game = await this.gameRepository.findOne(gameId);
+    const game = await this.gameRepository.findOne(gameId, { relations: ["tenant", "tenant.userId"] });
 
     if (!game) {
       return responseGenerator(response, 404, "game-not-found");
     }
 
-    if (game.id !== id) {
+    if (role !== UserRole.ADMIN && game.tenant.userId.id !== id) {
       return responseGenerator(response, 403, "forbidden");
     }
 
@@ -79,30 +85,47 @@ export class TenantController {
   }
 
   async getGame(request: Request, response: Response) {
-    const id = request.params.id;
+    const id = response.locals.auth.id;
+    const role = response.locals.auth.role;
+    const gameId = request.params.id;
 
-    const game = await this.gameRepository.findOne(id);
+    const game = await this.gameRepository.findOne(gameId, { relations: ["tenant", "tenant.userId"] });
 
     if (!game) {
       return responseGenerator(response, 404, "game-not-found");
     }
 
+    if (role !== UserRole.ADMIN && game.tenant.userId.id !== id) {
+      return responseGenerator(response, 403, "forbidden");
+    }
+
+    delete game.tenant;
+
     return responseGenerator(response, 200, "ok", game);
   }
 
   async updateGame(request: Request, response: Response) {
-    const id = request.params.id;
-    const { name, difficulty } = request.body;
+    const id = response.locals.auth.id;
+    const role = response.locals.auth.role;
+    const gameId = request.params.id;
+
+    const game = await this.gameRepository.findOne(gameId, { relations: ["tenant", "tenant.userId"] });
+
+    if (!game) {
+      return responseGenerator(response, 404, "game-not-found");
+    }
+
+    if (role !== UserRole.ADMIN && game.tenant.userId.id !== id) {
+      return responseGenerator(response, 403, "forbidden");
+    }
 
     try {
-      await this.gameRepository.update(id, {
-        name,
-        difficulty,
-      });
+      await this.gameRepository.save(partialUpdate(game, request.body, ["name", "difficulty"]));
     } catch (error) {
       console.error(error);
     }
 
     return responseGenerator(response, 200, "ok");
   }
+
 }
