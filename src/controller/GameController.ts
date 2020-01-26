@@ -1,16 +1,19 @@
-import { getRepository, getConnection } from "typeorm";
 import { Request, Response } from "express";
-import { Tenant, User, UserRole, Visitor } from "../entity/User";
-import { Game } from "../entity/Game";
-import { responseGenerator } from "../utils/responseGenerator";
-import { decodeQr } from "../utils/qr";
-import { Feedback } from "../entity/Feedback";
-import { partialUpdate } from "../utils/partialUpdateEntity";
-import config from "../config";
+import { getConnection, getRepository } from "typeorm";
 
-export class TenantController {
+import config from "../config";
+import { Feedback } from "../entity/Feedback";
+import { Game } from "../entity/Game";
+import { Tenant, User, UserRole, Visitor } from "../entity/User";
+import { partialUpdate } from "../utils/partialUpdateEntity";
+import { decodeQr } from "../utils/qr";
+import { responseGenerator } from "../utils/responseGenerator";
+
+export class GameController {
 
   private userRepository = getRepository(User);
+  private feedbackRepository = getRepository(Feedback);
+  private visitorRepository = getRepository(Visitor);
   private tenantRepository = getRepository(Tenant);
   private gameRepository = getRepository(Game);
 
@@ -219,6 +222,40 @@ export class TenantController {
         return responseGenerator(response, 500, "unknown-error");
       }
     }
+
+    return responseGenerator(response, 200, "ok");
+  }
+
+  async giveFeedback(request: Request, response: Response) {
+    const gameId = request.params.id;
+    const userId = response.locals.auth.id;
+
+    const { score, praise } = request.body;
+
+    const game = await this.gameRepository.findOne(gameId, { relations: ["tenant", "tenant.userId"] });
+
+    if (!game) {
+      return responseGenerator(response, 404, "game-not-found");
+    }
+
+    const visitor = await this.visitorRepository.findOne(userId, { relations: ["userId"] });
+
+    const feedback = await this.feedbackRepository.findOne({
+      where: {
+        from: visitor,
+        to: game,
+      }
+    });
+
+    if (feedback.rated) {
+      return responseGenerator(response, 400, "already-reviewed");
+    }
+
+    feedback.rated = true;
+    feedback.rating = score;
+    feedback.remark = praise.join(', ');
+
+    await this.feedbackRepository.save(feedback);
 
     return responseGenerator(response, 200, "ok");
   }
