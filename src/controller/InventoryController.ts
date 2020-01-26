@@ -3,7 +3,7 @@ import { getRepository } from "typeorm";
 
 import { Inventory } from "../entity/Inventory";
 import { Item } from "../entity/Item";
-import { User } from "../entity/User";
+import { User, UserRole } from "../entity/User";
 import { responseGenerator } from "../utils/responseGenerator";
 
 export class InventoryController {
@@ -16,19 +16,33 @@ export class InventoryController {
     const page = parseInt(request.query.page, 10) || 1;
     const itemPerPage = parseInt(request.query.itemPerPage, 10) || 10;
 
-    const [item, total] = await this.inventoryRepository.findAndCount({
+    const [rawItem, total] = await this.inventoryRepository.findAndCount({
       take: itemPerPage,
-      skip: (page - 1) * itemPerPage
+      skip: (page - 1) * itemPerPage,
+      relations: ["item"]
     });
 
-    console.log(item, total);
+    const item = rawItem.map((entry) => {
+      delete entry.id;
+      return entry;
+    });
 
-    return responseGenerator(response, 200, "ok");
+    return responseGenerator(response, 200, "ok", {
+      array: item,
+      page,
+      itemPerPage,
+      total
+    });
   }
 
   async createItem(request: Request, response: Response) {
     const { name, price, qty } = request.body;
-    const ownerId = request.body.ownerId || response.locals.auth.id;
+    let ownerId = response.locals.auth.id;
+    const userRole = response.locals.auth.id;
+
+    if (userRole === UserRole.ADMIN) {
+      ownerId = request.body.ownerId || ownerId;
+    }
 
     const owner = await this.userRepository.findOne(ownerId);
 
@@ -49,8 +63,6 @@ export class InventoryController {
         owner
       });
 
-      console.log(newItem);
-
       await this.inventoryRepository.save({
         item: newItem,
         qty
@@ -68,7 +80,7 @@ export class InventoryController {
     const id = request.params.id;
 
     const item = await this.itemRepository.findOne(id);
-    const inventory = await this.inventoryRepository.findOne({ item }, { select: ["qty"] });
+    const inventory = await this.inventoryRepository.findOne({ item }, { select: ["qty", "createdAt", "updatedAt"] });
 
     if (item && inventory) {
       inventory.item = item;
@@ -92,16 +104,14 @@ export class InventoryController {
 
     try {
       if (qty) {
-        await this.inventoryRepository.update(inventory.id, {
-          qty
-        });
+        inventory.qty = qty;
+        await this.inventoryRepository.save(inventory);
       }
 
       if (name || price) {
-        await this.itemRepository.update(item.id, {
-          name,
-          price
-        })
+        item.name = name || item.name;
+        item.price = price || item.price;
+        await this.itemRepository.save(item);
       }
     } catch (error) {
       console.error(error);
