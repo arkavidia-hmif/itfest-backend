@@ -65,6 +65,11 @@ export default () => {
     nameCheck.optional(),
   ], uc.registerTenant.bind(uc));
 
+  router.post("/verify/:code", [
+    checkJWT,
+    limitAccess([UserRole.TENANT]),
+  ], uc.verifyEmail.bind(uc));
+
   // User endpoint
   router.use("/user", checkJWT);
   router.get("/user/me", uc.getMe.bind(uc));

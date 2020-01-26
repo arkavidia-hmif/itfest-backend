@@ -272,6 +272,27 @@ export class UserController {
       qrid: qrHash
     });
   }
+
+  async verifyEmail(request: Request, response: Response) {
+    const code = request.params.code;
+    const id = response.locals.auth.id;
+
+    const tenant = await this.tenantRepository.findOne(id);
+
+    if (!tenant) {
+      return responseGenerator(response, 400, "user-not-tenant");
+    }
+
+    if (tenant.emailKey !== code) {
+      return responseGenerator(response, 400, "invalid-email-code");
+    }
+
+    tenant.emailVerified = true;
+
+    await this.tenantRepository.save(tenant);
+
+    return responseGenerator(response, 200, "ok");
+  }
   // async playGame(request: Request, response: Response){
   //   const qrid = request.params.qrid;
 
