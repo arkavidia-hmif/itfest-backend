@@ -2,6 +2,7 @@ import { Request, Response, Router } from "express";
 import { check, oneOf } from "express-validator";
 
 import config from "../config";
+import { TenantController } from "../controller/TenantController";
 import { TransactionController } from "../controller/TransactionController";
 import { UserController } from "../controller/UserController";
 import { UserRole } from "../entity/User";
@@ -15,6 +16,7 @@ export default () => {
 
   const uc = new UserController();
   const tc = new TransactionController();
+  const tec = new TenantController();
 
   const emailCheck = check("email").isEmail().withMessage("must be a valid email address");
   const nameCheck = check("name").isAlpha().withMessage("must only contain letter");
@@ -38,8 +40,7 @@ export default () => {
   router.post("/login", [
     oneOf([
       emailCheck,
-      check("username")
-        .isAlphanumeric().withMessage("must be an alphanumeric sequence"),
+      usernameCheck,
     ]),
     check("password")
       .not().isEmpty().withMessage("must be provided"),
@@ -109,6 +110,13 @@ export default () => {
     check("amount").isInt({ min: 0 }),
     checkParam,
   ], tc.giveQr.bind(tc));
+
+  router.post("/user/:qrid([a-z0-9]+)/play", [
+    limitAccess([UserRole.TENANT]),
+    check("game").isArray({ min: 1 }).withMessage("must be an array with >=1 length"),
+    check("game.*").isInt().withMessage("must be integer"),
+    checkParam,
+  ], tec.playGame.bind(tec));
 
   // Testing route
   router.get("/test-jwt", [checkJWT], (req: Request, res: Response) => {

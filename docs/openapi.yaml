@@ -457,6 +457,25 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/OK'
+        '400':
+          description: 'Bad request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+              examples:
+                'Not enough point (tenant)':
+                  value:
+                    status: 400
+                    code: 'not-enough-point'
+                'Visitor have already played the game':
+                  value:
+                    status: 400
+                    code: 'already-play-game' 
+                'Invalid qrid':
+                  value:
+                    status: 400
+                    code: 'invalid-qrid' 
         '404':
           description: 'User or game not found'
           content:

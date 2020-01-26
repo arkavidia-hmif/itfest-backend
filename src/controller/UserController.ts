@@ -131,7 +131,7 @@ export class UserController {
 
   async registerTenant(request: Request, response: Response) {
     const { email, password } = request.body;
-    const username: string = email.substring(0, email.indexOf('@'));
+    const username: string = email.substring(0, email.indexOf("@"));
     const name = request.body.name || email;
 
     delete request.body.password;
@@ -159,7 +159,7 @@ export class UserController {
         point: config.tenantInitial
       });
     } catch (err) {
-      if (err.code === 'ER_DUP_ENTRY') {
+      if (err.code === "ER_DUP_ENTRY") {
         return responseGenerator(response, 400, "user-exists");
       } else {
         console.error(err);
@@ -175,7 +175,7 @@ export class UserController {
   async registerVisitor(request: Request, response: Response) {
     const password: string = request.body.password;
     const email: string = request.body.email;
-    const emailFrontPart: string = email.substring(0, email.indexOf('@'))
+    const emailFrontPart: string = email.substring(0, email.indexOf("@"))
     const username: string = request.body.username || emailFrontPart;
 
     delete request.body.password;
@@ -218,7 +218,7 @@ export class UserController {
       })
 
     } catch (err) {
-      if (err.code === 'ER_DUP_ENTRY') {
+      if (err.code === "ER_DUP_ENTRY") {
         return responseGenerator(response, 400, "user-exists");
       } else {
         console.error(err);
@@ -247,11 +247,11 @@ export class UserController {
       if (user.role === UserRole.VISITOR) {
         const visitor = new Visitor();
         visitor.userId = user;
-        const changes = partialUpdate(visitor, request.body, ['dob', 'gender', 'interest']);
+        const changes = partialUpdate(visitor, request.body, ["dob", "gender", "interest"]);
         await this.visitorRepository.save(changes);
       }
 
-      const changes = partialUpdate(user, request.body, ['name', 'email', 'username']);
+      const changes = partialUpdate(user, request.body, ["name", "email", "username"]);
       await this.userRepository.save(changes);
     } catch (err) {
       console.error(err);
@@ -293,9 +293,4 @@ export class UserController {
 
     return responseGenerator(response, 200, "ok");
   }
-  // async playGame(request: Request, response: Response){
-  //   const qrid = request.params.qrid;
-
-
-  // }
 }
