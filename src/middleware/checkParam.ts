@@ -8,13 +8,24 @@ export function checkParam(request: Request, response: Response, next: NextFunct
     return next();
   } else {
     const errorArray = errors.array();
+    const errorResult = [];
 
-    const errorResult = errorArray.map((data) => {
-      return {
-        part: data.param,
-        message: data.msg,
-      };
-    });
+    for (const data of errorArray) {
+      if (data.param === "_error") {
+        const nestedErrors = (data as any).nestedErrors;
+        nestedErrors.forEach((error) => {
+          errorResult.push({
+            part: error.param,
+            message: error.msg,
+          });
+        });
+      } else {
+        errorResult.push({
+          part: data.param,
+          message: data.msg,
+        });
+      }
+    }
 
     return responseGenerator(response, 400, "invalid-input", errorResult);
   }
