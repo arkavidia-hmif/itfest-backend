@@ -1,4 +1,4 @@
-run# Itfest Backend
+# Itfest Backend
 
 Steps to run this project:
 
@@ -24,4 +24,5 @@ PORT #Service port
 
 ## API Doc
 [OpenAPI](docs/openapi.yaml)
+
 [Postman documenter(legacy)](https://documenter.getpostman.com/view/8029552/SVtYR6LZ?version=latest)
