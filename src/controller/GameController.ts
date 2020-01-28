@@ -8,6 +8,8 @@ import { Tenant, User, UserRole, Visitor } from "../entity/User";
 import { partialUpdate } from "../utils/partialUpdateEntity";
 import { decodeQr } from "../utils/qr";
 import { responseGenerator } from "../utils/responseGenerator";
+import { globalSocket } from "../routes/socket";
+import { isError } from "util";
 
 export class GameController {
 
@@ -224,6 +226,17 @@ export class GameController {
         });
 
         await Promise.all(feedbackPromise);
+
+        if (globalSocket[user.id]) {
+          globalSocket[user.id].emit("transaction", {
+            type: "play",
+            tenant: {
+              id: tenant.userId.id,
+              name: tenant.userId.name
+            },
+            amount: pointDelta
+          })
+        }
       });
     } catch (error) {
       if (typeof error === "string") {

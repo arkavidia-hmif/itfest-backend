@@ -205,8 +205,8 @@ export class InventoryController {
         await tmInventoryRepository.save(inventory);
 
         if (globalSocket[visitorId]) {
-          globalSocket[visitorId].emit('transaction', {
-            type: 'redeem',
+          globalSocket[visitorId].emit("transaction", {
+            type: "redeem",
             item: {
               id: item.id,
               name: item.name,
@@ -216,9 +216,9 @@ export class InventoryController {
         }
       });
     } catch (error) {
-      if (typeof error === 'string') {
+      if (typeof error === "string") {
         return responseGenerator(response, 400, error);
-      } else if (error.name === 'EntityNotFound') {
+      } else if (error.name === "EntityNotFound") {
         return responseGenerator(response, 404, "user-not-found");
       } else {
         return responseGenerator(response, 500, "unknown-error", error);
