@@ -1,14 +1,18 @@
 import { Request, Response } from "express";
-import { getRepository } from "typeorm";
+import { getRepository, getConnection } from "typeorm";
 
 import { Inventory } from "../entity/Inventory";
 import { Item } from "../entity/Item";
-import { User, UserRole } from "../entity/User";
+import { User, UserRole, Visitor } from "../entity/User";
 import { responseGenerator } from "../utils/responseGenerator";
+import { Transaction, TransactionType } from "../entity/Transaction";
+import { globalSocket } from "../routes/socket";
+import { decodeQr } from "../utils/qr";
 
 export class InventoryController {
 
   private inventoryRepository = getRepository(Inventory);
+  private transactionRepository = getRepository(Transaction);
   private itemRepository = getRepository(Item);
   private userRepository = getRepository(User);
 
@@ -138,6 +142,89 @@ export class InventoryController {
       console.error(error);
       return responseGenerator(response, 500, "unknown-error");
     }
+
+    return responseGenerator(response, 200, "ok");
+  }
+
+  async redeem(request: Request, response: Response) {
+    const adminId = response.locals.auth.id;
+    const itemId = request.body.item;
+
+    const userString = decodeQr(request.params.qrid);
+
+    let visitorId: number;
+
+    try {
+      const userData = JSON.parse(userString);
+      visitorId = userData.id;
+    } catch (error) {
+      console.error(error);
+      return responseGenerator(response, 400, "invalid-qrid");
+    }
+
+    try {
+      await getConnection().transaction(async transactionManager => {
+
+        const tmInventoryRepository = transactionManager.getRepository(Inventory);
+
+        const adminUser = await transactionManager.findOneOrFail(User, adminId);
+        const visitorUser = await transactionManager.findOneOrFail(Visitor, visitorId, { relations: ["userId"] });
+        const inventory = await tmInventoryRepository.findOne({
+          where: {
+            item: itemId
+          },
+          relations: ["item"]
+        });
+
+        const item = inventory.item;
+
+        if (!item) {
+          throw "item-not-found";
+        }
+
+        if (inventory.qty <= 0) {
+          throw "item-empty";
+        }
+        inventory.qty -= 1;
+
+        if (visitorUser.point < item.price) {
+          throw "not-enough-point";
+        }
+
+        await transactionManager.save(Transaction, {
+          from: visitorUser.userId,
+          to: adminUser,
+          amount: item.price,
+          type: TransactionType.REDEEM,
+          item: item
+        });
+
+        visitorUser.point -= item.price;
+
+        await transactionManager.save(Visitor, visitorUser);
+        await tmInventoryRepository.save(inventory);
+
+        if (globalSocket[visitorId]) {
+          globalSocket[visitorId].emit('transaction', {
+            type: 'redeem',
+            item: {
+              id: item.id,
+              name: item.name,
+            },
+            amount: item.price
+          });
+        }
+      });
+    } catch (error) {
+      if (typeof error === 'string') {
+        return responseGenerator(response, 400, error);
+      } else if (error.name === 'EntityNotFound') {
+        return responseGenerator(response, 404, "user-not-found");
+      } else {
+        return responseGenerator(response, 500, "unknown-error", error);
+      }
+    }
+
 
     return responseGenerator(response, 200, "ok");
   }

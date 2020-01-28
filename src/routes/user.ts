@@ -10,13 +10,15 @@ import { checkJWT } from "../middleware/checkJWT";
 import { checkParam } from "../middleware/checkParam";
 import { limitAccess } from "../middleware/limitAccess";
 import { paginationCheck } from "../middleware/paginationCheck";
+import { InventoryController } from "../controller/InventoryController";
 
 export default () => {
   const router = Router();
 
   const uc = new UserController();
   const tc = new TransactionController();
-  const tec = new GameController();
+  const gc = new GameController();
+  const ic = new InventoryController();
 
   const emailCheck = () => check("email").isEmail().withMessage("must be a valid email address");
   const nameCheck = () => check("name").matches(/^[a-zA-Z ]+$/i).withMessage("must only contain letter or space");
@@ -36,6 +38,7 @@ export default () => {
     .isAlphanumeric().withMessage("must be alphanumeric")
     .isLength({ min: 1 }).withMessage("must be >= 1 character long");
   const pointCheck = () => check("point").isInt({ min: 0 }).withMessage("must be a positive integer");
+  const itemCheck = () => check("item").isInt().withMessage("must be an integer");
 
   // Public user endpoint
   router.post("/login", [
@@ -118,7 +121,13 @@ export default () => {
     check("game").isArray({ min: 1 }).withMessage("must be an array with >=1 length"),
     check("game.*").isInt().withMessage("must be integer"),
     checkParam,
-  ], tec.playGame.bind(tec));
+  ], gc.playGame.bind(gc));
+
+  router.post("/user/:qrid([a-z0-9]+)/redeem", [
+    limitAccess([UserRole.ADMIN]),
+    itemCheck(),
+    checkParam,
+  ], ic.redeem.bind(ic));
 
   // Testing route
   router.get("/test-jwt", [checkJWT], (req: Request, res: Response) => {
