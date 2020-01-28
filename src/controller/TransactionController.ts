@@ -5,6 +5,7 @@ import { getRepository, getConnection } from "typeorm";
 import { responseGenerator } from "../utils/responseGenerator";
 import { User, UserRole, Visitor, Tenant } from "../entity/User";
 import { decodeQr } from "../utils/qr";
+import { globalSocket } from "../routes/socket";
 
 export class TransactionController {
 
@@ -96,6 +97,17 @@ export class TransactionController {
             point: toPointData.point + amount
           });
         }
+
+        if (globalSocket[toId]) {
+          globalSocket[toId].emit('transaction', {
+            type: 'give',
+            from: {
+              id: fromUser.id,
+              name: fromUser.name || fromUser.username,
+            },
+            amount: amount
+          });
+        }
       });
     } catch (error) {
       if (typeof error === 'string') {
@@ -106,6 +118,7 @@ export class TransactionController {
         return responseGenerator(response, 500, "unknown-error", error);
       }
     }
+
 
     return responseGenerator(response, 200, "ok");
   }
