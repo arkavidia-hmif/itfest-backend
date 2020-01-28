@@ -3,6 +3,7 @@ import { check, oneOf } from "express-validator";
 
 import config from "../config";
 import { GameController } from "../controller/GameController";
+import { InventoryController } from "../controller/InventoryController";
 import { TransactionController } from "../controller/TransactionController";
 import { UserController } from "../controller/UserController";
 import { UserRole } from "../entity/User";
@@ -10,7 +11,6 @@ import { checkJWT } from "../middleware/checkJWT";
 import { checkParam } from "../middleware/checkParam";
 import { limitAccess } from "../middleware/limitAccess";
 import { paginationCheck } from "../middleware/paginationCheck";
-import { InventoryController } from "../controller/InventoryController";
 
 export default () => {
   const router = Router();

@@ -277,7 +277,7 @@ export class GameController {
 
     feedback.rated = true;
     feedback.rating = score;
-    feedback.remark = praise.join(', ');
+    feedback.remark = praise.join(", ");
 
     await this.feedbackRepository.save(feedback);
 
