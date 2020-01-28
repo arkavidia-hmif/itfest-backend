@@ -23,8 +23,6 @@ createConnection().then(async connection => {
 
   const server = http.createServer(app);
 
-  socketRoutes
-
   socketRoutes(server);
 
   server.listen(process.env.PORT || 3000);
