@@ -19,7 +19,7 @@ export default () => {
   const tec = new GameController();
 
   const emailCheck = () => check("email").isEmail().withMessage("must be a valid email address");
-  const nameCheck = () => check("name").isAlpha().withMessage("must only contain letter");
+  const nameCheck = () => check("name").matches(/^[a-zA-Z ]+$/i).withMessage("must only contain letter or space");
   const genderCheck = () => check("gender")
     .isInt({ min: 1, max: 2 })
     .withMessage("must be a valid gender (1=male, 2=female)");
@@ -53,10 +53,10 @@ export default () => {
     passwordCheck(),
     voucherCheck(),
     usernameCheck().optional(),
-    nameCheck().optional(),
-    genderCheck().optional(),
-    interestCheck().optional(),
-    dobCheck().optional(),
+    nameCheck(),
+    genderCheck(),
+    interestCheck(),
+    dobCheck(),
     checkParam,
   ], uc.registerVisitor.bind(uc));
 

@@ -608,10 +608,13 @@ paths:
             schema:
               type: object
               required:
-                - name
                 - email
                 - password
+                - name
                 - voucher
+                - dob
+                - gender
+                - interest
               properties:
                 email:
                   type: string
@@ -638,6 +641,7 @@ paths:
 
             example:
               email: "visitor@email.com"
+              name: "Visitor name"
               password: "password1234"
               voucher: "abc123"
               dob: "1999-10-10"

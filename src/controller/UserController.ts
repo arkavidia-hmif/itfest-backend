@@ -188,12 +188,6 @@ export class UserController {
 
     let name = request.body.name;
 
-    if (!name) {
-      name = email;
-    } else {
-      delete request.body.name;
-    }
-
     const salt = bcrypt.genSaltSync(config.password.saltRounds);
 
     const encryptedHash = bcrypt.hashSync(password, salt);
