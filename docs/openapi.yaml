@@ -378,12 +378,7 @@ paths:
         - user
       summary: 'Transfer point to user with specified qrid'
       parameters:
-        - name: qrid
-          in: path
-          description: 'QRid of user to give'
-          required: true
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/qrid'
       requestBody:
         description: 'Amount to be transfered'
         content:
@@ -435,12 +430,7 @@ paths:
         - user
       summary: 'Make a visitor play game'
       parameters:
-        - name: qrid
-          in: path
-          description: 'QRid of user playing'
-          required: true
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/qrid'
       requestBody:
         description: 'Game played'
         content:
@@ -495,6 +485,62 @@ paths:
           $ref: '#/components/responses/InvalidBearer'
         '403':
           $ref: '#/components/responses/Forbidden'
+  /user/{qrid}:
+   get:
+      tags:
+        - user
+      summary: 'Get public user data from qrid'
+      parameters:
+        - $ref: '#/components/parameters/qrid'
+      responses:
+        '200':
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Response'
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          username: 
+                            type: string
+                          name:
+                            type: string
+                          role:
+                            type: string
+              example: 
+                status: 200
+                code: 'ok'
+                data:
+                  username: 'user1'
+                  name: 'Nama orang'
+                  role: 'visitor'
+        '400':
+          description: 'Bad request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+              examples:
+                'Invalid qrid':
+                  value:
+                    status: 400
+                    code: 'invalid-qrid' 
+        '404':
+          description: 'User not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+              examples:
+                'User not found':
+                  value:
+                    status: 404
+                    code: 'user-not-found'
+        '401':
+          $ref: '#/components/responses/InvalidBearer'
           
   /login:
     post:
@@ -1085,6 +1131,9 @@ paths:
       tags:
         - inventory
       summary: List all inventory
+      parameters: 
+        - $ref: '#/components/parameters/itemPerPage'
+        - $ref: '#/components/parameters/page'
       responses:
         '200':
           description: 'Success'
@@ -1327,6 +1376,13 @@ components:
       schema:
         type: integer
       description: "Page for pagination"
+    qrid:
+      in: path
+      name: qrid
+      description: 'QRid of user'
+      required: true
+      schema:
+        type: string
   schemas:
     Response:
       description: 'Standard response schema'

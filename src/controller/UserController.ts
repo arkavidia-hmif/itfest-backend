@@ -273,6 +273,32 @@ export class UserController {
     });
   }
 
+  async getQrData(request: Request, response: Response) {
+    const userString = decodeQr(request.params.qrid);
+
+    let userData: any = {};
+
+    try {
+      userData = JSON.parse(userString);
+
+    } catch (error) {
+      console.error(error);
+      return responseGenerator(response, 400, "invalid-qrid");
+    }
+
+    const user = await this.userRepository.findOne(userData.id);
+
+    if (!user) {
+      return responseGenerator(response, 404, "user-not-found");
+    }
+
+    return responseGenerator(response, 200, "ok", {
+      username: user.username,
+      name: user.name,
+      role: user.role,
+    });
+  }
+
   async verifyEmail(request: Request, response: Response) {
     const code = request.params.code;
     const id = response.locals.auth.id;
