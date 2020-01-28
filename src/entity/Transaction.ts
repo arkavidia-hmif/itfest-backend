@@ -3,6 +3,12 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, RelationId } from "t
 import { Item } from "./Item";
 import { User } from "./User";
 
+export enum TransactionType {
+  GIVE = "give",
+  PLAY = "play",
+  REDEEM = "redeem",
+}
+
 @Entity()
 export class Transaction {
 
@@ -19,8 +25,12 @@ export class Transaction {
   @IsPositive()
   amount: number;
 
-  @Column({ nullable: false, default: true })
-  transfer: boolean;
+  @Column({
+    default: TransactionType.GIVE,
+    enum: TransactionType,
+    type: "enum",
+  })
+  type: TransactionType;
 
   @ManyToOne((type) => Item, (item) => item.id)
   item: Item;
