@@ -87,10 +87,4 @@ export class Tenant {
 
   @Column({ nullable: false })
   point: number;
-
-  @Column({ nullable: false, default: false })
-  emailVerified: boolean;
-
-  @Column({ nullable: false })
-  emailKey: string;
 }

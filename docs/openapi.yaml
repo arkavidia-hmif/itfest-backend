@@ -1,64 +1,64 @@
 openapi: "3.0.0"
 info:
   version: 1.0.0
-  title: 'Backend IT-Fest'
-  description: 'Ini adalah dokumentasi backend untuk acara IT Festival Arkavidia 6.0'
+  title: "Backend IT-Fest"
+  description: "Ini adalah dokumentasi backend untuk acara IT Festival Arkavidia 6.0"
 servers:
   - url: http://localhost:3000
-tags: 
+tags:
   - name: user
-    description: 'Everything about user'
+    description: "Everything about user"
   - name: auth
-    description: 'Everything about authentication'
+    description: "Everything about authentication"
   - name: inventory
-    description: 'Everything about inventory and item'
+    description: "Everything about inventory and item"
   - name: game
-    description: 'Everything about game'
-security: 
+    description: "Everything about game"
+security:
   - bearerAuth: []
 paths:
   /user/me:
     get:
-      tags: 
+      tags:
         - user
-      summary: 'Get profile of self'
+      summary: "Get profile of self"
       responses:
-        '200':
-          description: 'Success'
+        "200":
+          description: "Success"
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/Response'
+                  - $ref: "#/components/schemas/Response"
                   - properties:
                       data:
-                        $ref: '#/components/schemas/UserData'
-              example: 
+                        $ref: "#/components/schemas/UserData"
+              example:
                 status: 200
-                code: 'ok'
+                code: "ok"
                 data:
                   id: 15
                   email: null
-                  username: 'admin'
-                  name: 'Joshua'
-                  dob: '1998-10-12'
+                  username: "admin"
+                  name: "Joshua"
+                  dob: "1998-10-12"
                   gender: 1
-                  interest: 
-                    - 'Fintech'
-                    - 'Operating system'
-                  role: 'admin'
-                  createdAt: '2019-09-22T10:53:44.199Z'
-                  updatedAt: '2019-09-22T10:53:44.199Z'
-        '401':
-          $ref: '#/components/responses/InvalidBearer'
+                  interest:
+                    - "Fintech"
+                    - "Operating system"
+                  role: "admin"
+                  createdAt: "2019-09-22T10:53:44.199Z"
+                  updatedAt: "2019-09-22T10:53:44.199Z"
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
     put:
       tags:
         - user
-      summary: 'Edit profile of self'
+      summary: "Edit profile of self"
       description: |
         User can only update email, username, and/or email
       requestBody:
-        description: 'Modified user data'
+        description: "Modified user data"
         content:
           application/json:
             schema:
@@ -69,46 +69,46 @@ paths:
                   format: email
                 username:
                   type: string
-                name: 
+                name:
                   type: string
             examples:
-              'Change name':
+              "Change name":
                 value:
-                  name: 'Nama baru'
+                  name: "Nama baru"
       responses:
-        '200':
-          $ref: '#/components/responses/OK'
-        '400':
-          description: 'Bad request'
+        "200":
+          $ref: "#/components/responses/OK"
+        "400":
+          description: "Bad request"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InputErrorResponse'
+                $ref: "#/components/schemas/InputErrorResponse"
               examples:
-                'Invalid username and email':
+                "Invalid username and email":
                   value:
                     status: 400
-                    code: 'invalid-input'
+                    code: "invalid-input"
                     data:
-                      - part: 'username'
-                        message: 'must be unique'
-                      - part: 'email'
-                        message: 'must contains @'
-        '401':
-          $ref: '#/components/responses/InvalidBearer'
+                      - part: "username"
+                        message: "must be unique"
+                      - part: "email"
+                        message: "must contains @"
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
   /user/me/transaction:
     get:
-      tags: 
+      tags:
         - user
-      summary: 'Get list of transaction of self'
+      summary: "Get list of transaction of self"
       responses:
-        '200':
-          description: 'Success'
+        "200":
+          description: "Success"
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/Response'
+                  - $ref: "#/components/schemas/Response"
                   - properties:
                       data:
                         allOf:
@@ -116,12 +116,12 @@ paths:
                               array:
                                 type: array
                                 items:
-                                  $ref: '#/components/schemas/TransactionData'
-                          - $ref: '#/components/schemas/Pagination'
-                        
-              example: 
+                                  $ref: "#/components/schemas/TransactionData"
+                          - $ref: "#/components/schemas/Pagination"
+
+              example:
                 status: 200
-                code: 'ok'
+                code: "ok"
                 data:
                   array:
                     - id: 1
@@ -138,90 +138,90 @@ paths:
                   page: 1
                   itemPerPage: 10
                   totalItem: 2
-        '401':
-          $ref: '#/components/responses/InvalidBearer'
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
   /user/me/qrid:
     get:
       tags:
         - user
-      summary: 'Get id for qr code generation'
+      summary: "Get id for qr code generation"
       responses:
-        '200':
-          description: 'Success'
+        "200":
+          description: "Success"
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/Response'
+                  - $ref: "#/components/schemas/Response"
                   - properties:
                       data:
                         type: object
                         properties:
                           qrid:
                             type: string
-              example: 
+              example:
                 status: 200
-                code: 'ok'
+                code: "ok"
                 data:
-                  qrid: 'e4c34a765085fc61b54466b26dc6f00a2680d573b7cca46ad2f7a56acacdd285'
-        '401':
-          $ref: '#/components/responses/InvalidBearer'
+                  qrid: "e4c34a765085fc61b54466b26dc6f00a2680d573b7cca46ad2f7a56acacdd285"
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
   /user/{id}:
     get:
       tags:
         - user
-      summary: 'Get user profile of specified id'
+      summary: "Get user profile of specified id"
       description: |
         **Only allowed for admin**
       parameters:
         - name: id
           in: path
-          description: 'ID of user to get'
+          description: "ID of user to get"
           required: true
           schema:
             type: integer
       responses:
-        '200':
-          description: 'Success'
+        "200":
+          description: "Success"
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/Response'
+                  - $ref: "#/components/schemas/Response"
                   - properties:
                       data:
-                        $ref: '#/components/schemas/UserData'
-              example: 
+                        $ref: "#/components/schemas/UserData"
+              example:
                 status: 200
-                code: 'ok'
+                code: "ok"
                 data:
                   id: 15
                   email: null
-                  username: 'admin'
-                  name: 'Joshua'
-                  role: 'admin'
-                  createdAt: '2019-09-22T10:53:44.199Z'
-                  updatedAt: '2019-09-22T10:53:44.199Z'
-        '401':
-          $ref: '#/components/responses/InvalidBearer'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                  username: "admin"
+                  name: "Joshua"
+                  role: "admin"
+                  createdAt: "2019-09-22T10:53:44.199Z"
+                  updatedAt: "2019-09-22T10:53:44.199Z"
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
     put:
       tags:
         - user
-      summary: 'Edit profile of specific user id'
+      summary: "Edit profile of specific user id"
       description: |
         **Only allowed for admin**
         User can only update email, username, and/or email
       parameters:
         - name: id
           in: path
-          description: 'ID of user to modify'
+          description: "ID of user to modify"
           required: true
           schema:
             type: integer
       requestBody:
-        description: 'Modified user data'
+        description: "Modified user data"
         content:
           application/json:
             schema:
@@ -232,57 +232,57 @@ paths:
                   format: email
                 username:
                   type: string
-                name: 
+                name:
                   type: string
             examples:
-              'Change name':
+              "Change name":
                 value:
-                  name: 'Nama baru'
+                  name: "Nama baru"
       responses:
-        '200':
-          $ref: '#/components/responses/OK'
-        '400':
-          description: 'Bad request'
+        "200":
+          $ref: "#/components/responses/OK"
+        "400":
+          description: "Bad request"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InputErrorResponse'
+                $ref: "#/components/schemas/InputErrorResponse"
               examples:
-                'Invalid username and email':
+                "Invalid username and email":
                   value:
                     status: 400
-                    code: 'invalid-input'
+                    code: "invalid-input"
                     data:
-                      - part: 'username'
-                        message: 'must be unique'
-                      - part: 'email'
-                        message: 'must contains @'
-        '401':
-          $ref: '#/components/responses/InvalidBearer'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                      - part: "username"
+                        message: "must be unique"
+                      - part: "email"
+                        message: "must contains @"
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
   /user/{id}/transaction:
     get:
       tags:
         - user
-      summary: 'Get list of transaction of user with specified id'
+      summary: "Get list of transaction of user with specified id"
       description: |
         **Only allowed for admin**
       parameters:
         - name: id
           in: path
-          description: 'ID of user to get'
+          description: "ID of user to get"
           required: true
           schema:
             type: integer
       responses:
-        '200':
-          description: 'Success'
+        "200":
+          description: "Success"
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/Response'
+                  - $ref: "#/components/schemas/Response"
                   - properties:
                       data:
                         allOf:
@@ -290,12 +290,12 @@ paths:
                               array:
                                 type: array
                                 items:
-                                  $ref: '#/components/schemas/TransactionData'
-                          - $ref: '#/components/schemas/Pagination'
-                        
-              example: 
+                                  $ref: "#/components/schemas/TransactionData"
+                          - $ref: "#/components/schemas/Pagination"
+
+              example:
                 status: 200
-                code: 'ok'
+                code: "ok"
                 data:
                   array:
                     - id: 1
@@ -312,26 +312,26 @@ paths:
                   page: 1
                   itemPerPage: 10
                   totalItem: 2
-        '401':
-          $ref: '#/components/responses/InvalidBearer'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
   /user/{id}/give:
     post:
       tags:
         - user
-      summary: 'Transfer point to user with specified id'
+      summary: "Transfer point to user with specified id"
       description: |
         **Only allowed for admin**
       parameters:
         - name: id
           in: path
-          description: 'ID of user to give'
+          description: "ID of user to give"
           required: true
           schema:
             type: integer
       requestBody:
-        description: 'Amount to be transfered'
+        description: "Amount to be transfered"
         content:
           application/json:
             schema:
@@ -339,48 +339,48 @@ paths:
               properties:
                 amount:
                   type: integer
-            example: 
+            example:
               amount: 100
       responses:
-        '200':
-          $ref: '#/components/responses/OK'
-        '404':
-          description: 'User not found'
+        "200":
+          $ref: "#/components/responses/OK"
+        "404":
+          description: "User not found"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
-              example: 
+                $ref: "#/components/schemas/Response"
+              example:
                 status: 404
-                code: 'user-not-found'
-        '400':
-          description: 'Bad request'
+                code: "user-not-found"
+        "400":
+          description: "Bad request"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: "#/components/schemas/Response"
               examples:
-                'Not enough point':
+                "Not enough point":
                   value:
                     status: 400
-                    code: 'not-enough-point'
-                'Transfer to same user':
+                    code: "not-enough-point"
+                "Transfer to same user":
                   value:
                     status: 400
-                    code: 'same-user-transfer'
-        '401':
-          $ref: '#/components/responses/InvalidBearer'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                    code: "same-user-transfer"
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
   /user/{qrid}/give:
     post:
       tags:
         - user
-      summary: 'Transfer point to user with specified qrid'
+      summary: "Transfer point to user with specified qrid"
       parameters:
-        - $ref: '#/components/parameters/qrid'
+        - $ref: "#/components/parameters/qrid"
       requestBody:
-        description: 'Amount to be transfered'
+        description: "Amount to be transfered"
         content:
           application/json:
             schema:
@@ -388,39 +388,39 @@ paths:
               properties:
                 amount:
                   type: integer
-            example: 
+            example:
               amount: 100
       responses:
-        '200':
-          $ref: '#/components/responses/OK'
-        '404':
-          description: 'User not found'
+        "200":
+          $ref: "#/components/responses/OK"
+        "404":
+          description: "User not found"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
-              example: 
+                $ref: "#/components/schemas/Response"
+              example:
                 status: 404
-                code: 'user-not-found'
-        '400':
-          description: 'Bad request'
+                code: "user-not-found"
+        "400":
+          description: "Bad request"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: "#/components/schemas/Response"
               examples:
-                'Not enough point':
+                "Not enough point":
                   value:
                     status: 400
-                    code: 'not-enough-point'
-                'Transfer to same user':
+                    code: "not-enough-point"
+                "Transfer to same user":
                   value:
                     status: 400
-                    code: 'same-user-transfer'
-        '401':
-          $ref: '#/components/responses/InvalidBearer'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                    code: "same-user-transfer"
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
   /user/{qrid}/play:
     post:
       description: |
@@ -428,11 +428,11 @@ paths:
       tags:
         - game
         - user
-      summary: 'Make a visitor play game'
+      summary: "Make a visitor play game"
       parameters:
-        - $ref: '#/components/parameters/qrid'
+        - $ref: "#/components/parameters/qrid"
       requestBody:
-        description: 'Game played'
+        description: "Game played"
         content:
           application/json:
             schema:
@@ -442,106 +442,106 @@ paths:
                   type: array
                   items:
                     type: integer
-            example: 
-              game: [1,2]
+            example:
+              game: [1, 2]
       responses:
-        '200':
-          $ref: '#/components/responses/OK'
-        '400':
-          description: 'Bad request'
+        "200":
+          $ref: "#/components/responses/OK"
+        "400":
+          description: "Bad request"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: "#/components/schemas/Response"
               examples:
-                'Not enough point (tenant)':
+                "Not enough point (tenant)":
                   value:
                     status: 400
-                    code: 'not-enough-point'
-                'Visitor have already played the game':
+                    code: "not-enough-point"
+                "Visitor have already played the game":
                   value:
                     status: 400
-                    code: 'already-play-game' 
-                'Invalid qrid':
+                    code: "already-play-game"
+                "Invalid qrid":
                   value:
                     status: 400
-                    code: 'invalid-qrid' 
-        '404':
-          description: 'User or game not found'
+                    code: "invalid-qrid"
+        "404":
+          description: "User or game not found"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: "#/components/schemas/Response"
               examples:
-                'User not found':
+                "User not found":
                   value:
                     status: 404
-                    code: 'user-not-found'
-                'Game not found':
+                    code: "user-not-found"
+                "Game not found":
                   value:
                     status: 404
-                    code: 'game-not-found'
-        '401':
-          $ref: '#/components/responses/InvalidBearer'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                    code: "game-not-found"
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
   /user/{qrid}:
-   get:
+    get:
       tags:
         - user
-      summary: 'Get public user data from qrid'
+      summary: "Get public user data from qrid"
       parameters:
-        - $ref: '#/components/parameters/qrid'
+        - $ref: "#/components/parameters/qrid"
       responses:
-        '200':
-          description: 'Success'
+        "200":
+          description: "Success"
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/Response'
+                  - $ref: "#/components/schemas/Response"
                   - properties:
                       data:
                         type: object
                         properties:
-                          username: 
+                          username:
                             type: string
                           name:
                             type: string
                           role:
                             type: string
-              example: 
+              example:
                 status: 200
-                code: 'ok'
+                code: "ok"
                 data:
-                  username: 'user1'
-                  name: 'Nama orang'
-                  role: 'visitor'
-        '400':
-          description: 'Bad request'
+                  username: "user1"
+                  name: "Nama orang"
+                  role: "visitor"
+        "400":
+          description: "Bad request"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: "#/components/schemas/Response"
               examples:
-                'Invalid qrid':
+                "Invalid qrid":
                   value:
                     status: 400
-                    code: 'invalid-qrid' 
-        '404':
-          description: 'User not found'
+                    code: "invalid-qrid"
+        "404":
+          description: "User not found"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: "#/components/schemas/Response"
               examples:
-                'User not found':
+                "User not found":
                   value:
                     status: 404
-                    code: 'user-not-found'
-        '401':
-          $ref: '#/components/responses/InvalidBearer'
-          
+                    code: "user-not-found"
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+
   /login:
     post:
       security: []
@@ -550,7 +550,7 @@ paths:
       requestBody:
         description: |
           User credential
-          
+
           Email and username field are interchangeable
         content:
           application/json:
@@ -566,48 +566,48 @@ paths:
                 password:
                   type: string
             examples:
-              'With email':
+              "With email":
                 value:
-                  email: 'admin@email.com'
-                  password: 'password1234'
-              'With username':
+                  email: "admin@email.com"
+                  password: "password1234"
+              "With username":
                 value:
-                  username: 'admin'
-                  password: 'password1234'
+                  username: "admin"
+                  password: "password1234"
       responses:
-        '200':
-          $ref: '#/components/responses/OKAuth'
-        '401':
-          description: 'Invalid credential'
-          content: 
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Response'
-              example: 
-                status: 401
-                code: 'invalid-auth'
-        '404':
-          description: 'User not found'
+        "200":
+          $ref: "#/components/responses/OKAuth"
+        "401":
+          description: "Invalid credential"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
-              example: 
+                $ref: "#/components/schemas/Response"
+              example:
+                status: 401
+                code: "invalid-auth"
+        "404":
+          description: "User not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+              example:
                 status: 404
-                code: 'user-not-found'
+                code: "user-not-found"
   /register/visitor:
     post:
       security: []
-      description: 'Activate (register) a visitor account'
+      description: "Activate (register) a visitor account"
       tags:
         - auth
       requestBody:
-        description: 'Activation information'
+        description: "Activation information"
         content:
           application/json:
             schema:
               type: object
-              required: 
+              required:
                 - name
                 - email
                 - password
@@ -627,7 +627,7 @@ paths:
                   type: string
                   format: date
                 gender:
-                  description: '1 untuk pria dan 2 untuk wanita'
+                  description: "1 untuk pria dan 2 untuk wanita"
                   type: number
                   minimum: 1
                   maximum: 2
@@ -635,51 +635,51 @@ paths:
                   type: array
                   items:
                     type: string
-                
-            example: 
-              email: 'visitor@email.com'
-              password: 'password1234'
-              voucher: 'abc123'
-              dob: '1999-10-10'
+
+            example:
+              email: "visitor@email.com"
+              password: "password1234"
+              voucher: "abc123"
+              dob: "1999-10-10"
               gender: 1
               interest:
-                - 'Gaming'
-                - 'FinTech'
-              
+                - "Gaming"
+                - "FinTech"
+
       responses:
-        '200':
-          $ref: '#/components/responses/OKAuth'
-        '400':
-          description: 'Bad request'
+        "200":
+          $ref: "#/components/responses/OKAuth"
+        "400":
+          description: "Bad request"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: "#/components/schemas/Response"
               examples:
-                'Invalid voucher':
+                "Invalid voucher":
                   value:
                     status: 400
-                    code: 'invalid-voucher'
-                'Invalid input(email)':
+                    code: "invalid-voucher"
+                "Invalid input(email)":
                   value:
                     status: 400
-                    code: 'invalid-input'
+                    code: "invalid-input"
                     data:
-                      - part: 'email'
-                      - message: 'must contains @'
+                      - part: "email"
+                      - message: "must contains @"
   /register/tenant:
     post:
       security: []
-      description: 'Register a tenant account'
+      description: "Register a tenant account"
       tags:
         - auth
       requestBody:
-        description: 'Registration information'
+        description: "Registration information"
         content:
           application/json:
             schema:
               type: object
-              required: 
+              required:
                 - email
                 - password
               properties:
@@ -693,86 +693,47 @@ paths:
                 password:
                   type: string
                   format: password
-                
-            example: 
-              name: 'Tenant'
-              email: 'tenant@email.com'
-              password: 'password1234'
-              
+
+            example:
+              name: "Tenant"
+              email: "tenant@email.com"
+              password: "password1234"
+
       responses:
-        '200':
-          $ref: '#/components/responses/OKAuth'
-        '400':
-          description: 'Bad request'
+        "200":
+          $ref: "#/components/responses/OKAuth"
+        "400":
+          description: "Bad request"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InputErrorResponse'
+                $ref: "#/components/schemas/InputErrorResponse"
               examples:
-                'Invalid input':
+                "Invalid input":
                   value:
                     status: 400
-                    code: 'invalid-input'
+                    code: "invalid-input"
                     data:
-                      - part: 'email'
-                        message: 'must contain @'
-                      - part: 'password'
-                        message: 'must contain capital letter and number'
-  /activate/{key}:
-    get:
-      tags: 
-        - auth
-      summary: 'Verify email'
-      parameters:
-        - name: key
-          in: path
-          description: 'Generated key assigned to an user for email verification'
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: 'Success'
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/Response'
-                  - properties:
-                      data:
-                        $ref: '#/components/schemas/UserData'
-              example: 
-                status: 200
-                code: 'ok'
-        '400':
-          description: 'Invalid key'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Response'
-              example:
-                status: 400
-                code: 'invalid-key'
-        '401':
-          $ref: '#/components/responses/InvalidBearer'
-
-
+                      - part: "email"
+                        message: "must contain @"
+                      - part: "password"
+                        message: "must contain capital letter and number"
   /game:
     get:
       tags:
         - game
       summary: List all game owned by a tenant or everything (if loggedin as an admin)
-      parameters: 
-        - $ref: '#/components/parameters/itemPerPage'
-        - $ref: '#/components/parameters/page'
+      parameters:
+        - $ref: "#/components/parameters/itemPerPage"
+        - $ref: "#/components/parameters/page"
       responses:
-        '200':
-          description: 'Success'
+        "200":
+          description: "Success"
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/Response'
+                  - $ref: "#/components/schemas/Response"
                   - properties:
                       data:
                         allOf:
@@ -780,27 +741,27 @@ paths:
                               array:
                                 type: array
                                 items:
-                                  $ref: '#/components/schemas/GameData'
-                          - $ref: '#/components/schemas/Pagination'
-                        
-              example: 
+                                  $ref: "#/components/schemas/GameData"
+                          - $ref: "#/components/schemas/Pagination"
+
+              example:
                 status: 200
-                code: 'ok'
+                code: "ok"
                 data:
                   array:
                     - id: 1
-                      name: 'Lempar PC'
+                      name: "Lempar PC"
                       difficulty: 3
                     - id: 2
-                      name: 'Makan RAM'
+                      name: "Makan RAM"
                       difficulty: 2
                   page: 1
                   itemPerPage: 10
                   totalItem: 2
-        '401':
-          $ref: '#/components/responses/InvalidBearer'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
     post:
       description: |
         **Only allowed for tenant and admin**
@@ -808,276 +769,275 @@ paths:
         - game
       summary: Create a new game
       requestBody:
-        description: 'Game information'
+        description: "Game information"
         content:
           application/json:
             schema:
               type: object
-              required: 
+              required:
                 - name
                 - difficulty
               properties:
                 name:
                   type: string
                 difficulty:
-                  description: 'easy(1), medium(2), hard(3)'
+                  description: "easy(1), medium(2), hard(3)"
                   type: number
                   minimum: 1
                   maximum: 3
                 tenant:
-                  description: 'User id of tenant if requesting user is admin'
+                  description: "User id of tenant if requesting user is admin"
                   type: number
-                
+
             examples:
-              'Requested by tenant':
+              "Requested by tenant":
                 value:
-                  name: 'Lempar PC'
+                  name: "Lempar PC"
                   difficulty: 3
-              'Requested by admin':
+              "Requested by admin":
                 value:
-                  name: 'Lempar PC'
+                  name: "Lempar PC"
                   difficulty: 3
                   tenant: 1
       responses:
-        '200':
-          $ref: '#/components/responses/OK'
-        '404':
-          description: 'Tenant not found'
+        "200":
+          $ref: "#/components/responses/OK"
+        "404":
+          description: "Tenant not found"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
-              example: 
+                $ref: "#/components/schemas/Response"
+              example:
                 status: 404
-                code: 'tenant-not-found'
-        '400':
-          description: 'Bad request'
+                code: "tenant-not-found"
+        "400":
+          description: "Bad request"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: "#/components/schemas/Response"
               examples:
-                'Admin request without tenant id':
+                "Admin request without tenant id":
                   value:
                     status: 400
-                    code: 'admin-no-tenant-id'
-                'Invalid input (difficulty)':
+                    code: "admin-no-tenant-id"
+                "Invalid input (difficulty)":
                   value:
                     status: 400
-                    code: 'invalid-input'
+                    code: "invalid-input"
                     data:
-                      - part: 'difficulty'
-                        message: 'must be between 1 to 3'
-        '401':
-          $ref: '#/components/responses/InvalidBearer'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                      - part: "difficulty"
+                        message: "must be between 1 to 3"
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
   /game/{id}:
     get:
       tags:
         - game
-      summary: 'Get game detail of specific id'
+      summary: "Get game detail of specific id"
       description: |
         **Only allowed for admin and tenant**
       parameters:
         - name: id
           in: path
-          description: 'ID of game to get'
+          description: "ID of game to get"
           required: true
           schema:
             type: integer
       responses:
-        '200':
-          description: 'Success'
+        "200":
+          description: "Success"
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/Response'
+                  - $ref: "#/components/schemas/Response"
                   - properties:
                       data:
-                        $ref: '#/components/schemas/GameData'
-              example: 
+                        $ref: "#/components/schemas/GameData"
+              example:
                 status: 200
-                code: 'ok'
+                code: "ok"
                 data:
                   id: 15
-                  name: 'Bola bekel'
+                  name: "Bola bekel"
                   difficulty: 2
-        '404':
-          description: 'Game not found'
+        "404":
+          description: "Game not found"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
-              example: 
+                $ref: "#/components/schemas/Response"
+              example:
                 status: 404
-                code: 'game-not-found'
-        '401':
-          $ref: '#/components/responses/InvalidBearer'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                code: "game-not-found"
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
     put:
       tags:
         - game
-      summary: 'Edit game detail of specific id'
+      summary: "Edit game detail of specific id"
       description: |
         **Only allowed for tenant and admin**
       parameters:
         - name: id
           in: path
-          description: 'ID of game to get'
+          description: "ID of game to get"
           required: true
           schema:
             type: integer
       requestBody:
-        description: 'Modified game data'
+        description: "Modified game data"
         content:
           application/json:
             schema:
               type: object
               properties:
-                name: 
+                name:
                   type: string
                 difficulty:
-                  description: 'easy(1), medium(2), hard(3)'
+                  description: "easy(1), medium(2), hard(3)"
                   type: number
                   minimum: 1
                   maximum: 3
             examples:
-              'Change name':
+              "Change name":
                 value:
-                  name: 'Nama baru'
+                  name: "Nama baru"
       responses:
-        '200':
-          $ref: '#/components/responses/OK'
-        '400':
-          description: 'Bad request'
+        "200":
+          $ref: "#/components/responses/OK"
+        "400":
+          description: "Bad request"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InputErrorResponse'
+                $ref: "#/components/schemas/InputErrorResponse"
               examples:
-                'Invalid difficulty':
+                "Invalid difficulty":
                   value:
                     status: 400
-                    code: 'invalid-input'
+                    code: "invalid-input"
                     data:
-                      - part: 'price'
-                        message: 'must be between 1 to 3'
-        '404':
-          description: 'Game not found'
+                      - part: "price"
+                        message: "must be between 1 to 3"
+        "404":
+          description: "Game not found"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
-              example: 
+                $ref: "#/components/schemas/Response"
+              example:
                 status: 404
-                code: 'game-not-found'
-        '401':
-          $ref: '#/components/responses/InvalidBearer'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                code: "game-not-found"
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
     delete:
       tags:
         - game
-      summary: 'Delete game of specific id'
+      summary: "Delete game of specific id"
       description: |
         **Only allowed for tenant and admin**
       parameters:
         - name: id
           in: path
-          description: 'ID of game to delete'
+          description: "ID of game to delete"
           required: true
           schema:
             type: integer
       responses:
-        '200':
-          $ref: '#/components/responses/OK'
-        '404':
-          description: 'Game not found'
+        "200":
+          $ref: "#/components/responses/OK"
+        "404":
+          description: "Game not found"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
-              example: 
+                $ref: "#/components/schemas/Response"
+              example:
                 status: 404
-                code: 'game-not-found'
-        '401':
-          $ref: '#/components/responses/InvalidBearer'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-  
+                code: "game-not-found"
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
   /game/{id}/review:
     get:
       tags:
         - game
-      summary: 'Get game review of specific id'
+      summary: "Get game review of specific id"
       description: |
         **Only allowed for tenant and admin**
       parameters:
         - name: id
           in: path
-          description: 'ID of game to get'
+          description: "ID of game to get"
           required: true
           schema:
             type: integer
       responses:
-        '200':
-          description: 'Success'
+        "200":
+          description: "Success"
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/Response'
+                  - $ref: "#/components/schemas/Response"
                   - properties:
                       data:
                         type: object
                         properties:
-                          review: 
+                          review:
                             type: number
-              example: 
+              example:
                 status: 200
-                code: 'ok'
+                code: "ok"
                 data:
                   review: 3.4
-        '404':
-          description: 'Game not found'
+        "404":
+          description: "Game not found"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
+                $ref: "#/components/schemas/Response"
               examples:
-                'Game not found':
+                "Game not found":
                   value:
                     status: 404
-                    code: 'game-not-found'
-        '401':
-          $ref: '#/components/responses/InvalidBearer'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-      
+                    code: "game-not-found"
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
     post:
       tags:
         - game
-      summary: 'Submit review for a game'
+      summary: "Submit review for a game"
       description: |
         **Only allowed after playing**
       parameters:
         - name: id
           in: path
-          description: 'ID of game to review'
+          description: "ID of game to review"
           required: true
           schema:
             type: integer
       requestBody:
-        description: 'Review data'
+        description: "Review data"
         content:
           application/json:
             schema:
               type: object
               properties:
-                score: 
+                score:
                   type: integer
                   minimum: 1
                   maximum: 5
@@ -1088,60 +1048,58 @@ paths:
             example:
               score: 5
               praise:
-                - 'fun'
-                - 'addicting'
+                - "fun"
+                - "addicting"
       responses:
-        '200':
-          $ref: '#/components/responses/OK'
-        '400':
-          description: 'Bad request'
+        "200":
+          $ref: "#/components/responses/OK"
+        "400":
+          description: "Bad request"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InputErrorResponse'
+                $ref: "#/components/schemas/InputErrorResponse"
               examples:
-                'Invalid score':
+                "Invalid score":
                   value:
                     status: 400
-                    code: 'invalid-input'
+                    code: "invalid-input"
                     data:
-                      - part: 'score'
-                        message: 'must be between 1 to 5'
-                'Already reviewed':
+                      - part: "score"
+                        message: "must be between 1 to 5"
+                "Already reviewed":
                   value:
                     status: 400
-                    code: 'already-reviewed'
-        '404':
-          description: 'Game not found'
+                    code: "already-reviewed"
+        "404":
+          description: "Game not found"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
-              example: 
+                $ref: "#/components/schemas/Response"
+              example:
                 status: 404
-                code: 'game-not-found'
-        '401':
-          $ref: '#/components/responses/InvalidBearer'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-      
-      
+                code: "game-not-found"
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
   /item:
     get:
       tags:
         - inventory
       summary: List all inventory
-      parameters: 
-        - $ref: '#/components/parameters/itemPerPage'
-        - $ref: '#/components/parameters/page'
+      parameters:
+        - $ref: "#/components/parameters/itemPerPage"
+        - $ref: "#/components/parameters/page"
       responses:
-        '200':
-          description: 'Success'
+        "200":
+          description: "Success"
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/Response'
+                  - $ref: "#/components/schemas/Response"
                   - properties:
                       data:
                         allOf:
@@ -1149,24 +1107,24 @@ paths:
                               array:
                                 type: array
                                 items:
-                                  $ref: '#/components/schemas/InventoryData'
-                          - $ref: '#/components/schemas/Pagination'
-                        
-              example: 
+                                  $ref: "#/components/schemas/InventoryData"
+                          - $ref: "#/components/schemas/Pagination"
+
+              example:
                 status: 200
-                code: 'ok'
+                code: "ok"
                 data:
                   array:
                     - qty: 1
                       item:
                         id: 1
-                        name: 'Es krim'
+                        name: "Es krim"
                         price: 3
                   page: 1
                   itemPerPage: 10
                   totalItem: 1
-        '401':
-          $ref: '#/components/responses/InvalidBearer'
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
     post:
       description: |
         **Only allowed for tenant and admin**
@@ -1174,12 +1132,12 @@ paths:
         - inventory
       summary: Create a new item
       requestBody:
-        description: 'Item information'
+        description: "Item information"
         content:
           application/json:
             schema:
               type: object
-              required: 
+              required:
                 - name
                 - price
               properties:
@@ -1189,101 +1147,100 @@ paths:
                   type: integer
                   minimum: 0
                 owner:
-                  description: 'Create item as another user, only allowed for admin'
+                  description: "Create item as another user, only allowed for admin"
                   type: integer
             example:
-              name: 'Es krim'
+              name: "Es krim"
               price: 2
-                
-            
+
       responses:
-        '200':
-          $ref: '#/components/responses/OK'
-        '400':
-          description: 'Bad request'
+        "200":
+          $ref: "#/components/responses/OK"
+        "400":
+          description: "Bad request"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InputErrorResponse'
+                $ref: "#/components/schemas/InputErrorResponse"
               examples:
-                'Invalid difficulty':
+                "Invalid difficulty":
                   value:
                     status: 400
-                    code: 'invalid-input'
+                    code: "invalid-input"
                     data:
-                      - part: 'price'
-                        message: 'must be >=0'
-        '404':
-          description: 'Tenant not found'
+                      - part: "price"
+                        message: "must be >=0"
+        "404":
+          description: "Tenant not found"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
-              example: 
+                $ref: "#/components/schemas/Response"
+              example:
                 status: 404
-                code: 'tenant-not-found'
-        '401':
-          $ref: '#/components/responses/InvalidBearer'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                code: "tenant-not-found"
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
   /item/{id}:
     get:
       tags:
         - inventory
-      summary: 'Get game detail of specific id'
+      summary: "Get game detail of specific id"
       parameters:
         - name: id
           in: path
-          description: 'ID of item to get'
+          description: "ID of item to get"
           required: true
           schema:
             type: integer
       responses:
-        '200':
-          description: 'Success'
+        "200":
+          description: "Success"
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/Response'
+                  - $ref: "#/components/schemas/Response"
                   - properties:
                       data:
-                        $ref: '#/components/schemas/InventoryData'
-              example: 
+                        $ref: "#/components/schemas/InventoryData"
+              example:
                 status: 200
-                code: 'ok'
+                code: "ok"
                 data:
                   qty: 3
                   item:
                     id: 15
-                    name: 'Bola bekel'
+                    name: "Bola bekel"
                     price: 2
-        '404':
-          description: 'Item not found'
+        "404":
+          description: "Item not found"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
-              example: 
+                $ref: "#/components/schemas/Response"
+              example:
                 status: 404
-                code: 'item-not-found'
-        '401':
-          $ref: '#/components/responses/InvalidBearer'
+                code: "item-not-found"
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
     put:
       tags:
         - inventory
-      summary: 'Edit item detail of specific id'
+      summary: "Edit item detail of specific id"
       description: |
         **Only allowed for tenant and admin**
       parameters:
         - name: id
           in: path
-          description: 'ID of item to edit'
+          description: "ID of item to edit"
           required: true
           schema:
             type: integer
       requestBody:
-        description: 'Modified item data'
+        description: "Modified item data"
         content:
           application/json:
             schema:
@@ -1292,75 +1249,74 @@ paths:
                 qty:
                   type: integer
                   minimum: 0
-                name: 
+                name:
                   type: string
                 price:
                   type: integer
                   minimum: 0
             examples:
-              'Change name':
+              "Change name":
                 value:
-                  name: 'Nama baru'
+                  name: "Nama baru"
       responses:
-        '200':
-          $ref: '#/components/responses/OK'
-        '400':
-          description: 'Bad request'
+        "200":
+          $ref: "#/components/responses/OK"
+        "400":
+          description: "Bad request"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InputErrorResponse'
+                $ref: "#/components/schemas/InputErrorResponse"
               examples:
-                'Invalid difficulty':
+                "Invalid difficulty":
                   value:
                     status: 400
-                    code: 'invalid-input'
+                    code: "invalid-input"
                     data:
-                      - part: 'price'
-                        message: 'must be >=0'
-        '404':
-          description: 'Game not found'
+                      - part: "price"
+                        message: "must be >=0"
+        "404":
+          description: "Game not found"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
-              example: 
+                $ref: "#/components/schemas/Response"
+              example:
                 status: 404
-                code: 'game-not-found'
-        '401':
-          $ref: '#/components/responses/InvalidBearer'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+                code: "game-not-found"
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
     delete:
       tags:
         - inventory
-      summary: 'Delete item of specific id'
+      summary: "Delete item of specific id"
       description: |
         **Only allowed for tenant and admin**
       parameters:
         - name: id
           in: path
-          description: 'ID of game to delete'
+          description: "ID of game to delete"
           required: true
           schema:
             type: integer
       responses:
-        '200':
-          $ref: '#/components/responses/OK'
-        '404':
-          description: 'Game not found'
+        "200":
+          $ref: "#/components/responses/OK"
+        "404":
+          description: "Game not found"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'
-              example: 
+                $ref: "#/components/schemas/Response"
+              example:
                 status: 404
-                code: 'game-not-found'
-        '401':
-          $ref: '#/components/responses/InvalidBearer'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-
+                code: "game-not-found"
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
 components:
   parameters:
@@ -1379,13 +1335,13 @@ components:
     qrid:
       in: path
       name: qrid
-      description: 'QRid of user'
+      description: "QRid of user"
       required: true
       schema:
         type: string
   schemas:
     Response:
-      description: 'Standard response schema'
+      description: "Standard response schema"
       type: object
       properties:
         status:
@@ -1393,27 +1349,27 @@ components:
         code:
           type: string
     InputErrorResponse:
-      description: 'Response for input validation error'
+      description: "Response for input validation error"
       allOf:
-        - $ref: '#/components/schemas/Response'
+        - $ref: "#/components/schemas/Response"
         - properties:
             data:
-              $ref: '#/components/schemas/InputErrorArray'
+              $ref: "#/components/schemas/InputErrorArray"
     InputErrorArray:
-      description: 'Array containing all input validation error'
+      description: "Array containing all input validation error"
       type: array
       items:
-        title: 'InputError'
+        title: "InputError"
         type: object
         properties:
           part:
-            description: 'The problematic input key'
+            description: "The problematic input key"
             type: string
           message:
-            description: 'Description of error'
+            description: "Description of error"
             type: string
     UserData:
-      description: 'User object'
+      description: "User object"
       type: object
       properties:
         id:
@@ -1424,7 +1380,7 @@ components:
           format: email
         username:
           type: string
-        name: 
+        name:
           type: string
         dob:
           type: string
@@ -1445,7 +1401,7 @@ components:
           type: string
           format: date-time
     TransactionData:
-      description: 'Transaction object'
+      description: "Transaction object"
       type: object
       properties:
         id:
@@ -1454,17 +1410,17 @@ components:
           type: integer
         transfer:
           type: boolean
-          description: 'Is transaction a transfer or buy'
+          description: "Is transaction a transfer or buy"
         fromId:
           type: integer
         toId:
           type: integer
         itemId:
           type: integer
-          description: 'Null on transfer transaction'
+          description: "Null on transfer transaction"
           nullable: true
     GameData:
-      description: 'Game object'
+      description: "Game object"
       type: object
       properties:
         id:
@@ -1475,9 +1431,9 @@ components:
           type: integer
           minimum: 1
           maximum: 3
-          description: 'easy(1), medium(2), hard(3)'
+          description: "easy(1), medium(2), hard(3)"
     ItemData:
-      description: 'Item object'
+      description: "Item object"
       type: object
       properties:
         id:
@@ -1488,15 +1444,15 @@ components:
           type: integer
           minimum: 0
     InventoryData:
-      description: 'Inventory object'
+      description: "Inventory object"
       type: object
       properties:
         qty:
           type: number
         item:
-          $ref: '#/components/schemas/ItemData'
+          $ref: "#/components/schemas/ItemData"
     Pagination:
-      description: 'Pagination helper object'
+      description: "Pagination helper object"
       type: object
       properties:
         page:
@@ -1507,61 +1463,59 @@ components:
           type: integer
   responses:
     OKAuth:
-      description: 'Success'
+      description: "Success"
       content:
         application/json:
           schema:
             allOf:
-              - $ref: '#/components/schemas/Response'
+              - $ref: "#/components/schemas/Response"
               - properties:
                   data:
                     type: object
                     properties:
                       jwt:
                         type: string
-          example: 
+          example:
             status: 200
-            code: 'ok'
+            code: "ok"
             data:
-              jwt: 'a jwt token'
+              jwt: "a jwt token"
     OK:
-      description: 'Success'
+      description: "Success"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Response'
-          example: 
+            $ref: "#/components/schemas/Response"
+          example:
             status: 200
-            code: 'ok'
+            code: "ok"
     InvalidBearer:
-      description: 'JWT token is missing or invalid'
+      description: "JWT token is missing or invalid"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Response'
+            $ref: "#/components/schemas/Response"
           examples:
             invalid:
               value:
                 status: 401
-                code: 'invalid-jwt'
+                code: "invalid-jwt"
             missing:
               value:
                 status: 401
-                code: 'no-bearer'
-            
+                code: "no-bearer"
+
     Forbidden:
       description: "User doesn't have enough permission"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Response'
-          example: 
+            $ref: "#/components/schemas/Response"
+          example:
             status: 403
-            code: 'forbidden'
+            code: "forbidden"
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
-      bearerFormat: JWT 
-          
-          
+      bearerFormat: JWT
