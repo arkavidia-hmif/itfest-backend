@@ -34,7 +34,7 @@ export default () => {
     .isLength({ min: 6, max: 6 }).withMessage("must be 6 characters long");
   const usernameCheck = () => check("username")
     .isAlphanumeric().withMessage("must be alphanumeric")
-    .isLength({ min: 6 }).withMessage("must be >= 6 characters long");
+    .isLength({ min: 1 }).withMessage("must be >= 1 character long");
   // const pointCheck =
 
   // Public user endpoint
