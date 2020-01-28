@@ -19,7 +19,20 @@ DB_URL #URL of database including auth
 SECRET #JWT secret
 QRKEY #32 character string for qr data encryption
 
+HOST_URL # URL of hosted server
 PORT #Service port
+
+# SMTP options, based on https://nodemailer.com/smtp/
+SMTP_HOST
+SMTP_PORT
+SMTP_SECURE
+SMTP_USERNAME
+SMTP_PASSWORD
+
+# Verification email options
+EMAIL_VERIFY_FROM
+EMAIL_VERIFY_SUBJECT
+EMAIL_VERIFY_TEMPALTE
 ```
 
 ## API Doc

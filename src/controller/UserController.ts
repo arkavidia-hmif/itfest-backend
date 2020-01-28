@@ -2,15 +2,19 @@ import * as bcrypt from "bcrypt";
 import * as crypto from "crypto";
 import { Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
-import { getRepository, getConnection } from "typeorm";
+import * as Mustache from "mustache";
+import { getConnection, getRepository } from "typeorm";
 
 import config from "../config";
 import { Tenant, User, UserRole, Visitor } from "../entity/User";
+import { Voucher } from "../entity/Voucher";
+import { transporter } from "../utils/mail";
+import { partialUpdate } from "../utils/partialUpdateEntity";
 import { decodeQr, generateQr } from "../utils/qr";
 import { responseGenerator } from "../utils/responseGenerator";
 import { TransactionController } from "./TransactionController";
-import { Voucher } from "../entity/Voucher";
-import { partialUpdate } from "../utils/partialUpdateEntity";
+import { readFileSync } from "fs";
+import { join } from "path";
 
 export class UserController {
 
@@ -113,6 +117,13 @@ export class UserController {
       return responseGenerator(response, 404, "user-not-found");
     }
 
+    if (user.role === UserRole.TENANT) {
+      const tenant = await this.tenantRepository.findOne(user.id);
+      if (!tenant.emailVerified && !process.env.DEBUG_SKIP_EMAIL) {
+        return responseGenerator(response, 400, "email-not-verified");
+      }
+    }
+
     if (bcrypt.compareSync(password, user.password)) {
       const token = jwt.sign({
         id: user.id,
@@ -143,24 +154,50 @@ export class UserController {
     const emailKey = crypto.randomBytes(48).toString("hex");
 
     try {
-      const savedUser = await this.userRepository.save({
-        role: UserRole.TENANT,
-        salt,
-        password: encryptedHash,
-        username,
-        name,
-        email,
-      });
+      await getConnection().transaction(async transactionManager => {
+        const tmUserRepository = transactionManager.getRepository(User);
+        const tmTenantRepository = transactionManager.getRepository(Tenant);
 
-      await this.tenantRepository.save({
-        userId: savedUser,
-        emailVerified: false,
-        emailKey,
-        point: config.tenantInitial
-      });
+
+        const savedUser = await tmUserRepository.save({
+          role: UserRole.TENANT,
+          salt,
+          password: encryptedHash,
+          username,
+          name,
+          email,
+        });
+
+        await tmTenantRepository.save({
+          userId: savedUser,
+          emailVerified: false,
+          emailKey,
+          point: config.tenantInitial
+        });
+
+        const templateLocation = join(__dirname, "..", "template/verify.mustache");
+
+        const templateFile = readFileSync(process.env.EMAIL_VERIFY_TEMPLATE || templateLocation);
+        const templateString = templateFile.toString();
+        const emailText = Mustache.render(templateString, {
+          name,
+          link: `${process.env.HOST_URL}/verify/${emailKey}`
+        });
+
+        if (!process.env.DEBUG_SKIP_EMAIL) {
+          await transporter.sendMail({
+            from: process.env.EMAIL_VERIFY_FROM || "itfest@arkavidia.id",
+            to: email,
+            subject: process.env.EMAIL_VERIFY_SUBJECT || "ITFest Email Verification",
+            text: emailText
+          });
+        }
+      })
     } catch (err) {
       if (err.code === "ER_DUP_ENTRY") {
         return responseGenerator(response, 400, "user-exists");
+      } else if (err.code === "ESOCKET") {
+        return responseGenerator(response, 500, "email-error");
       } else {
         console.error(err);
         return responseGenerator(response, 500, "unknown-error");
@@ -168,8 +205,6 @@ export class UserController {
     }
 
     return responseGenerator(response, 200, "ok");
-
-
   }
 
   async registerVisitor(request: Request, response: Response) {
@@ -301,16 +336,16 @@ export class UserController {
 
   async verifyEmail(request: Request, response: Response) {
     const code = request.params.code;
-    const id = response.locals.auth.id;
 
-    const tenant = await this.tenantRepository.findOne(id);
+    const tenant = await this.tenantRepository.findOne({
+      where: {
+        emailKey: code
+      },
+      relations: ["userId"]
+    });
 
     if (!tenant) {
-      return responseGenerator(response, 400, "user-not-tenant");
-    }
-
-    if (tenant.emailKey !== code) {
-      return responseGenerator(response, 400, "invalid-email-code");
+      return responseGenerator(response, 404, "tenant-not-found");
     }
 
     tenant.emailVerified = true;
