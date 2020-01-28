@@ -31,7 +31,7 @@
     "reflect-metadata": "^0.1.13",
     "socket.io": "^2.3.0",
     "sqlite3": "^4.0.3",
-    "typeorm": "0.2.18"
+    "typeorm": "0.2.21"
   },
   "scripts": {
     "start": "ts-node src/index.ts",
