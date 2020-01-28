@@ -35,7 +35,7 @@ export default () => {
   const usernameCheck = () => check("username")
     .isAlphanumeric().withMessage("must be alphanumeric")
     .isLength({ min: 1 }).withMessage("must be >= 1 character long");
-  // const pointCheck =
+  const pointCheck = () => check("point").isInt({ min: 0 }).withMessage("must be a positive integer");
 
   // Public user endpoint
   router.post("/login", [
@@ -61,12 +61,13 @@ export default () => {
   ], uc.registerVisitor.bind(uc));
 
   router.post("/register/tenant", [
+    checkJWT,
     limitAccess([UserRole.ADMIN]),
     emailCheck().optional(),
     passwordCheck(),
     usernameCheck(),
-    nameCheck().optional(),
-
+    nameCheck(),
+    pointCheck().optional(),
     checkParam,
   ], uc.registerTenant.bind(uc));
 

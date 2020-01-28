@@ -134,9 +134,9 @@ export class UserController {
   }
 
   async registerTenant(request: Request, response: Response) {
-    const { email, password } = request.body;
-    const username: string = email.substring(0, email.indexOf("@"));
-    const name = request.body.name || email;
+    const { email, username, password, point } = request.body;
+    // const username: string = request.body.uemail.substring(0, email.indexOf("@"));
+    const name = request.body.name || username;
 
     delete request.body.password;
 
@@ -161,7 +161,7 @@ export class UserController {
 
         await tmTenantRepository.save({
           userId: savedUser,
-          point: config.tenantInitial
+          point: point || config.tenantInitial
         });
       })
     } catch (err) {

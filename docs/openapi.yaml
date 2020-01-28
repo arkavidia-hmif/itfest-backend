@@ -674,7 +674,7 @@ paths:
   /register/tenant:
     post:
       security: []
-      description: "Register a tenant account"
+      description: "Register a tenant account (only allowed by admin)"
       tags:
         - auth
       requestBody:
@@ -684,8 +684,9 @@ paths:
             schema:
               type: object
               required:
-                - email
+                - username
                 - password
+                - name
               properties:
                 username:
                   type: string
@@ -697,10 +698,14 @@ paths:
                 password:
                   type: string
                   format: password
+                point:
+                  type: number
+                  minimum: 0
+                  description: "Override initial point"
 
             example:
               name: "Tenant"
-              email: "tenant@email.com"
+              username: "tenant"
               password: "password1234"
 
       responses:
