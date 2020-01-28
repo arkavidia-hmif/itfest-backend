@@ -27,8 +27,8 @@ export default () => {
   const dobCheck = () => check("dob").isISO8601().withMessage("must be a valid ISO8601 date");
   const passwordCheck = () => check("password")
     .matches(config.password.checkRegex, "i")
-    .withMessage("must include one lowercase character, one uppercase character, a number, and a special character")
-    .isLength({ min: 8 }).withMessage("must be at least 8 characters long");
+    .withMessage(config.password.checkMessage)
+    .isLength({ min: config.password.minLength }).withMessage(`must be at least ${config.password.minLength} characters long`);
   const voucherCheck = () => check("voucher")
     .isAlphanumeric().withMessage("must be alphanumeric")
     .isLength({ min: 6, max: 6 }).withMessage("must be 6 characters long");
