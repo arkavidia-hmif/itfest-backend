@@ -9,12 +9,6 @@ export class Transaction {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @RelationId((transaction: Transaction) => transaction.from)
-  fromId: number;
-
-  @RelationId((transaction: Transaction) => transaction.to)
-  toId: number;
-
   @ManyToOne((type) => User, (user) => user.id, { nullable: false })
   from: User;
 
@@ -25,11 +19,8 @@ export class Transaction {
   @IsPositive()
   amount: number;
 
-  @Column()
+  @Column({ nullable: false, default: true })
   transfer: boolean;
-
-  @RelationId((transaction: Transaction) => transaction.item)
-  itemId: number;
 
   @ManyToOne((type) => Item, (item) => item.id)
   item: Item;

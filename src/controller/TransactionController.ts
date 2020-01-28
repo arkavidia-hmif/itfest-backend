@@ -15,12 +15,13 @@ export class TransactionController {
     const [transactions, total] = await this.transactionRepository.findAndCount({
       where,
       take: itemPerPage,
-      skip: (page - 1) * itemPerPage
+      skip: (page - 1) * itemPerPage,
+      relations: ["from", "to", "item"],
     });
 
     const transactionsCleaned = transactions.map((transaction) => {
       if (transaction.transfer) {
-        delete transaction.itemId;
+        delete transaction.item;
       }
       return transaction;
     });

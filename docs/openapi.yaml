@@ -125,19 +125,65 @@ paths:
                 data:
                   array:
                     - id: 1
-                      amount: 123121
+                      amount: 123
                       transfer: true
-                      fromId: 15
-                      toId: 19
+                      from:
+                        id: 28
+                        email:
+                        username: "admin"
+                        name: "Joshua-admin"
+                        role: "admin"
+                        createdAt: "2020-01-28T11:31:31.642Z"
+                        updatedAt: "2020-01-28T11:31:31.642Z"
+                      to:
+                        id: 26
+                        email: "tenant10@email.com"
+                        username: "tenant10"
+                        name: "tenant10@email.com"
+                        role: "tenant"
+                        createdAt: "2020-01-28T05:12:35.917Z"
+                        updatedAt: "2020-01-28T05:12:35.917Z"
                     - id: 2
                       amount: 123
-                      transfer: false
-                      fromId: 15
-                      toId: 19
-                      itemId: 1
+                      transfer: true
+                      from:
+                        id: 28
+                        email:
+                        username: "admin"
+                        name: "Joshua-admin"
+                        role: "admin"
+                        createdAt: "2020-01-28T11:31:31.642Z"
+                        updatedAt: "2020-01-28T11:31:31.642Z"
+                      to:
+                        id: 26
+                        email: "tenant10@email.com"
+                        username: "tenant10"
+                        name: "tenant10@email.com"
+                        role: "tenant"
+                        createdAt: "2020-01-28T05:12:35.917Z"
+                        updatedAt: "2020-01-28T05:12:35.917Z"
+                    - id: 3
+                      amount: 123
+                      transfer: true
+                      from:
+                        id: 28
+                        email:
+                        username: "admin"
+                        name: "Joshua-admin"
+                        role: "admin"
+                        createdAt: "2020-01-28T11:31:31.642Z"
+                        updatedAt: "2020-01-28T11:31:31.642Z"
+                      to:
+                        id: 26
+                        email: "tenant10@email.com"
+                        username: "tenant10"
+                        name: "tenant10@email.com"
+                        role: "tenant"
+                        createdAt: "2020-01-28T05:12:35.917Z"
+                        updatedAt: "2020-01-28T05:12:35.917Z"
                   page: 1
                   itemPerPage: 10
-                  totalItem: 2
+                  totalItem: 3
         "401":
           $ref: "#/components/responses/InvalidBearer"
   /user/me/qrid:
@@ -299,19 +345,65 @@ paths:
                 data:
                   array:
                     - id: 1
-                      amount: 123121
+                      amount: 123
                       transfer: true
-                      fromId: 15
-                      toId: 19
+                      from:
+                        id: 28
+                        email:
+                        username: "admin"
+                        name: "Joshua-admin"
+                        role: "admin"
+                        createdAt: "2020-01-28T11:31:31.642Z"
+                        updatedAt: "2020-01-28T11:31:31.642Z"
+                      to:
+                        id: 26
+                        email: "tenant10@email.com"
+                        username: "tenant10"
+                        name: "tenant10@email.com"
+                        role: "tenant"
+                        createdAt: "2020-01-28T05:12:35.917Z"
+                        updatedAt: "2020-01-28T05:12:35.917Z"
                     - id: 2
                       amount: 123
-                      transfer: false
-                      fromId: 15
-                      toId: 19
-                      itemId: 1
+                      transfer: true
+                      from:
+                        id: 28
+                        email:
+                        username: "admin"
+                        name: "Joshua-admin"
+                        role: "admin"
+                        createdAt: "2020-01-28T11:31:31.642Z"
+                        updatedAt: "2020-01-28T11:31:31.642Z"
+                      to:
+                        id: 26
+                        email: "tenant10@email.com"
+                        username: "tenant10"
+                        name: "tenant10@email.com"
+                        role: "tenant"
+                        createdAt: "2020-01-28T05:12:35.917Z"
+                        updatedAt: "2020-01-28T05:12:35.917Z"
+                    - id: 3
+                      amount: 123
+                      transfer: true
+                      from:
+                        id: 28
+                        email:
+                        username: "admin"
+                        name: "Joshua-admin"
+                        role: "admin"
+                        createdAt: "2020-01-28T11:31:31.642Z"
+                        updatedAt: "2020-01-28T11:31:31.642Z"
+                      to:
+                        id: 26
+                        email: "tenant10@email.com"
+                        username: "tenant10"
+                        name: "tenant10@email.com"
+                        role: "tenant"
+                        createdAt: "2020-01-28T05:12:35.917Z"
+                        updatedAt: "2020-01-28T05:12:35.917Z"
                   page: 1
                   itemPerPage: 10
-                  totalItem: 2
+                  totalItem: 3
         "401":
           $ref: "#/components/responses/InvalidBearer"
         "403":
@@ -1420,14 +1512,63 @@ components:
         transfer:
           type: boolean
           description: "Is transaction a transfer or buy"
-        fromId:
-          type: integer
-        toId:
-          type: integer
-        itemId:
-          type: integer
-          description: "Null on transfer transaction"
-          nullable: true
+        from:
+          type: object
+          properties:
+            id:
+              type: integer
+            email:
+              type: string
+              format: email
+            username:
+              type: string
+            name:
+              type: string
+            role:
+              type: string
+              enum: [admin, tenant, visitor]
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+        to:
+          type: object
+          properties:
+            id:
+              type: integer
+            email:
+              type: string
+              format: email
+            username:
+              type: string
+            name:
+              type: string
+            role:
+              type: string
+              enum: [admin, tenant, visitor]
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+        item:
+          type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            price:
+              type: integer
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
     GameData:
       description: "Game object"
       type: object
