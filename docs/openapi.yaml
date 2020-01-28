@@ -126,7 +126,7 @@ paths:
                   array:
                     - id: 1
                       amount: 123
-                      transfer: true
+                      type: "give"
                       from:
                         id: 28
                         email:
@@ -145,7 +145,7 @@ paths:
                         updatedAt: "2020-01-28T05:12:35.917Z"
                     - id: 2
                       amount: 123
-                      transfer: true
+                      type: "give"
                       from:
                         id: 28
                         email:
@@ -164,7 +164,7 @@ paths:
                         updatedAt: "2020-01-28T05:12:35.917Z"
                     - id: 3
                       amount: 123
-                      transfer: true
+                      type: "give"
                       from:
                         id: 28
                         email:
@@ -346,7 +346,7 @@ paths:
                   array:
                     - id: 1
                       amount: 123
-                      transfer: true
+                      type: "give"
                       from:
                         id: 28
                         email:
@@ -365,7 +365,7 @@ paths:
                         updatedAt: "2020-01-28T05:12:35.917Z"
                     - id: 2
                       amount: 123
-                      transfer: true
+                      type: "give"
                       from:
                         id: 28
                         email:
@@ -384,7 +384,7 @@ paths:
                         updatedAt: "2020-01-28T05:12:35.917Z"
                     - id: 3
                       amount: 123
-                      transfer: true
+                      type: "give"
                       from:
                         id: 28
                         email:
@@ -1509,9 +1509,9 @@ components:
           type: integer
         amount:
           type: integer
-        transfer:
-          type: boolean
-          description: "Is transaction a transfer or buy"
+        type:
+          type: string
+          enum: [redeem, give, play]
         from:
           type: object
           properties:
