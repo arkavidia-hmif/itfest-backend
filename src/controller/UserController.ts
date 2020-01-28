@@ -144,11 +144,12 @@ export class UserController {
 
     const encryptedHash = bcrypt.hashSync(password, salt);
 
+    let token = "";
+
     try {
       await getConnection().transaction(async transactionManager => {
         const tmUserRepository = transactionManager.getRepository(User);
         const tmTenantRepository = transactionManager.getRepository(Tenant);
-
 
         const savedUser = await tmUserRepository.save({
           role: UserRole.TENANT,
@@ -163,6 +164,13 @@ export class UserController {
           userId: savedUser,
           point: point || config.tenantInitial
         });
+
+        token = jwt.sign({
+          id: savedUser.id,
+          username: savedUser.username,
+          email: savedUser.email,
+          role: savedUser.role,
+        }, config.secret)
       })
     } catch (err) {
       if (err.code === "ER_DUP_ENTRY") {
@@ -175,7 +183,10 @@ export class UserController {
       }
     }
 
-    return responseGenerator(response, 200, "ok");
+
+    return responseGenerator(response, 200, "ok", {
+      jwt: token
+    });
   }
 
   async registerVisitor(request: Request, response: Response) {
@@ -200,9 +211,12 @@ export class UserController {
       return responseGenerator(response, 400, "invalid-voucher");
     }
 
+    let token = "";
+
     try {
       await getConnection().transaction(async transactionManager => {
-        const savedUser = await transactionManager.save(User, {
+        const tmUserRepository = transactionManager.getRepository(User);
+        const savedUser = await tmUserRepository.save({
           role: UserRole.VISITOR,
           salt,
           password: encryptedHash,
@@ -215,8 +229,14 @@ export class UserController {
           ...request.body,
         });
         await transactionManager.delete(Voucher, voucherItem);
-      })
 
+        token = jwt.sign({
+          id: savedUser.id,
+          username: savedUser.username,
+          email: savedUser.email,
+          role: savedUser.role,
+        }, config.secret)
+      })
     } catch (err) {
       if (err.code === "ER_DUP_ENTRY") {
         return responseGenerator(response, 400, "user-exists");
@@ -226,7 +246,9 @@ export class UserController {
       }
     }
 
-    return responseGenerator(response, 200, "ok");
+    return responseGenerator(response, 200, "ok", {
+      jwt: token
+    });
   }
 
   async editUserMe(request: Request, response: Response) {
