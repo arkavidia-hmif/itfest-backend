@@ -8,6 +8,8 @@ import { Tenant, User, UserRole, Visitor } from "../entity/User";
 import { partialUpdate } from "../utils/partialUpdateEntity";
 import { decodeQr } from "../utils/qr";
 import { responseGenerator } from "../utils/responseGenerator";
+import { globalSocket } from "../routes/socket";
+import { isError } from "util";
 
 export class GameController {
 
@@ -144,7 +146,7 @@ export class GameController {
   async playGame(request: Request, response: Response) {
     const tenantId = response.locals.auth.id;
     const userString = decodeQr(request.params.qrid);
-    const gameId: number[] = request.body.game;
+    const difficulties: number[] = request.body.difficulty;
 
     let userData: any = {};
 
@@ -162,12 +164,6 @@ export class GameController {
       return responseGenerator(response, 404, "user-not-found");
     }
 
-    const game = await this.gameRepository.findByIds(gameId);
-
-    if (game.length !== gameId.length) {
-      return responseGenerator(response, 404, "game-not-found");
-    }
-
     try {
       await getConnection().transaction(async transactionManager => {
         const tmTenantRepository = transactionManager.getRepository(Tenant);
@@ -176,11 +172,11 @@ export class GameController {
 
 
         const reducer = (acc, current) => {
-          acc += config.gamePoint[current.difficulty];
+          acc += config.gamePoint[current];
           return acc;
         }
 
-        const pointDelta = game.reduce(reducer, 0);
+        const pointDelta = difficulties.reduce(reducer, 0);
 
         const tenant = await tmTenantRepository.findOne(tenantId, { relations: ["userId"] });
 
@@ -194,36 +190,39 @@ export class GameController {
 
         const visitor = await tmVisitorRepository.findOne(user.id, { relations: ["userId"] });
 
-        visitor.point += pointDelta
+        visitor.point += pointDelta;
 
         await tmVisitorRepository.save(visitor);
 
-        const feedbackCheckPromise = game.map((entry) => {
-          return tmFeedbackRepository.findOne({
-            where: {
-              from: visitor,
-              to: entry,
-            }
-          });
-        })
+        const feedback = await tmFeedbackRepository.findOne({
+          where: {
+            from: visitor,
+            to: tenant
+          }
+        });
 
-        const feedbackCheck = (await Promise.all(feedbackCheckPromise)).map((entry) => !!entry);
-
-        if (feedbackCheck.includes(true)) {
+        if (feedback) {
           throw "already-play-game";
         }
 
-        const feedbackPromise = game.map((entry) => {
-          return tmFeedbackRepository.save({
-            from: visitor,
-            to: entry,
-            rating: 0,
-            remark: "",
-            rated: false
-          });
+        await tmFeedbackRepository.save({
+          from: visitor,
+          to: tenant,
+          rating: 0,
+          remark: "",
+          rated: false
         });
 
-        await Promise.all(feedbackPromise);
+        if (globalSocket[user.id]) {
+          globalSocket[user.id].emit("transaction", {
+            type: "play",
+            tenant: {
+              id: tenant.userId.id,
+              name: tenant.userId.name
+            },
+            amount: pointDelta
+          })
+        }
       });
     } catch (error) {
       if (typeof error === "string") {
@@ -238,15 +237,15 @@ export class GameController {
   }
 
   async giveFeedback(request: Request, response: Response) {
-    const gameId = request.params.id;
+    const tenantId = request.params.id;
     const userId = response.locals.auth.id;
 
     const { score, praise } = request.body;
 
-    const game = await this.gameRepository.findOne(gameId, { relations: ["tenant", "tenant.userId"] });
+    const tenant = await this.tenantRepository.findOne(tenantId, { relations: ["userId"] });
 
-    if (!game) {
-      return responseGenerator(response, 404, "game-not-found");
+    if (!tenant) {
+      return responseGenerator(response, 404, "tenant-not-found");
     }
 
     const visitor = await this.visitorRepository.findOne(userId, { relations: ["userId"] });
@@ -254,7 +253,7 @@ export class GameController {
     const feedback = await this.feedbackRepository.findOne({
       where: {
         from: visitor,
-        to: game,
+        to: tenant,
       }
     });
 
@@ -264,7 +263,7 @@ export class GameController {
 
     feedback.rated = true;
     feedback.rating = score;
-    feedback.remark = praise.join(', ');
+    feedback.remark = praise.join(", ");
 
     await this.feedbackRepository.save(feedback);
 
@@ -274,21 +273,21 @@ export class GameController {
   async getFeedback(request: Request, response: Response) {
     const userId = response.locals.auth.id;
     const userRole = response.locals.auth.role;
-    const gameId = request.params.id;
+    const tenantId = request.params.id;
 
-    const game = await this.gameRepository.findOne(gameId, { relations: ["tenant", "tenant.userId"] });
+    const tenant = await this.tenantRepository.findOne(tenantId, { relations: ["userId"] });
 
-    if (!game) {
-      return responseGenerator(response, 404, "game-not-found");
+    if (!tenant) {
+      return responseGenerator(response, 404, "tenant-not-found");
     }
 
-    if (userRole !== UserRole.ADMIN && game.tenant.userId.id !== userId) {
+    if (userRole !== UserRole.ADMIN && tenant.userId.id !== userId) {
       return responseGenerator(response, 403, "forbidden");
     }
 
     const feedback = await this.feedbackRepository.find({
       where: {
-        to: game,
+        to: tenant,
       }
     });
 

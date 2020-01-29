@@ -1,6 +1,9 @@
 export default {
   password: {
-    checkRegex: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{0,}$/,
+    // checkRegex: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{0,}$/,
+    checkRegex: /.*/,
+    checkMessage: "must contain something",
+    minLength: 8,
     saltRounds: 10,
   },
   secret: process.env.SECRET || "secret-key",

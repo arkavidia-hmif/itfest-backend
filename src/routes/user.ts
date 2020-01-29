@@ -3,6 +3,7 @@ import { check, oneOf } from "express-validator";
 
 import config from "../config";
 import { GameController } from "../controller/GameController";
+import { InventoryController } from "../controller/InventoryController";
 import { TransactionController } from "../controller/TransactionController";
 import { UserController } from "../controller/UserController";
 import { UserRole } from "../entity/User";
@@ -16,10 +17,11 @@ export default () => {
 
   const uc = new UserController();
   const tc = new TransactionController();
-  const tec = new GameController();
+  const gc = new GameController();
+  const ic = new InventoryController();
 
   const emailCheck = () => check("email").isEmail().withMessage("must be a valid email address");
-  const nameCheck = () => check("name").isAlpha().withMessage("must only contain letter");
+  const nameCheck = () => check("name").matches(/^[a-zA-Z ]+$/i).withMessage("must only contain letter or space");
   const genderCheck = () => check("gender")
     .isInt({ min: 1, max: 2 })
     .withMessage("must be a valid gender (1=male, 2=female)");
@@ -27,14 +29,16 @@ export default () => {
   const dobCheck = () => check("dob").isISO8601().withMessage("must be a valid ISO8601 date");
   const passwordCheck = () => check("password")
     .matches(config.password.checkRegex, "i")
-    .withMessage("must include one lowercase character, one uppercase character, a number, and a special character")
-    .isLength({ min: 8 }).withMessage("must be at least 8 characters long");
+    .withMessage(config.password.checkMessage)
+    .isLength({ min: config.password.minLength }).withMessage(`must be at least ${config.password.minLength} characters long`);
   const voucherCheck = () => check("voucher")
     .isAlphanumeric().withMessage("must be alphanumeric")
     .isLength({ min: 6, max: 6 }).withMessage("must be 6 characters long");
   const usernameCheck = () => check("username")
     .isAlphanumeric().withMessage("must be alphanumeric")
-    .isLength({ min: 6 }).withMessage("must be >= 6 characters long");
+    .isLength({ min: 1 }).withMessage("must be >= 1 character long");
+  const pointCheck = () => check("point").isInt({ min: 0 }).withMessage("must be a positive integer");
+  const itemCheck = () => check("item").isInt().withMessage("must be an integer");
 
   // Public user endpoint
   router.post("/login", [
@@ -52,22 +56,23 @@ export default () => {
     passwordCheck(),
     voucherCheck(),
     usernameCheck().optional(),
-    nameCheck().optional(),
-    genderCheck().optional(),
-    interestCheck().optional(),
-    dobCheck().optional(),
+    nameCheck(),
+    genderCheck(),
+    interestCheck(),
+    dobCheck(),
     checkParam,
   ], uc.registerVisitor.bind(uc));
 
   router.post("/register/tenant", [
-    emailCheck(),
+    checkJWT,
+    limitAccess([UserRole.ADMIN]),
+    emailCheck().optional(),
     passwordCheck(),
-    usernameCheck().optional(),
-    nameCheck().optional(),
+    usernameCheck(),
+    nameCheck(),
+    pointCheck().optional(),
     checkParam,
   ], uc.registerTenant.bind(uc));
-
-  router.get("/verify/:code", uc.verifyEmail.bind(uc));
 
   // User endpoint
   router.use("/user", checkJWT);
@@ -113,10 +118,16 @@ export default () => {
 
   router.post("/user/:qrid([a-z0-9]+)/play", [
     limitAccess([UserRole.TENANT]),
-    check("game").isArray({ min: 1 }).withMessage("must be an array with >=1 length"),
-    check("game.*").isInt().withMessage("must be integer"),
+    check("difficulty").isArray({ min: 1 }).withMessage("must be an array with >=1 length"),
+    check("difficulty.*").isInt({ min: 1, max: 3 }).withMessage("must be integer between 1 and 3"),
     checkParam,
-  ], tec.playGame.bind(tec));
+  ], gc.playGame.bind(gc));
+
+  router.post("/user/:qrid([a-z0-9]+)/redeem", [
+    limitAccess([UserRole.ADMIN]),
+    itemCheck(),
+    checkParam,
+  ], ic.redeem.bind(ic));
 
   // Testing route
   router.get("/test-jwt", [checkJWT], (req: Request, res: Response) => {

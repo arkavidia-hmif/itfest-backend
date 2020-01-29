@@ -23,31 +23,34 @@ Notification will be sent to the `transaction` event. There are 3 types of `tran
 - give
 ```
 {
-	type: "give"
+	type: "give",
 	from:{
-		id: int
+		id: int,
 		name: string
-	}
+	},
+  amount: int
 }
 ```
 - redeem
 ```
 {
-	type: "redeem"
+	type: "redeem",
 	item:{
-		id: int
+		id: int,
 		name: string
-	}
+	},
+  amount: int
 }
 ```
 - play
 ```
 {
-	type: "give"
+	type: "give",
 	tenant:{
-		id: int
+		id: int,
 		name: string
-	}
+	},
+  amount: int
 }
 ```
 

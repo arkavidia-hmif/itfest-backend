@@ -3,17 +3,17 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, RelationId } from "t
 import { Item } from "./Item";
 import { User } from "./User";
 
+export enum TransactionType {
+  GIVE = "give",
+  PLAY = "play",
+  REDEEM = "redeem",
+}
+
 @Entity()
 export class Transaction {
 
   @PrimaryGeneratedColumn()
   id: number;
-
-  @RelationId((transaction: Transaction) => transaction.from)
-  fromId: number;
-
-  @RelationId((transaction: Transaction) => transaction.to)
-  toId: number;
 
   @ManyToOne((type) => User, (user) => user.id, { nullable: false })
   from: User;
@@ -25,11 +25,12 @@ export class Transaction {
   @IsPositive()
   amount: number;
 
-  @Column()
-  transfer: boolean;
-
-  @RelationId((transaction: Transaction) => transaction.item)
-  itemId: number;
+  @Column({
+    default: TransactionType.GIVE,
+    enum: TransactionType,
+    type: "enum",
+  })
+  type: TransactionType;
 
   @ManyToOne((type) => Item, (item) => item.id)
   item: Item;

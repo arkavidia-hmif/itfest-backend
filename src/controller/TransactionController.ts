@@ -1,10 +1,11 @@
 import { Request, Response, json } from "express";
 
-import { Transaction } from "../entity/Transaction";
+import { Transaction, TransactionType } from "../entity/Transaction";
 import { getRepository, getConnection } from "typeorm";
 import { responseGenerator } from "../utils/responseGenerator";
 import { User, UserRole, Visitor, Tenant } from "../entity/User";
 import { decodeQr } from "../utils/qr";
+import { globalSocket } from "../routes/socket";
 
 export class TransactionController {
 
@@ -14,12 +15,13 @@ export class TransactionController {
     const [transactions, total] = await this.transactionRepository.findAndCount({
       where,
       take: itemPerPage,
-      skip: (page - 1) * itemPerPage
+      skip: (page - 1) * itemPerPage,
+      relations: ["from", "to", "item"],
     });
 
     const transactionsCleaned = transactions.map((transaction) => {
-      if (transaction.transfer) {
-        delete transaction.itemId;
+      if (transaction.type !== TransactionType.REDEEM) {
+        delete transaction.item;
       }
       return transaction;
     });
@@ -65,21 +67,21 @@ export class TransactionController {
         }
 
         if (fromUser.role !== UserRole.ADMIN) {
-          const fromPointData = await fromUserRepository.findOneOrFail(fromUser.id);
+          const fromPointData = await fromUserRepository.findOneOrFail(fromUser.id, { relations: ["userId"] });
           if (fromPointData.point < amount) {
             throw "not-enough-point";
           }
 
-          await fromUserRepository.update(fromPointData, {
-            point: fromPointData.point - amount,
-          });
+          fromPointData.point -= amount;
+
+          await fromUserRepository.save(fromPointData);
         }
 
         await transactionManager.insert(Transaction, {
           from: fromUser,
           to: toUser,
           amount: amount,
-          transfer: true
+          type: TransactionType.GIVE
         });
 
         let toUserRepository;
@@ -91,9 +93,19 @@ export class TransactionController {
         }
 
         if (toUser.role !== UserRole.ADMIN) {
-          const toPointData = await toUserRepository.findOneOrFail(toUser.id);
-          await toUserRepository.update(toPointData, {
-            point: toPointData.point + amount
+          const toPointData = await toUserRepository.findOneOrFail(toUser.id, { relations: ["userId"] });
+          toPointData.point += amount;
+          await toUserRepository.save(toPointData);
+        }
+
+        if (globalSocket[toId]) {
+          globalSocket[toId].emit('transaction', {
+            type: 'give',
+            from: {
+              id: fromUser.id,
+              name: fromUser.name || fromUser.username,
+            },
+            amount: amount
           });
         }
       });
@@ -106,6 +118,7 @@ export class TransactionController {
         return responseGenerator(response, 500, "unknown-error", error);
       }
     }
+
 
     return responseGenerator(response, 200, "ok");
   }

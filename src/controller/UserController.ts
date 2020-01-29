@@ -117,13 +117,6 @@ export class UserController {
       return responseGenerator(response, 404, "user-not-found");
     }
 
-    if (user.role === UserRole.TENANT) {
-      const tenant = await this.tenantRepository.findOne(user.id);
-      if (!tenant.emailVerified && !process.env.DEBUG_SKIP_EMAIL) {
-        return responseGenerator(response, 400, "email-not-verified");
-      }
-    }
-
     if (bcrypt.compareSync(password, user.password)) {
       const token = jwt.sign({
         id: user.id,
@@ -141,9 +134,9 @@ export class UserController {
   }
 
   async registerTenant(request: Request, response: Response) {
-    const { email, password } = request.body;
-    const username: string = email.substring(0, email.indexOf("@"));
-    const name = request.body.name || email;
+    const { email, username, password, point } = request.body;
+    // const username: string = request.body.uemail.substring(0, email.indexOf("@"));
+    const name = request.body.name || username;
 
     delete request.body.password;
 
@@ -151,13 +144,12 @@ export class UserController {
 
     const encryptedHash = bcrypt.hashSync(password, salt);
 
-    const emailKey = crypto.randomBytes(48).toString("hex");
+    let token = "";
 
     try {
       await getConnection().transaction(async transactionManager => {
         const tmUserRepository = transactionManager.getRepository(User);
         const tmTenantRepository = transactionManager.getRepository(Tenant);
-
 
         const savedUser = await tmUserRepository.save({
           role: UserRole.TENANT,
@@ -170,28 +162,15 @@ export class UserController {
 
         await tmTenantRepository.save({
           userId: savedUser,
-          emailVerified: false,
-          emailKey,
-          point: config.tenantInitial
+          point: point || config.tenantInitial
         });
 
-        const templateLocation = join(__dirname, "..", "template/verify.mustache");
-
-        const templateFile = readFileSync(process.env.EMAIL_VERIFY_TEMPLATE || templateLocation);
-        const templateString = templateFile.toString();
-        const emailText = Mustache.render(templateString, {
-          name,
-          link: `${process.env.HOST_URL}/verify/${emailKey}`
-        });
-
-        if (!process.env.DEBUG_SKIP_EMAIL) {
-          await transporter.sendMail({
-            from: process.env.EMAIL_VERIFY_FROM || "itfest@arkavidia.id",
-            to: email,
-            subject: process.env.EMAIL_VERIFY_SUBJECT || "ITFest Email Verification",
-            text: emailText
-          });
-        }
+        token = jwt.sign({
+          id: savedUser.id,
+          username: savedUser.username,
+          email: savedUser.email,
+          role: savedUser.role,
+        }, config.secret)
       })
     } catch (err) {
       if (err.code === "ER_DUP_ENTRY") {
@@ -204,7 +183,10 @@ export class UserController {
       }
     }
 
-    return responseGenerator(response, 200, "ok");
+
+    return responseGenerator(response, 200, "ok", {
+      jwt: token
+    });
   }
 
   async registerVisitor(request: Request, response: Response) {
@@ -216,12 +198,6 @@ export class UserController {
     delete request.body.password;
 
     let name = request.body.name;
-
-    if (!name) {
-      name = email;
-    } else {
-      delete request.body.name;
-    }
 
     const salt = bcrypt.genSaltSync(config.password.saltRounds);
 
@@ -235,9 +211,12 @@ export class UserController {
       return responseGenerator(response, 400, "invalid-voucher");
     }
 
+    let token = "";
+
     try {
       await getConnection().transaction(async transactionManager => {
-        const savedUser = await transactionManager.save(User, {
+        const tmUserRepository = transactionManager.getRepository(User);
+        const savedUser = await tmUserRepository.save({
           role: UserRole.VISITOR,
           salt,
           password: encryptedHash,
@@ -250,8 +229,14 @@ export class UserController {
           ...request.body,
         });
         await transactionManager.delete(Voucher, voucherItem);
-      })
 
+        token = jwt.sign({
+          id: savedUser.id,
+          username: savedUser.username,
+          email: savedUser.email,
+          role: savedUser.role,
+        }, config.secret)
+      })
     } catch (err) {
       if (err.code === "ER_DUP_ENTRY") {
         return responseGenerator(response, 400, "user-exists");
@@ -261,7 +246,9 @@ export class UserController {
       }
     }
 
-    return responseGenerator(response, 200, "ok");
+    return responseGenerator(response, 200, "ok", {
+      jwt: token
+    });
   }
 
   async editUserMe(request: Request, response: Response) {
@@ -332,26 +319,5 @@ export class UserController {
       name: user.name,
       role: user.role,
     });
-  }
-
-  async verifyEmail(request: Request, response: Response) {
-    const code = request.params.code;
-
-    const tenant = await this.tenantRepository.findOne({
-      where: {
-        emailKey: code
-      },
-      relations: ["userId"]
-    });
-
-    if (!tenant) {
-      return responseGenerator(response, 404, "tenant-not-found");
-    }
-
-    tenant.emailVerified = true;
-
-    await this.tenantRepository.save(tenant);
-
-    return responseGenerator(response, 200, "ok");
   }
 }
