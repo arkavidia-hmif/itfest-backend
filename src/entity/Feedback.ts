@@ -17,13 +17,16 @@ export class Feedback {
   @JoinColumn({ name: "tenantReviewed" })
   to: Tenant;
 
-  @Column()
+  @Column({ nullable: false, default: 0 })
   @IsPositive()
   rating: number;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, default: "" })
   remark: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, default: "" })
+  comment: string;
+
+  @Column({ nullable: false, default: false })
   rated: boolean;
 }
