@@ -524,18 +524,82 @@ paths:
       parameters:
         - $ref: "#/components/parameters/qrid"
       requestBody:
-        description: "Game played"
+        description: "Difficulty of game played"
         content:
           application/json:
             schema:
               type: object
               properties:
-                game:
+                difficulty:
                   type: array
                   items:
                     type: integer
+                    minimum: 1
+                    maximum: 3
             example:
-              game: [1, 2]
+              difficulty: [1, 2]
+      responses:
+        "200":
+          $ref: "#/components/responses/OK"
+        "400":
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+              examples:
+                "Not enough point (tenant)":
+                  value:
+                    status: 400
+                    code: "not-enough-point"
+                "Visitor have already played the game":
+                  value:
+                    status: 400
+                    code: "already-play-game"
+                "Invalid qrid":
+                  value:
+                    status: 400
+                    code: "invalid-qrid"
+        "404":
+          description: "User or game not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+              examples:
+                "User not found":
+                  value:
+                    status: 404
+                    code: "user-not-found"
+                "Game not found":
+                  value:
+                    status: 404
+                    code: "game-not-found"
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /user/{qrid}/redeem:
+    post:
+      description: |
+        **Only allowed for admin**
+      tags:
+        - inventory
+        - user
+      summary: "Make a visitor redeem an item"
+      parameters:
+        - $ref: "#/components/parameters/qrid"
+      requestBody:
+        description: "Item redeemed"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                item:
+                  type: integer
+            example:
+              item: 1
       responses:
         "200":
           $ref: "#/components/responses/OK"
@@ -620,6 +684,14 @@ paths:
                   value:
                     status: 400
                     code: "invalid-qrid"
+                "Not enough point":
+                  value:
+                    status: 400
+                    code: "not-enough-point"
+                "Out of stock":
+                  value:
+                    status: 400
+                    code: "item-empty"
         "404":
           description: "User not found"
           content:
@@ -627,10 +699,10 @@ paths:
               schema:
                 $ref: "#/components/schemas/Response"
               examples:
-                "User not found":
+                "Item not found":
                   value:
                     status: 404
-                    code: "user-not-found"
+                    code: "item-not-found"
         "401":
           $ref: "#/components/responses/InvalidBearer"
 
@@ -819,267 +891,267 @@ paths:
                         message: "must contain @"
                       - part: "password"
                         message: "must contain capital letter and number"
-  /game:
-    get:
-      tags:
-        - game
-      summary: List all game owned by a tenant or everything (if loggedin as an admin)
-      parameters:
-        - $ref: "#/components/parameters/itemPerPage"
-        - $ref: "#/components/parameters/page"
-      responses:
-        "200":
-          description: "Success"
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/Response"
-                  - properties:
-                      data:
-                        allOf:
-                          - properties:
-                              array:
-                                type: array
-                                items:
-                                  $ref: "#/components/schemas/GameData"
-                          - $ref: "#/components/schemas/Pagination"
+  # /game:
+  #   get:
+  #     tags:
+  #       - game
+  #     summary: List all game owned by a tenant or everything (if loggedin as an admin)
+  #     parameters:
+  #       - $ref: "#/components/parameters/itemPerPage"
+  #       - $ref: "#/components/parameters/page"
+  #     responses:
+  #       "200":
+  #         description: "Success"
+  #         content:
+  #           application/json:
+  #             schema:
+  #               allOf:
+  #                 - $ref: "#/components/schemas/Response"
+  #                 - properties:
+  #                     data:
+  #                       allOf:
+  #                         - properties:
+  #                             array:
+  #                               type: array
+  #                               items:
+  #                                 $ref: "#/components/schemas/GameData"
+  #                         - $ref: "#/components/schemas/Pagination"
 
-              example:
-                status: 200
-                code: "ok"
-                data:
-                  array:
-                    - id: 1
-                      name: "Lempar PC"
-                      difficulty: 3
-                    - id: 2
-                      name: "Makan RAM"
-                      difficulty: 2
-                  page: 1
-                  itemPerPage: 10
-                  totalItem: 2
-        "401":
-          $ref: "#/components/responses/InvalidBearer"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-    post:
-      description: |
-        **Only allowed for tenant and admin**
-      tags:
-        - game
-      summary: Create a new game
-      requestBody:
-        description: "Game information"
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - name
-                - difficulty
-              properties:
-                name:
-                  type: string
-                difficulty:
-                  description: "easy(1), medium(2), hard(3)"
-                  type: number
-                  minimum: 1
-                  maximum: 3
-                tenant:
-                  description: "User id of tenant if requesting user is admin"
-                  type: number
+  #             example:
+  #               status: 200
+  #               code: "ok"
+  #               data:
+  #                 array:
+  #                   - id: 1
+  #                     name: "Lempar PC"
+  #                     difficulty: 3
+  #                   - id: 2
+  #                     name: "Makan RAM"
+  #                     difficulty: 2
+  #                 page: 1
+  #                 itemPerPage: 10
+  #                 totalItem: 2
+  #       "401":
+  #         $ref: "#/components/responses/InvalidBearer"
+  #       "403":
+  #         $ref: "#/components/responses/Forbidden"
+  #   post:
+  #     description: |
+  #       **Only allowed for tenant and admin**
+  #     tags:
+  #       - game
+  #     summary: Create a new game
+  #     requestBody:
+  #       description: "Game information"
+  #       content:
+  #         application/json:
+  #           schema:
+  #             type: object
+  #             required:
+  #               - name
+  #               - difficulty
+  #             properties:
+  #               name:
+  #                 type: string
+  #               difficulty:
+  #                 description: "easy(1), medium(2), hard(3)"
+  #                 type: number
+  #                 minimum: 1
+  #                 maximum: 3
+  #               tenant:
+  #                 description: "User id of tenant if requesting user is admin"
+  #                 type: number
 
-            examples:
-              "Requested by tenant":
-                value:
-                  name: "Lempar PC"
-                  difficulty: 3
-              "Requested by admin":
-                value:
-                  name: "Lempar PC"
-                  difficulty: 3
-                  tenant: 1
-      responses:
-        "200":
-          $ref: "#/components/responses/OK"
-        "404":
-          description: "Tenant not found"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Response"
-              example:
-                status: 404
-                code: "tenant-not-found"
-        "400":
-          description: "Bad request"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Response"
-              examples:
-                "Admin request without tenant id":
-                  value:
-                    status: 400
-                    code: "admin-no-tenant-id"
-                "Invalid input (difficulty)":
-                  value:
-                    status: 400
-                    code: "invalid-input"
-                    data:
-                      - part: "difficulty"
-                        message: "must be between 1 to 3"
-        "401":
-          $ref: "#/components/responses/InvalidBearer"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-  /game/{id}:
+  #           examples:
+  #             "Requested by tenant":
+  #               value:
+  #                 name: "Lempar PC"
+  #                 difficulty: 3
+  #             "Requested by admin":
+  #               value:
+  #                 name: "Lempar PC"
+  #                 difficulty: 3
+  #                 tenant: 1
+  #     responses:
+  #       "200":
+  #         $ref: "#/components/responses/OK"
+  #       "404":
+  #         description: "Tenant not found"
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/Response"
+  #             example:
+  #               status: 404
+  #               code: "tenant-not-found"
+  #       "400":
+  #         description: "Bad request"
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/Response"
+  #             examples:
+  #               "Admin request without tenant id":
+  #                 value:
+  #                   status: 400
+  #                   code: "admin-no-tenant-id"
+  #               "Invalid input (difficulty)":
+  #                 value:
+  #                   status: 400
+  #                   code: "invalid-input"
+  #                   data:
+  #                     - part: "difficulty"
+  #                       message: "must be between 1 to 3"
+  #       "401":
+  #         $ref: "#/components/responses/InvalidBearer"
+  #       "403":
+  #         $ref: "#/components/responses/Forbidden"
+  # /game/{id}:
+  #   get:
+  #     tags:
+  #       - game
+  #     summary: "Get game detail of specific id"
+  #     description: |
+  #       **Only allowed for admin and tenant**
+  #     parameters:
+  #       - name: id
+  #         in: path
+  #         description: "ID of game to get"
+  #         required: true
+  #         schema:
+  #           type: integer
+  #     responses:
+  #       "200":
+  #         description: "Success"
+  #         content:
+  #           application/json:
+  #             schema:
+  #               allOf:
+  #                 - $ref: "#/components/schemas/Response"
+  #                 - properties:
+  #                     data:
+  #                       $ref: "#/components/schemas/GameData"
+  #             example:
+  #               status: 200
+  #               code: "ok"
+  #               data:
+  #                 id: 15
+  #                 name: "Bola bekel"
+  #                 difficulty: 2
+  #       "404":
+  #         description: "Game not found"
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/Response"
+  #             example:
+  #               status: 404
+  #               code: "game-not-found"
+  #       "401":
+  #         $ref: "#/components/responses/InvalidBearer"
+  #       "403":
+  #         $ref: "#/components/responses/Forbidden"
+  #   put:
+  #     tags:
+  #       - game
+  #     summary: "Edit game detail of specific id"
+  #     description: |
+  #       **Only allowed for tenant and admin**
+  #     parameters:
+  #       - name: id
+  #         in: path
+  #         description: "ID of game to get"
+  #         required: true
+  #         schema:
+  #           type: integer
+  #     requestBody:
+  #       description: "Modified game data"
+  #       content:
+  #         application/json:
+  #           schema:
+  #             type: object
+  #             properties:
+  #               name:
+  #                 type: string
+  #               difficulty:
+  #                 description: "easy(1), medium(2), hard(3)"
+  #                 type: number
+  #                 minimum: 1
+  #                 maximum: 3
+  #           examples:
+  #             "Change name":
+  #               value:
+  #                 name: "Nama baru"
+  #     responses:
+  #       "200":
+  #         $ref: "#/components/responses/OK"
+  #       "400":
+  #         description: "Bad request"
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/InputErrorResponse"
+  #             examples:
+  #               "Invalid difficulty":
+  #                 value:
+  #                   status: 400
+  #                   code: "invalid-input"
+  #                   data:
+  #                     - part: "price"
+  #                       message: "must be between 1 to 3"
+  #       "404":
+  #         description: "Game not found"
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/Response"
+  #             example:
+  #               status: 404
+  #               code: "game-not-found"
+  #       "401":
+  #         $ref: "#/components/responses/InvalidBearer"
+  #       "403":
+  #         $ref: "#/components/responses/Forbidden"
+  #   delete:
+  #     tags:
+  #       - game
+  #     summary: "Delete game of specific id"
+  #     description: |
+  #       **Only allowed for tenant and admin**
+  #     parameters:
+  #       - name: id
+  #         in: path
+  #         description: "ID of game to delete"
+  #         required: true
+  #         schema:
+  #           type: integer
+  #     responses:
+  #       "200":
+  #         $ref: "#/components/responses/OK"
+  #       "404":
+  #         description: "Game not found"
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/Response"
+  #             example:
+  #               status: 404
+  #               code: "game-not-found"
+  #       "401":
+  #         $ref: "#/components/responses/InvalidBearer"
+  #       "403":
+  #         $ref: "#/components/responses/Forbidden"
+  /tenant/{id}/review:
     get:
       tags:
         - game
-      summary: "Get game detail of specific id"
-      description: |
-        **Only allowed for admin and tenant**
-      parameters:
-        - name: id
-          in: path
-          description: "ID of game to get"
-          required: true
-          schema:
-            type: integer
-      responses:
-        "200":
-          description: "Success"
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/Response"
-                  - properties:
-                      data:
-                        $ref: "#/components/schemas/GameData"
-              example:
-                status: 200
-                code: "ok"
-                data:
-                  id: 15
-                  name: "Bola bekel"
-                  difficulty: 2
-        "404":
-          description: "Game not found"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Response"
-              example:
-                status: 404
-                code: "game-not-found"
-        "401":
-          $ref: "#/components/responses/InvalidBearer"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-    put:
-      tags:
-        - game
-      summary: "Edit game detail of specific id"
+      summary: "Get tenant review of specific id"
       description: |
         **Only allowed for tenant and admin**
       parameters:
         - name: id
           in: path
-          description: "ID of game to get"
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        description: "Modified game data"
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                difficulty:
-                  description: "easy(1), medium(2), hard(3)"
-                  type: number
-                  minimum: 1
-                  maximum: 3
-            examples:
-              "Change name":
-                value:
-                  name: "Nama baru"
-      responses:
-        "200":
-          $ref: "#/components/responses/OK"
-        "400":
-          description: "Bad request"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/InputErrorResponse"
-              examples:
-                "Invalid difficulty":
-                  value:
-                    status: 400
-                    code: "invalid-input"
-                    data:
-                      - part: "price"
-                        message: "must be between 1 to 3"
-        "404":
-          description: "Game not found"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Response"
-              example:
-                status: 404
-                code: "game-not-found"
-        "401":
-          $ref: "#/components/responses/InvalidBearer"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-    delete:
-      tags:
-        - game
-      summary: "Delete game of specific id"
-      description: |
-        **Only allowed for tenant and admin**
-      parameters:
-        - name: id
-          in: path
-          description: "ID of game to delete"
-          required: true
-          schema:
-            type: integer
-      responses:
-        "200":
-          $ref: "#/components/responses/OK"
-        "404":
-          description: "Game not found"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Response"
-              example:
-                status: 404
-                code: "game-not-found"
-        "401":
-          $ref: "#/components/responses/InvalidBearer"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-  /game/{id}/review:
-    get:
-      tags:
-        - game
-      summary: "Get game review of specific id"
-      description: |
-        **Only allowed for tenant and admin**
-      parameters:
-        - name: id
-          in: path
-          description: "ID of game to get"
+          description: "ID of tenant to get"
           required: true
           schema:
             type: integer
@@ -1103,7 +1175,7 @@ paths:
                 data:
                   review: 3.4
         "404":
-          description: "Game not found"
+          description: "Tenant not found"
           content:
             application/json:
               schema:
@@ -1112,7 +1184,7 @@ paths:
                 "Game not found":
                   value:
                     status: 404
-                    code: "game-not-found"
+                    code: "tenant-not-found"
         "401":
           $ref: "#/components/responses/InvalidBearer"
         "403":
@@ -1121,13 +1193,13 @@ paths:
     post:
       tags:
         - game
-      summary: "Submit review for a game"
+      summary: "Submit review for a tenant"
       description: |
         **Only allowed after playing**
       parameters:
         - name: id
           in: path
-          description: "ID of game to review"
+          description: "ID of tenant to review"
           required: true
           schema:
             type: integer
@@ -1173,14 +1245,14 @@ paths:
                     status: 400
                     code: "already-reviewed"
         "404":
-          description: "Game not found"
+          description: "Tenant not found"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Response"
               example:
                 status: 404
-                code: "game-not-found"
+                code: "tenant-not-found"
         "401":
           $ref: "#/components/responses/InvalidBearer"
         "403":
