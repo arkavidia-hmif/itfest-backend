@@ -39,6 +39,7 @@ export default () => {
     limitAccess([UserRole.VISITOR]),
     check("score").isInt({ min: 0, max: 5 }).withMessage("must be an integer from 0 to 5"),
     check("praise").isArray().withMessage("must be an array"),
+    check("comment").isString().withMessage("must be a string"),
     checkParam,
   ], gc.giveFeedback.bind(gc));
 

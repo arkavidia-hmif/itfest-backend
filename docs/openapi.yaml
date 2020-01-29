@@ -1218,11 +1218,14 @@ paths:
                   type: array
                   items:
                     type: string
+                comment:
+                  type: string
             example:
               score: 5
               praise:
                 - "fun"
                 - "addicting"
+              comment: "Please make the game easier"
       responses:
         "200":
           $ref: "#/components/responses/OK"

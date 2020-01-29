@@ -208,8 +208,6 @@ export class GameController {
         await tmFeedbackRepository.save({
           from: visitor,
           to: tenant,
-          rating: 0,
-          remark: "",
           rated: false
         });
 
@@ -240,7 +238,7 @@ export class GameController {
     const tenantId = request.params.id;
     const userId = response.locals.auth.id;
 
-    const { score, praise } = request.body;
+    const { score, praise, comment } = request.body;
 
     const tenant = await this.tenantRepository.findOne(tenantId, { relations: ["userId"] });
 
@@ -264,6 +262,7 @@ export class GameController {
     feedback.rated = true;
     feedback.rating = score;
     feedback.remark = praise.join(", ");
+    feedback.comment = comment || "";
 
     await this.feedbackRepository.save(feedback);
 
