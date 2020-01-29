@@ -118,8 +118,8 @@ export default () => {
 
   router.post("/user/:qrid([a-z0-9]+)/play", [
     limitAccess([UserRole.TENANT]),
-    check("game").isArray({ min: 1 }).withMessage("must be an array with >=1 length"),
-    check("game.*").isInt().withMessage("must be integer"),
+    check("difficulty").isArray({ min: 1 }).withMessage("must be an array with >=1 length"),
+    check("difficulty.*").isInt({ min: 1, max: 3 }).withMessage("must be integer between 1 and 3"),
     checkParam,
   ], gc.playGame.bind(gc));
 
