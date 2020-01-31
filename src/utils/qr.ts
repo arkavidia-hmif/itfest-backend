@@ -17,11 +17,15 @@ export function generateQr(user: User) {
 }
 
 export function decodeQr(encryptedText: string) {
-  const iv = encryptedText.substring(0, 16);
-  const code = encryptedText.substring(16);
-  const decipher = crypto.createDecipheriv("aes256", config.qrKey, iv);
-  let plain = decipher.update(code, "hex", "utf8");
-  plain += decipher.final("utf8");
+  try {
+    const iv = encryptedText.substring(0, 16);
+    const code = encryptedText.substring(16);
+    const decipher = crypto.createDecipheriv("aes256", config.qrKey, iv);
+    let plain = decipher.update(code, "hex", "utf8");
+    plain += decipher.final("utf8");
 
-  return plain;
+    return plain;
+  } catch (error) {
+    return "error";
+  }
 }
