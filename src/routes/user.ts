@@ -76,6 +76,16 @@ export default () => {
 
   // User endpoint
   router.use("/user", checkJWT);
+  router.get("/user", [
+    limitAccess([UserRole.ADMIN]),
+    ...paginationCheck,
+    checkParam,
+  ], uc.listUser.bind(uc));
+  router.get("/user/:type(tenant|visitor)", [
+    limitAccess([UserRole.ADMIN]),
+    ...paginationCheck,
+    checkParam,
+  ], uc.listUser.bind(uc));
   router.get("/user/me", uc.getMe.bind(uc));
   router.put("/user/me", [
     emailCheck().optional(),

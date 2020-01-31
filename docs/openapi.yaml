@@ -17,6 +17,162 @@ tags:
 security:
   - bearerAuth: []
 paths:
+  /user:
+    get:
+      tags:
+        - user
+      summary: "List all user"
+      description: |
+        **Only allowed for admin**
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Response"
+                  - properties:
+                      data:
+                        allOf:
+                          - properties:
+                              array:
+                                type: array
+                                items:
+                                  $ref: "#/components/schemas/BaseUserData"
+                          - $ref: "#/components/schemas/Pagination"
+
+              example:
+                status: 200
+                code: ok
+                data:
+                  array:
+                    - id: 1
+                      email:
+                      username: admin
+                      name: Administrator
+                      role: admin
+                      createdAt: "2020-01-29T00:14:42.648Z"
+                      updatedAt: "2020-01-29T00:14:42.648Z"
+                    - id: 2
+                      email: tenant@email.com
+                      username: tenant
+                      name: Tenantaaa
+                      role: tenant
+                      createdAt: "2020-01-29T00:15:42.965Z"
+                      updatedAt: "2020-01-29T00:15:42.965Z"
+                    - id: 3
+                      email: visitor@email.com
+                      username: visitor
+                      name: Joshua visitor
+                      role: visitor
+                      createdAt: "2020-01-29T00:16:05.210Z"
+                      updatedAt: "2020-01-29T00:16:05.210Z"
+                  page: 1
+                  itemPerPage: 10
+                  total: 3
+
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /user/visitor:
+    get:
+      tags:
+        - user
+      summary: "List all visitor"
+      description: |
+        **Only allowed for admin**
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Response"
+                  - properties:
+                      data:
+                        allOf:
+                          - properties:
+                              array:
+                                type: array
+                                items:
+                                  $ref: "#/components/schemas/VisitorData"
+                          - $ref: "#/components/schemas/Pagination"
+
+              example:
+                status: 200
+                code: ok
+                data:
+                  array:
+                    - id: 3
+                      email: visitor@email.com
+                      username: visitor
+                      name: Joshua visitor
+                      role: visitor
+                      createdAt: "2020-01-29T00:16:05.210Z"
+                      updatedAt: "2020-01-29T00:16:05.210Z"
+                      dob: "1999-10-10T00:00:00.000Z"
+                      gender: 2
+                      interest:
+                        - Gaming
+                        - FinTech
+                      point: 1023
+                  page: 1
+                  itemPerPage: 10
+                  total: 1
+
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /user/tenant:
+    get:
+      tags:
+        - user
+      summary: "List all tenant"
+      description: |
+        **Only allowed for admin**
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Response"
+                  - properties:
+                      data:
+                        allOf:
+                          - properties:
+                              array:
+                                type: array
+                                items:
+                                  $ref: "#/components/schemas/TenantData"
+                          - $ref: "#/components/schemas/Pagination"
+
+              example:
+                status: 200
+                code: ok
+                data:
+                  array:
+                    - id: 2
+                      email: tenant@email.com
+                      username: tenant
+                      name: Tenantaaa
+                      role: tenant
+                      createdAt: "2020-01-29T00:15:42.965Z"
+                      updatedAt: "2020-01-29T00:15:42.965Z"
+                      point: 876
+                  page: 1
+                  itemPerPage: 10
+                  total: 1
+
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
   /user/me:
     get:
       tags:
@@ -32,7 +188,10 @@ paths:
                   - $ref: "#/components/schemas/Response"
                   - properties:
                       data:
-                        $ref: "#/components/schemas/UserData"
+                        oneOf:
+                          - $ref: "#/components/schemas/BaseUserData"
+                          - $ref: "#/components/schemas/VisitorData"
+                          - $ref: "#/components/schemas/TenantData"
               example:
                 status: 200
                 code: "ok"
@@ -239,7 +398,10 @@ paths:
                   - $ref: "#/components/schemas/Response"
                   - properties:
                       data:
-                        $ref: "#/components/schemas/UserData"
+                        oneOf:
+                          - $ref: "#/components/schemas/BaseUserData"
+                          - $ref: "#/components/schemas/VisitorData"
+                          - $ref: "#/components/schemas/TenantData"
               example:
                 status: 200
                 code: "ok"
@@ -1584,7 +1746,7 @@ components:
         updatedAt:
           type: string
           format: date-time
-    UserData:
+    VisitorData:
       allOf:
         - $ref: "#/components/schemas/BaseUserData"
         - properties:
@@ -1597,7 +1759,16 @@ components:
               type: array
               items:
                 type: string
-        - description: "User object"
+            point:
+              type: integer
+        - description: "User (visitor) object"
+    TenantData:
+      allOf:
+        - $ref: "#/components/schemas/BaseUserData"
+        - properties:
+            point:
+              type: integer
+        - description: "User (tenant) object"
     TransactionData:
       description: "Transaction object"
       type: object

@@ -57,6 +57,56 @@ export class UserController {
     return codeList;
   }
 
+  async listUser(request: Request, response: Response) {
+    const page = parseInt(request.query.page, 10) || 1;
+    const itemPerPage = parseInt(request.query.itemPerPage, 10) || 10;
+
+    const type = request.params.type;
+
+    let array = null;
+    let total = null;
+
+    console.log(type);
+    if (type === UserRole.TENANT) {
+      [array, total] = await this.tenantRepository.findAndCount({
+        take: itemPerPage,
+        skip: (page - 1) * itemPerPage,
+        relations: ["userId"]
+      });
+    } else if (type === UserRole.VISITOR) {
+      [array, total] = await this.visitorRepository.findAndCount({
+        take: itemPerPage,
+        skip: (page - 1) * itemPerPage,
+        relations: ["userId"]
+      });
+    } else {
+      [array, total] = await this.userRepository.findAndCount({
+        take: itemPerPage,
+        skip: (page - 1) * itemPerPage
+      });
+    }
+
+    array = array.map((entry) => {
+      if (entry.userId) {
+        const userData = entry.userId;
+        delete entry.userId;
+        return {
+          ...userData,
+          ...entry
+        };
+      } else {
+        return entry;
+      }
+    });
+
+    return responseGenerator(response, 200, "ok", {
+      array,
+      page,
+      itemPerPage,
+      total
+    });
+  }
+
   async getUser(request: Request, response: Response) {
     const user = await this.userRepository.findOne(request.params.id);
 
