@@ -1,5 +1,6 @@
 import { IsPositive } from "class-validator";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, RelationId, CreateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+
 import { Item } from "./Item";
 import { User } from "./User";
 
