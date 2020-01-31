@@ -1,5 +1,5 @@
 import { IsPositive } from "class-validator";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, RelationId } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, RelationId, CreateDateColumn } from "typeorm";
 import { Item } from "./Item";
 import { User } from "./User";
 
@@ -14,6 +14,10 @@ export class Transaction {
 
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column()
+  @CreateDateColumn()
+  createdAt: Date;
 
   @ManyToOne((type) => User, (user) => user.id, { nullable: false })
   from: User;

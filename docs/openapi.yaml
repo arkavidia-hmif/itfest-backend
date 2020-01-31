@@ -125,6 +125,7 @@ paths:
                 data:
                   array:
                     - id: 1
+                      createdAt: "2020-01-31T00:14:49.370Z"
                       amount: 123
                       type: "give"
                       from:
@@ -144,6 +145,7 @@ paths:
                         createdAt: "2020-01-28T05:12:35.917Z"
                         updatedAt: "2020-01-28T05:12:35.917Z"
                     - id: 2
+                      createdAt: "2020-01-31T00:14:49.370Z"
                       amount: 123
                       type: "give"
                       from:
@@ -163,6 +165,7 @@ paths:
                         createdAt: "2020-01-28T05:12:35.917Z"
                         updatedAt: "2020-01-28T05:12:35.917Z"
                     - id: 3
+                      createdAt: "2020-01-31T00:14:49.370Z"
                       amount: 123
                       type: "give"
                       from:
@@ -345,6 +348,7 @@ paths:
                 data:
                   array:
                     - id: 1
+                      createdAt: "2020-01-31T00:14:49.370Z"
                       amount: 123
                       type: "give"
                       from:
@@ -364,6 +368,7 @@ paths:
                         createdAt: "2020-01-28T05:12:35.917Z"
                         updatedAt: "2020-01-28T05:12:35.917Z"
                     - id: 2
+                      createdAt: "2020-01-31T00:14:49.370Z"
                       amount: 123
                       type: "give"
                       from:
@@ -383,6 +388,7 @@ paths:
                         createdAt: "2020-01-28T05:12:35.917Z"
                         updatedAt: "2020-01-28T05:12:35.917Z"
                     - id: 3
+                      createdAt: "2020-01-31T00:14:49.370Z"
                       amount: 123
                       type: "give"
                       from:
@@ -1582,6 +1588,9 @@ components:
       properties:
         id:
           type: integer
+        createdAt:
+          type: string
+          format: date-time
         amount:
           type: integer
         type:

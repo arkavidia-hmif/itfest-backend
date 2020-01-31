@@ -77,7 +77,7 @@ export class TransactionController {
           await fromUserRepository.save(fromPointData);
         }
 
-        await transactionManager.insert(Transaction, {
+        await transactionManager.save(Transaction, {
           from: fromUser,
           to: toUser,
           amount: amount,
