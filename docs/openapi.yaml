@@ -1297,14 +1297,27 @@ paths:
                 code: "ok"
                 data:
                   array:
-                    - qty: 1
+                    - qty: 2
+                      createdAt: "2020-01-31T13:23:39.852Z"
+                      updatedAt: "2020-01-31T13:23:39.852Z"
                       item:
                         id: 1
-                        name: "Es krim"
-                        price: 3
+                        name: "Samsung S11"
+                        price: 1
+                        createdAt: "2020-01-31T13:23:39.832Z"
+                        updatedAt: "2020-01-31T13:23:39.832Z"
+                        owner:
+                          id: 2
+                          email: "tenant@email.com"
+                          username: "tenant"
+                          name: "Tenantaaa"
+                          role: "tenant"
+                          createdAt: "2020-01-29T00:15:42.965Z"
+                          updatedAt: "2020-01-29T00:15:42.965Z"
                   page: 1
                   itemPerPage: 10
-                  totalItem: 1
+                  total: 1
+
         "401":
           $ref: "#/components/responses/InvalidBearer"
     post:
@@ -1392,11 +1405,24 @@ paths:
                 status: 200
                 code: "ok"
                 data:
-                  qty: 3
+                  qty: 2
+                  createdAt: "2020-01-31T13:23:39.852Z"
+                  updatedAt: "2020-01-31T13:23:39.852Z"
                   item:
-                    id: 15
-                    name: "Bola bekel"
-                    price: 2
+                    id: 1
+                    name: "Samsung S11"
+                    price: 1
+                    createdAt: "2020-01-31T13:23:39.832Z"
+                    updatedAt: "2020-01-31T13:23:39.832Z"
+                    owner:
+                      id: 2
+                      email: "tenant@email.com"
+                      username: "tenant"
+                      name: "Tenantaaa"
+                      role: "tenant"
+                      createdAt: "2020-01-29T00:15:42.965Z"
+                      updatedAt: "2020-01-29T00:15:42.965Z"
+
         "404":
           description: "Item not found"
           content:
@@ -1550,8 +1576,8 @@ components:
           message:
             description: "Description of error"
             type: string
-    UserData:
-      description: "User object"
+    BaseUserData:
+      description: "Base user object"
       type: object
       properties:
         id:
@@ -1564,15 +1590,6 @@ components:
           type: string
         name:
           type: string
-        dob:
-          type: string
-          format: date
-        gender:
-          type: integer
-        interest:
-          type: array
-          items:
-            type: string
         role:
           type: string
           enum: [admin, tenant, visitor]
@@ -1582,6 +1599,20 @@ components:
         updatedAt:
           type: string
           format: date-time
+    UserData:
+      allOf:
+        - $ref: "#/components/schemas/BaseUserData"
+        - properties:
+            dob:
+              type: string
+              format: date
+            gender:
+              type: integer
+            interest:
+              type: array
+              items:
+                type: string
+        - description: "User object"
     TransactionData:
       description: "Transaction object"
       type: object
@@ -1677,6 +1708,8 @@ components:
         price:
           type: integer
           minimum: 0
+        owner:
+          $ref: "#/components/schemas/BaseUserData"
     InventoryData:
       description: "Inventory object"
       type: object

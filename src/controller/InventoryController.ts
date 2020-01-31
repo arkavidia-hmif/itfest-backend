@@ -23,7 +23,7 @@ export class InventoryController {
     const [rawItem, total] = await this.inventoryRepository.findAndCount({
       take: itemPerPage,
       skip: (page - 1) * itemPerPage,
-      relations: ["item"]
+      relations: ["item", "item.owner"]
     });
 
     const item = rawItem.map((entry) => {
@@ -83,7 +83,7 @@ export class InventoryController {
   async getItem(request: Request, response: Response) {
     const id = request.params.id;
 
-    const item = await this.itemRepository.findOne(id);
+    const item = await this.itemRepository.findOne(id, { relations: ["owner"] });
     const inventory = await this.inventoryRepository.findOne({ item }, { select: ["qty", "createdAt", "updatedAt"] });
 
     if (item && inventory) {
