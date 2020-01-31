@@ -21,8 +21,11 @@ export class Item {
   name: string;
 
   @ManyToOne((type) => User)
-  @JoinColumn()
+  @JoinColumn({ name: "ownerId" })
   owner: User;
+
+  @Column({ nullable: false })
+  ownerId: number;
 
   @Column()
   @IsPositive()

@@ -1306,14 +1306,7 @@ paths:
                         price: 1
                         createdAt: "2020-01-31T13:23:39.832Z"
                         updatedAt: "2020-01-31T13:23:39.832Z"
-                        owner:
-                          id: 2
-                          email: "tenant@email.com"
-                          username: "tenant"
-                          name: "Tenantaaa"
-                          role: "tenant"
-                          createdAt: "2020-01-29T00:15:42.965Z"
-                          updatedAt: "2020-01-29T00:15:42.965Z"
+                        ownerId: 2
                   page: 1
                   itemPerPage: 10
                   total: 1
@@ -1414,15 +1407,7 @@ paths:
                     price: 1
                     createdAt: "2020-01-31T13:23:39.832Z"
                     updatedAt: "2020-01-31T13:23:39.832Z"
-                    owner:
-                      id: 2
-                      email: "tenant@email.com"
-                      username: "tenant"
-                      name: "Tenantaaa"
-                      role: "tenant"
-                      createdAt: "2020-01-29T00:15:42.965Z"
-                      updatedAt: "2020-01-29T00:15:42.965Z"
-
+                    ownerId: 2
         "404":
           description: "Item not found"
           content:
@@ -1708,8 +1693,8 @@ components:
         price:
           type: integer
           minimum: 0
-        owner:
-          $ref: "#/components/schemas/BaseUserData"
+        ownerId:
+          type: integer
     InventoryData:
       description: "Inventory object"
       type: object
