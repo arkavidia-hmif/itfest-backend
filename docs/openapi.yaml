@@ -215,7 +215,7 @@ paths:
         - user
       summary: "Edit profile of self"
       description: |
-        User can only update email, username, and/or email
+        User can update dob, gender, interest, name, and username
       requestBody:
         description: "Modified user data"
         content:
@@ -416,7 +416,7 @@ paths:
       summary: "Edit profile of specific user id"
       description: |
         **Only allowed for admin**
-        User can only update email, username, and/or email
+        User can update dob, gender, interest, name, and username
       parameters:
         - name: id
           in: path
