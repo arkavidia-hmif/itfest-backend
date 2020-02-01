@@ -222,14 +222,7 @@ paths:
           application/json:
             schema:
               type: object
-              properties:
-                email:
-                  type: string
-                  format: email
-                username:
-                  type: string
-                name:
-                  type: string
+              description: "Changed key value"
             examples:
               "Change name":
                 value:
@@ -437,14 +430,7 @@ paths:
           application/json:
             schema:
               type: object
-              properties:
-                email:
-                  type: string
-                  format: email
-                username:
-                  type: string
-                name:
-                  type: string
+              description: "Changed key value"
             examples:
               "Change name":
                 value:

@@ -339,7 +339,7 @@ export class UserController {
         await this.visitorRepository.save(changes);
       }
 
-      const changes = partialUpdate(user, request.body, ["name", "email", "username"]);
+      const changes = partialUpdate(user, request.body, ["name", "username"]);
       await this.userRepository.save(changes);
     } catch (err) {
       console.error(err);
