@@ -132,6 +132,9 @@ export default () => {
     check("difficulty.*").isInt({ min: 1, max: 3 }).withMessage("must be integer between 1 and 3"),
     checkParam,
   ], gc.playGame.bind(gc));
+  router.get("/user/:qrid([a-z0-9]+)/play/status", [
+    limitAccess([UserRole.TENANT]),
+  ], gc.checkPlayStatus.bind(gc));
 
   router.post("/user/:qrid([a-z0-9]+)/redeem", [
     limitAccess([UserRole.ADMIN]),

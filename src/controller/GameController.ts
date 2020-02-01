@@ -143,6 +143,43 @@ export class GameController {
     return responseGenerator(response, 200, "ok");
   }
 
+  async checkPlayStatus(request: Request, response: Response) {
+    const userString = decodeQr(request.params.qrid);
+    const tenantId = response.locals.auth.id;
+
+    let userData: any = {};
+
+    try {
+      userData = JSON.parse(userString);
+
+    } catch (error) {
+      console.error(error);
+      return responseGenerator(response, 400, "invalid-qrid");
+    }
+
+    const visitor = await this.visitorRepository.findOne(userData.id, {
+      relations: ["userId"]
+    });
+    if (!visitor) {
+      return responseGenerator(response, 404, "visitor-not-found");
+    }
+
+    const tenant = await this.tenantRepository.findOne(tenantId, {
+      relations: ["userId"]
+    });
+
+    const feedback = await this.feedbackRepository.findOne({
+      where: {
+        from: visitor,
+        to: tenant
+      }
+    });
+
+    return responseGenerator(response, 200, "ok", {
+      played: feedback.rated
+    });
+  }
+
   async playGame(request: Request, response: Response) {
     const tenantId = response.locals.auth.id;
     const userString = decodeQr(request.params.qrid);

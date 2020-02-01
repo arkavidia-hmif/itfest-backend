@@ -670,7 +670,7 @@ paths:
   /user/{qrid}/play:
     post:
       description: |
-        **Only allowed for tenant and admin**
+        **Only allowed for tenant**
       tags:
         - game
         - user
@@ -729,6 +729,61 @@ paths:
                   value:
                     status: 404
                     code: "game-not-found"
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /user/{qrid}/play/status:
+    get:
+      description: |
+        **Only allowed for tenant**
+      tags:
+        - game
+        - user
+      summary: "Get play status for a visitor"
+      parameters:
+        - $ref: "#/components/parameters/qrid"
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Response"
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          played:
+                            type: boolean
+              example:
+                status: 200
+                code: "ok"
+                data:
+                  played: false
+        "400":
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+              examples:
+                "Invalid qrid":
+                  value:
+                    status: 400
+                    code: "invalid-qrid"
+        "404":
+          description: "Visitor not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+              examples:
+                "Visitor not found":
+                  value:
+                    status: 404
+                    code: "visitor-not-found"
         "401":
           $ref: "#/components/responses/InvalidBearer"
         "403":
