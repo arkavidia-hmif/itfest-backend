@@ -942,11 +942,7 @@ paths:
               required:
                 - email
                 - password
-                - name
                 - voucher
-                - dob
-                - gender
-                - interest
               properties:
                 email:
                   type: string

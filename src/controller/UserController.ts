@@ -247,7 +247,7 @@ export class UserController {
 
     delete request.body.password;
 
-    let name = request.body.name;
+    let name = request.body.name || email;
 
     const salt = bcrypt.genSaltSync(config.password.saltRounds);
 
@@ -274,9 +274,25 @@ export class UserController {
           name,
           email,
         });
+
+        let filled = false;
+        let point = 0;
+
+        if (request.body.dob &&
+          request.body.gender &&
+          request.body.interest &&
+          request.body.name) {
+          filled = true;
+          point += 20;
+        }
+
+        const changes = partialUpdate({}, request.body, ["dob", "gender", "interest"])
+
         await transactionManager.save(Visitor, {
           userId: savedUser,
-          ...request.body,
+          ...changes,
+          point,
+          filled,
         });
         await transactionManager.delete(Voucher, voucherItem);
 

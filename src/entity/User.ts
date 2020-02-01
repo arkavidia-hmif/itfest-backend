@@ -66,17 +66,20 @@ export class Visitor {
   @JoinColumn({ name: "userId" })
   userId: User;
 
-  @Column()
+  @Column({ nullable: true })
   dob: Date;
 
-  @Column()
+  @Column({ nullable: true })
   gender: Gender;
 
-  @Column("simple-array")
+  @Column("simple-array", { nullable: true })
   interest: string[];
 
   @Column({ nullable: false, default: 0 })
   point: number;
+
+  @Column({ nullable: false, default: false })
+  filled: boolean;
 }
 
 @Entity()

@@ -35,7 +35,7 @@ export default () => {
     .isAlphanumeric().withMessage("must be alphanumeric")
     .isLength({ min: 6, max: 6 }).withMessage("must be 6 characters long");
   const usernameCheck = () => check("username")
-    .isAlphanumeric().withMessage("must be alphanumeric")
+    .matches(/^[a-zA-Z0-9_\-\.+]+$/i).withMessage("must be alphanumeric or _-+.")
     .isLength({ min: 1 }).withMessage("must be >= 1 character long");
   const pointCheck = () => check("point").isInt({ min: 0 }).withMessage("must be a positive integer");
   const itemCheck = () => check("item").isInt().withMessage("must be an integer");
@@ -56,10 +56,10 @@ export default () => {
     passwordCheck(),
     voucherCheck(),
     usernameCheck().optional(),
-    nameCheck(),
-    genderCheck(),
-    interestCheck(),
-    dobCheck(),
+    nameCheck().optional(),
+    genderCheck().optional(),
+    interestCheck().optional(),
+    dobCheck().optional(),
     checkParam,
   ], uc.registerVisitor.bind(uc));
 
