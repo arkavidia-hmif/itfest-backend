@@ -194,6 +194,17 @@ export class GameController {
 
         await tmVisitorRepository.save(visitor);
 
+        const feedback = await tmFeedbackRepository.findOne({
+          where: {
+            from: visitor,
+            to: tenant
+          }
+        });
+
+        if (feedback) {
+          throw "already-play-game";
+        }
+
         await tmFeedbackRepository.save({
           from: visitor,
           to: tenant,
