@@ -283,7 +283,7 @@ export class UserController {
           request.body.interest &&
           request.body.name) {
           filled = true;
-          point += 20;
+          point += config.userFillBonus;
         }
 
         const changes = partialUpdate({}, request.body, ["dob", "gender", "interest"])
@@ -336,6 +336,11 @@ export class UserController {
         const visitor = new Visitor();
         visitor.userId = user;
         const changes = partialUpdate(visitor, request.body, ["dob", "gender", "interest"]);
+
+        if (visitor.dob && visitor.gender && visitor.interest && (user.name !== user.email) && !visitor.filled) {
+          visitor.point += config.userFillBonus;
+        }
+
         await this.visitorRepository.save(changes);
       }
 

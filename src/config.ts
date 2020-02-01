@@ -13,5 +13,6 @@ export default {
     1: 50,
     2: 100,
     3: 200,
-  }
+  },
+  userFillBonus: 20
 };
