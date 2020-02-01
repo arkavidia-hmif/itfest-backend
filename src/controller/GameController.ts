@@ -10,6 +10,7 @@ import { decodeQr } from "../utils/qr";
 import { responseGenerator } from "../utils/responseGenerator";
 import { globalSocket } from "../routes/socket";
 import { isError } from "util";
+import { Transaction, TransactionType } from "../entity/Transaction";
 
 export class GameController {
 
@@ -206,6 +207,7 @@ export class GameController {
         const tmTenantRepository = transactionManager.getRepository(Tenant);
         const tmVisitorRepository = transactionManager.getRepository(Visitor);
         const tmFeedbackRepository = transactionManager.getRepository(Feedback);
+        const tmTransactionRepository = transactionManager.getRepository(Transaction);
 
 
         const reducer = (acc, current) => {
@@ -246,6 +248,13 @@ export class GameController {
           from: visitor,
           to: tenant,
           rated: false
+        });
+
+        await tmTransactionRepository.save({
+          type: TransactionType.PLAY,
+          from: tenant.userId,
+          to: visitor.userId,
+          amount: pointDelta,
         });
 
         if (globalSocket[user.id]) {
