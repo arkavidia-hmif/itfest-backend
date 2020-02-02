@@ -24,6 +24,9 @@ paths:
       summary: "List all user"
       description: |
         **Only allowed for admin**
+      parameters:
+        - $ref: "#/components/parameters/itemPerPage"
+        - $ref: "#/components/parameters/page"
       responses:
         "200":
           description: "Success"
@@ -83,6 +86,9 @@ paths:
       summary: "List all visitor"
       description: |
         **Only allowed for admin**
+      parameters:
+        - $ref: "#/components/parameters/itemPerPage"
+        - $ref: "#/components/parameters/page"
       responses:
         "200":
           description: "Success"
@@ -134,6 +140,9 @@ paths:
       summary: "List all tenant"
       description: |
         **Only allowed for admin**
+      parameters:
+        - $ref: "#/components/parameters/itemPerPage"
+        - $ref: "#/components/parameters/page"
       responses:
         "200":
           description: "Success"
@@ -215,7 +224,7 @@ paths:
         - user
       summary: "Edit profile of self"
       description: |
-        User can update dob, gender, interest, name, and username
+        User can only update email, username, and/or email
       requestBody:
         description: "Modified user data"
         content:
@@ -253,6 +262,9 @@ paths:
       tags:
         - user
       summary: "Get list of transaction of self"
+      parameters:
+        - $ref: "#/components/parameters/itemPerPage"
+        - $ref: "#/components/parameters/page"
       responses:
         "200":
           description: "Success"
@@ -416,7 +428,7 @@ paths:
       summary: "Edit profile of specific user id"
       description: |
         **Only allowed for admin**
-        User can update dob, gender, interest, name, and username
+        User can only update email, username, and/or email
       parameters:
         - name: id
           in: path
@@ -472,6 +484,8 @@ paths:
           required: true
           schema:
             type: integer
+        - $ref: "#/components/parameters/itemPerPage"
+        - $ref: "#/components/parameters/page"
       responses:
         "200":
           description: "Success"
