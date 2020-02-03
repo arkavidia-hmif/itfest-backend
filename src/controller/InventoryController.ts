@@ -42,7 +42,7 @@ export class InventoryController {
   async createItem(request: Request, response: Response) {
     const { name, price, qty } = request.body;
     let ownerId = response.locals.auth.id;
-    const userRole = response.locals.auth.id;
+    const userRole = response.locals.auth.role;
 
     if (userRole === UserRole.ADMIN) {
       ownerId = request.body.ownerId || ownerId;
