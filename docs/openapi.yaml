@@ -771,11 +771,14 @@ paths:
                         properties:
                           played:
                             type: boolean
+                          rated:
+                            type: boolean
               example:
                 status: 200
                 code: "ok"
                 data:
-                  played: false
+                  played: true
+                  rated: false
         "400":
           description: "Bad request"
           content:

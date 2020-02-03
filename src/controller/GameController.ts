@@ -177,7 +177,8 @@ export class GameController {
     });
 
     return responseGenerator(response, 200, "ok", {
-      played: feedback.rated
+      played: !!feedback,
+      rated: feedback.rated
     });
   }
 
