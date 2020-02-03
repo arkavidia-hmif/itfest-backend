@@ -54,7 +54,12 @@ export class InventoryController {
       return responseGenerator(response, 400, "owner-not-found")
     }
 
-    const existingItem = await this.itemRepository.findOne({ name });
+    const existingItem = await this.itemRepository.findOne({
+      where: {
+        name,
+        owner,
+      }
+    });
 
     if (existingItem) {
       return responseGenerator(response, 400, "item-exists");
