@@ -45,6 +45,14 @@ export class InventoryController {
     const itemPerPage = parseInt(request.query.itemPerPage, 10) || 10;
 
     let [userArray, userTotal] = await this.userRepository.findAndCount({
+      where: [
+        {
+          role: UserRole.ADMIN
+        },
+        {
+          role: UserRole.TENANT
+        }
+      ],
       take: itemPerPage,
       skip: (page - 1) * itemPerPage,
       select: ["id", "name"]
