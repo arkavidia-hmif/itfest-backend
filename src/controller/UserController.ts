@@ -133,7 +133,7 @@ export class UserController {
     const page = parseInt(request.query.page, 10) || 1;
     const itemPerPage = parseInt(request.query.itemPerPage, 10) || 10;
 
-    const [transactions, totalItem] = await this.tc.getTransaction([{ from: userId }, { to: userId }])
+    const [transactions, totalItem] = await this.tc.getTransaction([{ from: userId }, { to: userId }], page, itemPerPage);
 
     return responseGenerator(response, 200, "ok", {
       array: transactions,
