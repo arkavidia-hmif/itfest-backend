@@ -279,13 +279,17 @@ export class UserController {
 
         if (request.body.dob &&
           request.body.gender &&
-          request.body.interest &&
+          (request.body.interest && request.body.interest.length > 0) &&
           request.body.name) {
           filled = true;
           point += config.userFillBonus;
         }
 
-        const changes = partialUpdate({}, request.body, ["dob", "gender", "interest"])
+        const changes: any = partialUpdate({}, request.body, ["dob", "gender", "interest"]);
+
+        if (changes.interest && changes.interest.length == 0) {
+          delete changes.interest;
+        }
 
         await transactionManager.save(Visitor, {
           userId: savedUser,
@@ -332,12 +336,22 @@ export class UserController {
       }
 
       if (user.role === UserRole.VISITOR) {
-        const visitor = new Visitor();
-        visitor.userId = user;
-        const changes = partialUpdate(visitor, request.body, ["dob", "gender", "interest"]);
+        const visitor = await this.visitorRepository.findOne({
+          where: {
+            userId: user
+          },
+          relations: ["userId"]
+        });
 
-        if (visitor.dob && visitor.gender && visitor.interest && (user.name !== user.email) && !visitor.filled) {
+        const changes: any = partialUpdate(visitor, request.body, ["dob", "gender", "interest"]);
+
+        if (changes.interest && changes.interest.length == 0) {
+          delete changes.interest;
+        }
+
+        if (visitor.dob && visitor.gender && (visitor.interest && visitor.interest.length > 0) && (user.name !== user.email) && !visitor.filled) {
           visitor.point += config.userFillBonus;
+          visitor.filled = true;
         }
 
         await this.visitorRepository.save(changes);
