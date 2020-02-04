@@ -230,6 +230,7 @@ export class InventoryController {
   async redeem(request: Request, response: Response) {
     const adminId = response.locals.auth.id;
     const itemId = request.body.item;
+    const amount = request.body.amount;
 
     const userString = decodeQr(request.params.qrid);
 
@@ -263,24 +264,26 @@ export class InventoryController {
           throw "item-not-found";
         }
 
-        if (inventory.qty <= 0) {
-          throw "item-empty";
+        if (inventory.qty < amount) {
+          throw "not-enough-qty";
         }
-        inventory.qty -= 1;
+        inventory.qty -= amount;
 
-        if (visitorUser.point < item.price) {
+        if (visitorUser.point < (item.price * amount)) {
           throw "not-enough-point";
         }
 
-        await transactionManager.save(Transaction, {
-          from: visitorUser.userId,
-          to: adminUser,
-          amount: item.price,
-          type: TransactionType.REDEEM,
-          item: item
-        });
+        for (let i = 0; i < amount; i++) {
+          await transactionManager.save(Transaction, {
+            from: visitorUser.userId,
+            to: adminUser,
+            amount: item.price,
+            type: TransactionType.REDEEM,
+            item: item
+          });
+        }
 
-        visitorUser.point -= item.price;
+        visitorUser.point -= (item.price * amount);
 
         await transactionManager.save(Visitor, visitorUser);
         await tmInventoryRepository.save(inventory);
@@ -290,9 +293,9 @@ export class InventoryController {
             type: "redeem",
             item: {
               id: item.id,
-              name: item.name,
+              name: amount > 1 ? `${amount}x${item.name}` : item.name,
             },
-            amount: item.price
+            amount: (item.price * amount)
           });
         }
       });

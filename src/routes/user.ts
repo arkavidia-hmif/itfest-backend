@@ -39,6 +39,7 @@ export default () => {
     .isLength({ min: 1 }).withMessage("must be >= 1 character long");
   const pointCheck = () => check("point").isInt({ min: 0 }).withMessage("must be a positive integer");
   const itemCheck = () => check("item").isInt().withMessage("must be an integer");
+  const amountCheck = () => check("amount").isInt({ min: 1 }).withMessage("must be an integer >= 1");
 
   // Public user endpoint
   router.post("/login", [
@@ -144,6 +145,7 @@ export default () => {
   router.post("/user/:qrid([a-z0-9]+)/redeem", [
     limitAccess([UserRole.ADMIN]),
     itemCheck(),
+    amountCheck(),
     checkParam,
   ], ic.redeem.bind(ic));
 
