@@ -1553,6 +1553,9 @@ paths:
                 ownerId:
                   description: "Create item as another user, only allowed for admin"
                   type: integer
+                qty:
+                  type: integer
+                  minimum: 0
             example:
               name: "Es krim"
               price: 2
