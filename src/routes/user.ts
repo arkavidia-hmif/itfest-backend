@@ -86,6 +86,11 @@ export default () => {
     ...paginationCheck,
     checkParam,
   ], uc.listUser.bind(uc));
+  router.get("/user/item", [
+    limitAccess([UserRole.ADMIN]),
+    ...paginationCheck,
+    checkParam,
+  ], ic.listTenatWithItem.bind(ic));
   router.get("/user/me", uc.getMe.bind(uc));
   router.put("/user/me", [
     emailCheck().optional(),

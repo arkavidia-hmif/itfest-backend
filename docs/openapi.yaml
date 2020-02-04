@@ -182,6 +182,68 @@ paths:
           $ref: "#/components/responses/InvalidBearer"
         "403":
           $ref: "#/components/responses/Forbidden"
+  /user/item:
+    get:
+      tags:
+        - user
+        - inventory
+      summary: "Get user and their inventory"
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              example:
+                status: 200
+                code: ok
+                data:
+                  array:
+                    - id: 1
+                      name: Administrator
+                      items:
+                        - id: 4
+                          name: Samsung S11
+                          price: 10
+                          qty: 2
+                        - id: 6
+                          name: Samsung S12
+                          price: 1
+                          qty: 2
+                    - id: 2
+                      name: Joshuaa
+                      items:
+                        - id: 1
+                          name: Samsung S11
+                          price: 11
+                          qty: 1
+                    - id: 3
+                      name: Joshuaa
+                      items:
+                        - id: 5
+                          name: Samsung S11
+                          price: 1
+                          qty: 2
+                    - id: 5
+                      name: Joshua visitor
+                      items: []
+                    - id: 6
+                      name: visitor3@email.com
+                      items: []
+                    - id: 7
+                      name: Tenantaaa
+                      items:
+                        - id: 3
+                          name: Samsung S8
+                          price: 5
+                          qty: 2
+                  page: 1
+                  itemPerPage: 10
+                  total: 6
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
   /user/me:
     get:
       tags:

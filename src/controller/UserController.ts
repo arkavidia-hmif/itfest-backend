@@ -66,7 +66,6 @@ export class UserController {
     let array = null;
     let total = null;
 
-    console.log(type);
     if (type === UserRole.TENANT) {
       [array, total] = await this.tenantRepository.findAndCount({
         take: itemPerPage,

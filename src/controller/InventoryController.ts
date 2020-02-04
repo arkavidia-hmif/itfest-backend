@@ -39,6 +39,65 @@ export class InventoryController {
     });
   }
 
+
+  async listTenatWithItem(request: Request, response: Response) {
+    const page = parseInt(request.query.page, 10) || 1;
+    const itemPerPage = parseInt(request.query.itemPerPage, 10) || 10;
+
+    let [userArray, userTotal] = await this.userRepository.findAndCount({
+      take: itemPerPage,
+      skip: (page - 1) * itemPerPage,
+      select: ["id", "name"]
+    });
+
+    const tenantIdArray = userArray.map((entry) => {
+      return {
+        ownerId: entry.id
+      };
+    });
+
+    let [itemArray, itemTotal] = await this.itemRepository.findAndCount({
+      where: tenantIdArray,
+      select: ["id"]
+    });
+
+    const itemIdArray = itemArray.map((entry) => {
+      return {
+        item: entry.id
+      }
+    })
+
+    let [inventoryArray, inventoryTotal] = await this.inventoryRepository.findAndCount({
+      where: itemIdArray,
+      relations: ["item"]
+    });
+
+    const finalArray = userArray.map((entry) => {
+      const filteredInventory = inventoryArray.filter((inventory) => inventory.item.ownerId == entry.id);
+      const userInventory = filteredInventory.map((inventory) => {
+        return {
+          id: inventory.item.id,
+          name: inventory.item.name,
+          price: inventory.item.price,
+          qty: inventory.qty
+        };
+      });
+
+      return {
+        id: entry.id,
+        name: entry.name,
+        items: userInventory
+      }
+    });
+
+    return responseGenerator(response, 200, "ok", {
+      array: finalArray,
+      page,
+      itemPerPage,
+      total: userTotal
+    });
+  }
+
   async createItem(request: Request, response: Response) {
     const { name, price, qty } = request.body;
     let ownerId = response.locals.auth.id;
