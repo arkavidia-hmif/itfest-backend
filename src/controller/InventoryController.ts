@@ -230,7 +230,7 @@ export class InventoryController {
   async redeem(request: Request, response: Response) {
     const adminId = response.locals.auth.id;
     const itemId = request.body.item;
-    const amount = request.body.amount;
+    const amount = request.body.amount || 1;
 
     const userString = decodeQr(request.params.qrid);
 
