@@ -178,7 +178,7 @@ export class GameController {
 
     return responseGenerator(response, 200, "ok", {
       played: !!feedback,
-      rated: feedback.rated
+      rated: !!feedback ? feedback.rated : false
     });
   }
 
