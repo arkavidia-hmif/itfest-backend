@@ -109,6 +109,10 @@ export class InventoryController {
       return responseGenerator(response, 404, "item-not-found");
     }
 
+    if (response.locals.auth.role !== UserRole.ADMIN && item.ownerId !== response.locals.auth.id) {
+      return responseGenerator(response, 403, "forbidden");
+    }
+
     const inventory = await this.inventoryRepository.findOne({ item: item })
 
     try {
@@ -136,8 +140,13 @@ export class InventoryController {
 
     const item = await this.itemRepository.findOne(id);
 
+
     if (!item) {
       return responseGenerator(response, 404, "item-not-found");
+    }
+
+    if (response.locals.auth.role !== UserRole.ADMIN && item.ownerId !== response.locals.auth.id) {
+      return responseGenerator(response, 403, "forbidden");
     }
 
     try {
