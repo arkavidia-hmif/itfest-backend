@@ -320,6 +320,14 @@ export class UserController {
     });
   }
 
+  checkFilled(visitorObj: any, userObj: any): boolean {
+    return (visitorObj.dob &&
+      visitorObj.gender &&
+      (visitorObj.interest && visitorObj.interest.length > 0) &&
+      (userObj.name !== userObj.email) &&
+      !visitorObj.filled);
+  }
+
   async editUserMe(request: Request, response: Response) {
     request.params.id = response.locals.auth.id;
     return this.editUser(request, response);
@@ -335,6 +343,8 @@ export class UserController {
         return responseGenerator(response, 404, "user-not-found");
       }
 
+      const updatedUser = partialUpdate(user, request.body, ["name", "username"]);
+
       if (user.role === UserRole.VISITOR) {
         const visitor = await this.visitorRepository.findOne({
           where: {
@@ -343,22 +353,21 @@ export class UserController {
           relations: ["userId"]
         });
 
-        const changes: any = partialUpdate(visitor, request.body, ["dob", "gender", "interest"]);
+        const updatedVisitor: any = partialUpdate(visitor, request.body, ["dob", "gender", "interest"]);
 
-        if (changes.interest && changes.interest.length == 0) {
-          delete changes.interest;
+        if (updatedVisitor.interest && updatedVisitor.interest.length == 0) {
+          delete updatedVisitor.interest;
         }
 
-        if (visitor.dob && visitor.gender && (visitor.interest && visitor.interest.length > 0) && (user.name !== user.email) && !visitor.filled) {
-          visitor.point += config.userFillBonus;
-          visitor.filled = true;
+        if (this.checkFilled(updatedVisitor, updatedUser)) {
+          updatedVisitor.point += config.userFillBonus;
+          updatedVisitor.filled = true;
         }
 
-        await this.visitorRepository.save(changes);
+        await this.visitorRepository.save(updatedVisitor);
       }
 
-      const changes = partialUpdate(user, request.body, ["name", "username"]);
-      await this.userRepository.save(changes);
+      await this.userRepository.save(updatedUser);
     } catch (err) {
       console.error(err);
       return responseGenerator(response, 500, "unknown-error");
