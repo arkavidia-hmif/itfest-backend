@@ -185,6 +185,7 @@ export class UserController {
   async registerTenant(request: Request, response: Response) {
     const { email, username, password, point } = request.body;
     // const username: string = request.body.uemail.substring(0, email.indexOf("@"));
+
     const name = request.body.name || username;
 
     delete request.body.password;
@@ -199,6 +200,14 @@ export class UserController {
       await getConnection().transaction(async transactionManager => {
         const tmUserRepository = transactionManager.getRepository(User);
         const tmTenantRepository = transactionManager.getRepository(Tenant);
+
+        if (tmUserRepository.findOne({
+          where: {
+            username
+          }
+        })) {
+          throw "user-exists";
+        };
 
         const savedUser = await tmUserRepository.save({
           role: UserRole.TENANT,
@@ -222,7 +231,7 @@ export class UserController {
         }, config.secret)
       })
     } catch (err) {
-      if (err.code === "ER_DUP_ENTRY") {
+      if (err === "user-exists" || err.code === "ER_DUP_ENTRY") {
         return responseGenerator(response, 400, "user-exists");
       } else if (err.code === "ESOCKET") {
         return responseGenerator(response, 500, "email-error");
