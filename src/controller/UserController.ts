@@ -201,9 +201,9 @@ export class UserController {
         const tmUserRepository = transactionManager.getRepository(User);
         const tmTenantRepository = transactionManager.getRepository(Tenant);
 
-        if (tmUserRepository.findOne({
+        if (await tmUserRepository.findOne({
           where: {
-            username
+            username: username
           }
         })) {
           throw "user-exists";
