@@ -133,7 +133,7 @@ export class UserController {
     const page = parseInt(request.query.page, 10) || 1;
     const itemPerPage = parseInt(request.query.itemPerPage, 10) || 10;
 
-    const [transactions, totalItem] = await this.tc.getTransaction([{ from: userId }, { to: userId }])
+    const [transactions, totalItem] = await this.tc.getTransaction([{ from: userId }, { to: userId }], page, itemPerPage);
 
     return responseGenerator(response, 200, "ok", {
       array: transactions,
@@ -279,13 +279,17 @@ export class UserController {
 
         if (request.body.dob &&
           request.body.gender &&
-          request.body.interest &&
+          (request.body.interest && request.body.interest.length > 0) &&
           request.body.name) {
           filled = true;
           point += config.userFillBonus;
         }
 
-        const changes = partialUpdate({}, request.body, ["dob", "gender", "interest"])
+        const changes: any = partialUpdate({}, request.body, ["dob", "gender", "interest"]);
+
+        if (changes.interest && changes.interest.length == 0) {
+          delete changes.interest;
+        }
 
         await transactionManager.save(Visitor, {
           userId: savedUser,
@@ -316,6 +320,14 @@ export class UserController {
     });
   }
 
+  checkFilled(visitorObj: any, userObj: any): boolean {
+    return (visitorObj.dob &&
+      visitorObj.gender &&
+      (visitorObj.interest && visitorObj.interest.length > 0) &&
+      (userObj.name !== userObj.email) &&
+      !visitorObj.filled);
+  }
+
   async editUserMe(request: Request, response: Response) {
     request.params.id = response.locals.auth.id;
     return this.editUser(request, response);
@@ -331,20 +343,31 @@ export class UserController {
         return responseGenerator(response, 404, "user-not-found");
       }
 
-      if (user.role === UserRole.VISITOR) {
-        const visitor = new Visitor();
-        visitor.userId = user;
-        const changes = partialUpdate(visitor, request.body, ["dob", "gender", "interest"]);
+      const updatedUser = partialUpdate(user, request.body, ["name", "username"]);
 
-        if (visitor.dob && visitor.gender && visitor.interest && (user.name !== user.email) && !visitor.filled) {
-          visitor.point += config.userFillBonus;
+      if (user.role === UserRole.VISITOR) {
+        const visitor = await this.visitorRepository.findOne({
+          where: {
+            userId: user
+          },
+          relations: ["userId"]
+        });
+
+        const updatedVisitor: any = partialUpdate(visitor, request.body, ["dob", "gender", "interest"]);
+
+        if (updatedVisitor.interest && updatedVisitor.interest.length == 0) {
+          delete updatedVisitor.interest;
         }
 
-        await this.visitorRepository.save(changes);
+        if (this.checkFilled(updatedVisitor, updatedUser)) {
+          updatedVisitor.point += config.userFillBonus;
+          updatedVisitor.filled = true;
+        }
+
+        await this.visitorRepository.save(updatedVisitor);
       }
 
-      const changes = partialUpdate(user, request.body, ["name", "username"]);
-      await this.userRepository.save(changes);
+      await this.userRepository.save(updatedUser);
     } catch (err) {
       console.error(err);
       return responseGenerator(response, 500, "unknown-error");

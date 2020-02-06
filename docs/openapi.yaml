@@ -883,8 +883,12 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - item
               properties:
                 item:
+                  type: integer
+                amount:
                   type: integer
             example:
               item: 1
