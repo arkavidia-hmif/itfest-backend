@@ -59,7 +59,7 @@ export class UserController {
 
   async listUser(request: Request, response: Response) {
     const page = parseInt(request.query.page, 10) || 1;
-    const itemPerPage = parseInt(request.query.itemPerPage, 10) || 10;
+    const itemPerPage = parseInt(request.query.itemPerPage, 10) || 100;
 
     const type = request.params.type;
 
