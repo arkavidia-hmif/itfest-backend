@@ -42,7 +42,7 @@ export class InventoryController {
 
   async listTenatWithItem(request: Request, response: Response) {
     const page = parseInt(request.query.page, 10) || 1;
-    const itemPerPage = parseInt(request.query.itemPerPage, 10) || 10;
+    const itemPerPage = parseInt(request.query.itemPerPage, 10) || 100;
 
     let [userArray, userTotal] = await this.userRepository.findAndCount({
       where: [
