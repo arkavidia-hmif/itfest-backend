@@ -72,9 +72,9 @@ export class TransactionController {
             throw "not-enough-point";
           }
 
-          fromPointData.point -= amount;
-
-          await fromUserRepository.save(fromPointData);
+          await fromUserRepository.decrement({
+            userId: fromUser.id
+          }, "point", amount);
         }
 
         await transactionManager.save(Transaction, {
@@ -93,9 +93,7 @@ export class TransactionController {
         }
 
         if (toUser.role !== UserRole.ADMIN) {
-          const toPointData = await toUserRepository.findOneOrFail(toUser.id, { relations: ["userId"] });
-          toPointData.point += amount;
-          await toUserRepository.save(toPointData);
+          await toUserRepository.increment({ userId: toUser.id }, "point", amount);
         }
 
         if (globalSocket[toId]) {
