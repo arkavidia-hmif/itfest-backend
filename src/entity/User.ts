@@ -1,5 +1,5 @@
 import { IsAlphanumeric, IsEmail } from "class-validator";
-import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn, Check } from "typeorm";
 
 export enum UserRole {
   ADMIN = "admin",
@@ -61,6 +61,7 @@ export class User {
   updatedAt: Date;
 }
 @Entity()
+@Check(`(point >= 0)`)
 export class Visitor {
   @OneToOne((type) => User, { primary: true })
   @JoinColumn({ name: "userId" })
@@ -83,6 +84,7 @@ export class Visitor {
 }
 
 @Entity()
+@Check(`(point >= 0)`)
 export class Tenant {
   @OneToOne((type) => User, { primary: true })
   @JoinColumn({ name: "userId" })
