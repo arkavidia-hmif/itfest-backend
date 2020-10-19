@@ -15,8 +15,8 @@ import { User } from "./User";
 export class Scoreboard {
     @PrimaryColumn()
     @OneToOne(type => User)
-    @JoinColumn({ name : 'playerId' })
-    playerId : number;
+    @JoinColumn({ name : 'userId' })
+    userId : number;
 
     @Column({ default : () => 0 })
     score : number;

@@ -10,15 +10,15 @@ import {
     OneToOne,
 } from "typeorm";
 import { Game } from "./Game";
-import { Scoreboard } from "./scoreboard";
+import { Scoreboard } from "./Scoreboard";
 import { User } from "./User";
 
 @Entity()
 export class GameScoreboard {
     @PrimaryColumn()
-    @ManyToOne(() => Scoreboard, scoreboard => scoreboard.playerId )
-    @JoinColumn({ name : 'playerId' })
-    playerId : number;
+    @ManyToOne(() => Scoreboard, scoreboard => scoreboard.userId )
+    @JoinColumn({ name : 'userId' })
+    userId : number;
 
     @PrimaryColumn()
     @ManyToOne(() => Game, game => game.id )
@@ -29,6 +29,6 @@ export class GameScoreboard {
     score : number;
 
     @Column({type: "datetime", default: () => "CURRENT_TIMESTAMP"})
-    lastUpdated: Date;
+    playedAt: Date;
 }
 
