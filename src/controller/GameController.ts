@@ -4,6 +4,7 @@ import { getConnection, getRepository } from "typeorm";
 import config from "../config";
 import { Feedback } from "../entity/Feedback";
 import { Game } from "../entity/Game";
+import { GameState } from "../entity/GameState";
 import { Tenant, User, UserRole, Visitor } from "../entity/User";
 import { partialUpdate } from "../utils/partialUpdateEntity";
 import { decodeQr } from "../utils/qr";
@@ -20,20 +21,13 @@ export class GameController {
   private tenantRepository = getRepository(Tenant);
   private gameRepository = getRepository(Game);
 
+  // Get all game
   async listGame(request: Request, response: Response) {
-    const { id, role } = response.locals.auth;
     const page = parseInt(request.query.page, 10) || 1;
     const itemPerPage = parseInt(request.query.itemPerPage, 10) || 10;
 
-    let whereParam = {};
-    if (role === UserRole.TENANT) {
-      const tenant = await this.tenantRepository.findOne(id, { relations: ["userId"] });
-      whereParam = { tenant };
-    }
-
     try {
       const [game, total] = await this.gameRepository.findAndCount({
-        where: whereParam,
         take: itemPerPage,
         skip: (page - 1) * itemPerPage
       });
@@ -51,6 +45,7 @@ export class GameController {
 
   }
 
+  // deprecate
   async registerGame(request: Request, response: Response) {
     const authId = response.locals.auth.id;
     const role = response.locals.auth.role;
@@ -80,6 +75,7 @@ export class GameController {
     return responseGenerator(response, 200, "ok");
   }
 
+  // deprecate
   async deleteGame(request: Request, response: Response) {
     const id = response.locals.auth.id;
     const role = response.locals.auth.role;
@@ -100,9 +96,8 @@ export class GameController {
     return responseGenerator(response, 200, "ok");
   }
 
+  // get data game
   async getGame(request: Request, response: Response) {
-    const id = response.locals.auth.id;
-    const role = response.locals.auth.role;
     const gameId = request.params.id;
 
     const game = await this.gameRepository.findOne(gameId, { relations: ["tenant", "tenant.userId"] });
@@ -111,15 +106,12 @@ export class GameController {
       return responseGenerator(response, 404, "game-not-found");
     }
 
-    if (role !== UserRole.ADMIN && game.tenant.userId.id !== id) {
-      return responseGenerator(response, 403, "forbidden");
-    }
-
     delete game.tenant;
 
     return responseGenerator(response, 200, "ok", game);
   }
 
+  // update data game
   async updateGame(request: Request, response: Response) {
     const id = response.locals.auth.id;
     const role = response.locals.auth.role;
@@ -136,7 +128,7 @@ export class GameController {
     }
 
     try {
-      await this.gameRepository.save(partialUpdate(game, request.body, ["name", "difficulty"]));
+      await this.gameRepository.save(partialUpdate(game, request.body, ["name", "difficulty", "type", "state"]));
     } catch (error) {
       console.error(error);
     }
@@ -184,20 +176,11 @@ export class GameController {
 
   async playGame(request: Request, response: Response) {
     const tenantId = response.locals.auth.id;
-    const userString = decodeQr(request.params.qrid);
+    const userId = request.body.userId;
+    const gameId = request.body.gameId;
     const difficulties: number[] = request.body.difficulty;
 
-    let userData: any = {};
-
-    try {
-      userData = JSON.parse(userString);
-
-    } catch (error) {
-      console.error(error);
-      return responseGenerator(response, 400, "invalid-qrid");
-    }
-
-    const user = await this.userRepository.findOne(userData.id);
+    const user = await this.userRepository.findOne(userId);
 
     if (!user || user.role !== UserRole.VISITOR) {
       return responseGenerator(response, 404, "user-not-found");
@@ -209,7 +192,13 @@ export class GameController {
         const tmVisitorRepository = transactionManager.getRepository(Visitor);
         const tmFeedbackRepository = transactionManager.getRepository(Feedback);
         const tmTransactionRepository = transactionManager.getRepository(Transaction);
+        const tmGameStateRepository = transactionManager.getRepository(GameState);
 
+        await tmGameStateRepository.save({
+          game: gameId,
+          user: userId,
+          state: ''
+        })
 
         const reducer = (acc, current) => {
           acc += config.gamePoint[current];

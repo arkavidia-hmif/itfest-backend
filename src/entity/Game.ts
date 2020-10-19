@@ -8,6 +8,11 @@ export enum GameDifficulty {
   HARD = 3,
 }
 
+export enum GameType {
+  QUIZ = 1,
+  CROSSWORD = 2
+}
+
 @Entity()
 export class Game {
   @PrimaryGeneratedColumn()
@@ -28,4 +33,14 @@ export class Game {
     nullable: false,
   })
   difficulty: GameDifficulty;
+
+  @Column({
+    enum: GameType,
+    type: "enum",
+    nullable: false,
+  })
+  type: GameType;
+
+  @Column()
+  state: string;
 }
