@@ -10,7 +10,7 @@ import {
     OneToOne,
 } from "typeorm";
 import { Game } from "./Game";
-import { Scoreboard } from "./scoreboard";
+import { Scoreboard } from "./Scoreboard";
 import { User } from "./User";
 
 @Entity()
