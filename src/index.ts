@@ -28,5 +28,6 @@ createConnection().then(async connection => {
   server.listen(process.env.PORT || 3000);
 
   console.log("Express server has started");
+  console.log("Listen to the port: " + (process.env.PORT || 3000));
 
 }).catch(error => console.log(error));
