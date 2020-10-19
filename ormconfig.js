@@ -17,6 +17,16 @@ function getConfig() {
       "subscribersDir": "src/subscriber"
     }
   }
+  return {
+    "type": "mysql",
+    "host": "localhost",
+    "port": 3306,
+    "username": "root",
+    "password": "root",
+    "database": "itfest",
+    "insecureAuth" : true,
+    ...config
+  }
   if (process.env.DB_URL) {
     return {
       "type": process.env.DB_TYPE,
