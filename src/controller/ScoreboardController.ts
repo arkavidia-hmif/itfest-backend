@@ -1,12 +1,8 @@
-import * as bcrypt from "bcrypt";
-import * as crypto from "crypto";
 import { Request, response, Response } from "express";
-import * as jwt from "jsonwebtoken";
 import { getConnection, getRepository } from "typeorm";
 import config from "../config";
 import { Tenant, User, UserRole, Visitor } from "../entity/User";
 import { Scoreboard } from "../entity/Scoreboard";
-import { partialUpdate } from "../utils/partialUpdateEntity";
 import { responseGenerator } from "../utils/responseGenerator";
 import { TransactionController } from "./TransactionController";
 import { readFileSync } from "fs";
@@ -17,10 +13,11 @@ import { Result } from "express-validator";
 export class ScoreboardController {
     private scoreboardRepository = getRepository(Scoreboard);
 
-    async getGameScoreboard(req : Request, res : Response){
+    async getScoreboard(req : Request, res : Response){
+        const gameId: any = +req.params.gameId;
         const scoreboard = await this.scoreboardRepository.find({
                             where: {
-                                gameId:  req.params.gameId,
+                                gameId:  gameId,
                             }
                         })
 

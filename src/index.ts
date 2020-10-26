@@ -12,7 +12,6 @@ import userRoutes from "./routes/user";
 import tenantRoutes from "./routes/tenant";
 
 createConnection().then(async connection => {
-
   const app = express();
   app.use(express.json());
   app.use(cors());

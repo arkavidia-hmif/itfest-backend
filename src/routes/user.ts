@@ -121,33 +121,33 @@ export default () => {
     checkParam,
   ], uc.getTransaction.bind(uc));
 
-  router.get("/user/:qrid([a-z0-9]+)", uc.getQrData.bind(uc));
+  // router.get("/user/:qrid([a-z0-9]+)", uc.getQrData.bind(uc));
 
   router.post("/user/:id([0-9]+)/give", [
     check("amount").isInt({ min: 0 }),
     checkParam,
   ], tc.give.bind(tc));
-  router.post("/user/:qrid([a-z0-9]+)/give", [
-    check("amount").isInt({ min: 0 }),
-    checkParam,
-  ], tc.giveQr.bind(tc));
+  // router.post("/user/:qrid([a-z0-9]+)/give", [
+  //   check("amount").isInt({ min: 0 }),
+  //   checkParam,
+  // ], tc.giveQr.bind(tc));
 
-  router.post("/user/:qrid([a-z0-9]+)/play", [
-    limitAccess([UserRole.TENANT]),
-    check("difficulty").isArray({ min: 1 }).withMessage("must be an array with >=1 length"),
-    check("difficulty.*").isInt({ min: 1, max: 3 }).withMessage("must be integer between 1 and 3"),
-    checkParam,
-  ], gc.playGame.bind(gc));
-  router.get("/user/:qrid([a-z0-9]+)/play/status", [
-    limitAccess([UserRole.TENANT]),
-  ], gc.checkPlayStatus.bind(gc));
+  // router.post("/user/:qrid([a-z0-9]+)/play", [
+  //   limitAccess([UserRole.TENANT]),
+  //   check("difficulty").isArray({ min: 1 }).withMessage("must be an array with >=1 length"),
+  //   check("difficulty.*").isInt({ min: 1, max: 3 }).withMessage("must be integer between 1 and 3"),
+  //   checkParam,
+  // ], gc.playGame.bind(gc));
+  // router.get("/user/:qrid([a-z0-9]+)/play/status", [
+  //   limitAccess([UserRole.TENANT]),
+  // ], gc.checkPlayStatus.bind(gc));
 
-  router.post("/user/:qrid([a-z0-9]+)/redeem", [
-    limitAccess([UserRole.ADMIN]),
-    itemCheck(),
-    amountCheck(),
-    checkParam,
-  ], ic.redeem.bind(ic));
+  // router.post("/user/:qrid([a-z0-9]+)/redeem", [
+  //   limitAccess([UserRole.ADMIN]),
+  //   itemCheck(),
+  //   amountCheck(),
+  //   checkParam,
+  // ], ic.redeem.bind(ic));
 
   // Testing route
   router.get("/test-jwt", [checkJWT], (req: Request, res: Response) => {

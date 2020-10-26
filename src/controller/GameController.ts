@@ -178,6 +178,98 @@ export class GameController {
   // }
     return 0;
   }
+
+  async listGame(request: Request, response: Response) {
+    const page = parseInt(request.query.page, 10) || 1;
+    const itemPerPage = parseInt(request.query.itemPerPage, 10) || 10;
+
+    try {
+      const [game, total] = await this.gameRepository.findAndCount({
+        take: itemPerPage,
+        skip: (page - 1) * itemPerPage
+      });
+
+      return responseGenerator(response, 200, "ok", {
+        array: game,
+        page,
+        itemPerPage,
+        total
+      });
+    } catch (error) {
+      console.error(error);
+      return responseGenerator(response, 500, "unknown-error");
+    }
+
+  }
+
+  async giveFeedback(request: Request, response: Response) {
+    const tenantId = request.params.id;
+    const userId = response.locals.auth.id;
+
+    const { score, praise, comment } = request.body;
+
+    const tenant = await this.tenantRepository.findOne(tenantId, { relations: ["userId"] });
+
+    if (!tenant) {
+      return responseGenerator(response, 404, "tenant-not-found");
+    }
+
+    const visitor = await this.visitorRepository.findOne(userId, { relations: ["userId"] });
+
+    const feedback = await this.feedbackRepository.findOne({
+      where: {
+        from: visitor,
+        to: tenant,
+      }
+    });
+
+    if (feedback.rated) {
+      return responseGenerator(response, 400, "already-reviewed");
+    }
+
+    feedback.rated = true;
+    feedback.rating = score;
+    feedback.remark = praise.join(", ");
+    feedback.comment = comment || "";
+
+    await this.feedbackRepository.save(feedback);
+
+    return responseGenerator(response, 200, "ok");
+  }
+
+  async getFeedback(request: Request, response: Response) {
+    const userId = response.locals.auth.id;
+    const userRole = response.locals.auth.role;
+    const tenantId = request.params.id;
+
+    const tenant = await this.tenantRepository.findOne(tenantId, { relations: ["userId"] });
+
+    if (!tenant) {
+      return responseGenerator(response, 404, "tenant-not-found");
+    }
+
+    if (userRole !== UserRole.ADMIN && tenant.userId.id !== userId) {
+      return responseGenerator(response, 403, "forbidden");
+    }
+
+    const feedback = await this.feedbackRepository.find({
+      where: {
+        to: tenant,
+      }
+    });
+
+    const reducer = (acc, current) => {
+      if (current.rated) {
+        acc += current.rating
+      }
+      return acc;
+    }
+
+    const total = feedback.reduce(reducer, 0);
+    const review = total / feedback.length;
+
+    return responseGenerator(response, 200, "ok", { review });
+  }
 }
 
 
