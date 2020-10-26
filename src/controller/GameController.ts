@@ -7,11 +7,11 @@ import { Game } from "../entity/Game";
 import { GameState } from "../entity/GameState";
 import { Scoreboard } from "../entity/Scoreboard";
 import { Tenant, User, UserRole, Visitor } from "../entity/User";
+import { Transaction, TransactionType } from "../entity/Transaction";
 import { responseGenerator } from "../utils/responseGenerator";
 
 import { partialUpdate } from "../utils/partialUpdateEntity";
 import { globalSocket } from "../routes/socket";
-import { Transaction, TransactionType } from "../entity/Transaction";
 
 export class GameController {
 
@@ -22,6 +22,7 @@ export class GameController {
   private gameRepository = getRepository(Game);
   private gameStateRepository = getRepository(GameState);
   private scoreboardRepository = getRepository(Scoreboard);
+  private transactionRepository = getRepository(Transaction);
 
   // get data game
   async getGame(request: Request, response: Response) {
@@ -133,29 +134,27 @@ export class GameController {
     try {
       const score : number = this.evaluateScore("dataterima", "answer");
 
-      await this.scoreboardRepository.save({
-        game: gameId,
-        user: userId,
-        submitTime: new Date()
-      } as unknown as Scoreboard);
-
+      // TODO: update scoreboard
       await this.scoreboardRepository.save({
         user: userId,
         game: gameId,
         score: score,
         playedAt: gameState.startTime
       } as unknown as Scoreboard);
-      // if (game.type == GameType.QUIZ) {
-      //   Object.keys(data).forEach((key) => {
-      //     if (data[key] == game.answer[key]) {
-      //       // point++
-      //     }
-      //   })
-      // }
+
+      await this.gameStateRepository.save({
+        game: gameId,
+        user: userId,
+        submitTime: new Date(),
+        isSubmit: 1
+      } as unknown as GameState);
 
       // TODO: masukkan score ke trasaction from: tenant, to: user
-
-      // TODO: update scoreboard
+      await this.transactionRepository.save({
+        from: game.tenantId,
+        to: userId,
+        amount: score
+      })
 
     } catch (error) {
       if (typeof error === "string") {
@@ -170,6 +169,13 @@ export class GameController {
   }
 
   evaluateScore(a: string, b: string) : number{
+  // if (game.type == GameType.QUIZ) {
+  //   Object.keys(data).forEach((key) => {
+  //     if (data[key] == game.answer[key]) {
+  //       // point++
+  //     }
+  //   })
+  // }
     return 0;
   }
 }

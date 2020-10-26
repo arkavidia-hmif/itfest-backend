@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, CreateDateColumn } from "typeorm";
 
 import { Game } from "./Game";
 import { User } from "./User";
@@ -18,8 +18,10 @@ export class GameState {
   isSubmit: boolean;
 
   @Column({ type: 'timestamp', default: () => "CURRENT_TIMESTAMP"})
+  @CreateDateColumn()
   startTime: Date;
 
   @Column({ type: 'timestamp'})
+  @CreateDateColumn()
   submitTime: Date;
 }
