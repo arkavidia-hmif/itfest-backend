@@ -15,20 +15,17 @@ import { User } from "./User";
 
 @Entity()
 export class Scoreboard {
-    @PrimaryColumn()
-    // @ManyToOne(() => Scoreboard, scoreboard => scoreboard.userId )
-    // @JoinColumn({ name : 'userId' })
-    userId : number;
 
-    @PrimaryColumn()
-    @ManyToOne(() => Game, game => game.id )
-    @JoinColumn({ name : 'gameId' })
-    gameId : number;
+    @ManyToOne((type) => Game, (game) => game.id, { nullable: false })
+    game: Game;
+
+    @ManyToOne((type) => User, (user) => user.id, { nullable: false })
+    user: User;
 
     @Column({ default : () => 0 })
     score : number;
 
-    @Column({type: "datetime", default: () => "CURRENT_TIMESTAMP"})
+    @Column({type: "timestamp", default: () => "CURRENT_TIMESTAMP"})
     playedAt: Date;
 }
 
