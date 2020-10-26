@@ -46,7 +46,7 @@ export class GameController {
       return responseGenerator(response, 400, "game-havent-started");
     }
     
-    if (gameState?.isSubmit) {
+    if (gameState.isSubmit) {
       return responseGenerator(response, 400, "user-already-play");
     }
 
@@ -127,7 +127,7 @@ export class GameController {
 
     const timeElapsed = new Date().getTime() - gameState.startTime.getTime();
 
-    if (gameState?.isSubmit) {
+    if (gameState.isSubmit) {
       return responseGenerator(response, 400, "user-already-submitted");
     }
 
