@@ -42,5 +42,8 @@ export class Game {
   type: GameType;
 
   @Column()
-  state: string;
+  problem: string;
+
+  @Column()
+  answer: string;
 }
