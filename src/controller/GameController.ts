@@ -104,7 +104,7 @@ export class GameController {
 
   async submitGame(request: Request, response: Response) {
     const userId = response.locals.auth.id;
-    const gameId = request.params.gameId;
+    const gameId: any = +request.params.gameId;
     const data = request.body.data || {};
 
     const game = await this.gameRepository.findOne(gameId);
@@ -140,18 +140,18 @@ export class GameController {
         game: gameId,
         score: score,
         playedAt: gameState.startTime
-      } as unknown as Scoreboard);
+      });
 
       await this.gameStateRepository.save({
         game: gameId,
         user: userId,
         submitTime: new Date(),
-        isSubmit: 1
-      } as unknown as GameState);
+        isSubmit: true
+      });
 
       // TODO: masukkan score ke trasaction from: tenant, to: user
       await this.transactionRepository.save({
-        from: game.tenantId,
+        from: game.tenant.userId,
         to: userId,
         amount: score
       })
