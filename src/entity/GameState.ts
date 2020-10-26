@@ -15,5 +15,12 @@ export class GameState {
   user: User;
 
   @Column()
-  state: string;
+  isSubmit: boolean;
+
+  @Column({ type: 'timestamp', default: () => "CURRENT_TIMESTAMP"})
+  startDate: Date;
+
+  @Column({ type: 'timestamp'})
+  submitTime: Date;
+}
 }

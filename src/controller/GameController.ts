@@ -20,6 +20,8 @@ export class GameController {
   private visitorRepository = getRepository(Visitor);
   private tenantRepository = getRepository(Tenant);
   private gameRepository = getRepository(Game);
+  private gameStateRepository = getRepository(GameState);
+  
 
   // get data game
   async getGame(request: Request, response: Response) {
@@ -35,5 +37,37 @@ export class GameController {
     delete game.answer;
 
     return responseGenerator(response, 200, "ok", game);
+  }
+
+
+  async playGame(request: Request, response: Response){
+    const userId = response.locals.auth.id;
+    const gameId = request.params.gameId;
+    const difficulty = request.body.difficulty;
+
+    const user = await this.userRepository.findOne(userId);
+
+    if (!user || user.role !== UserRole.VISITOR) {
+      return responseGenerator(response, 404, "user-not-found");
+    }
+
+    try {
+
+
+
+    } catch (error) {
+      if (typeof error === "string") {
+        return responseGenerator(response, 400, error);
+      } else {
+        console.error(error);
+        return responseGenerator(response, 500, "unknown-error");
+      }
+    }
+
+    return responseGenerator(response, 200, "ok");
+  }
+
+  async addGame(request: Request, response: Response){
+
   }
 }
