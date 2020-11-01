@@ -9,6 +9,7 @@ import inventoryRoutes from "./routes/inventory";
 import socketRoutes from "./routes/socket";
 import transactionRoutes from "./routes/transaction";
 import userRoutes from "./routes/user";
+import gameRoutes from "./routes/game";
 import tenantRoutes from "./routes/tenant";
 
 import { UserController } from "./controller/UserController";
@@ -21,11 +22,12 @@ createConnection().then(async connection => {
   app.use(transactionRoutes());
   app.use(inventoryRoutes());
   app.use(tenantRoutes());
+  app.use(gameRoutes());
 
-  const crtUser = new UserController();
-  await crtUser.regisAdmin();
-  await crtUser.regisTenant();
-  await crtUser.regisVisitor();
+  // const crtUser = new UserController();
+  // await crtUser.regisAdmin();
+  // await crtUser.regisTenant();
+  // await crtUser.regisVisitor();
 
   const server = http.createServer(app);
 

@@ -22,8 +22,8 @@ export default () => {
     const ic = new InventoryController();
     const sc = new ScoreboardController();
 
-    router.get('/game/:id([a-z0-9]+)', [
-        limitAccess([UserRole.VISITOR, UserRole.ADMIN])
+    router.get("/game/:id([0-9]+)", [
+      limitAccess([UserRole.VISITOR, UserRole.ADMIN])
     ], gc.getGame.bind(gc));
 
     router.post('/game/:id([a-z0-9]+)/play', [
@@ -49,5 +49,5 @@ export default () => {
     //     limitAccess([UserRole.ADMIN, UserRole.TENANT])
     // ], gc.deleteGame.bind(gc));
 
-
+    return router;
 }

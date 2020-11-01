@@ -26,7 +26,7 @@ export class GameController {
 
   // get data game
   async getGame(request: Request, response: Response) {
-    const userId = response.locals.auth.id; 
+    const userId = response.locals.auth.id;
     const gameId = request.params.id;
 
     const game = await this.gameRepository.findOne(gameId);
@@ -52,6 +52,8 @@ export class GameController {
 
     delete game.tenant;
     delete game.answer;
+
+    return responseGenerator(response, 200, 'ok', { ...game });
   }
 
   async playGame(request: Request, response: Response) {
