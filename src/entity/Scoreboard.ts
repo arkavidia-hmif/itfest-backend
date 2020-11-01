@@ -15,6 +15,8 @@ import { User } from "./User";
 
 @Entity()
 export class Scoreboard {
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @ManyToOne((type) => Game, (game) => game.id, { nullable: false })
     game: Game;

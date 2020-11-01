@@ -121,16 +121,19 @@ export default () => {
     checkParam,
   ], uc.getTransaction.bind(uc));
 
-  // router.get("/user/:qrid([a-z0-9]+)", uc.getQrData.bind(uc));
-
   router.post("/user/:id([0-9]+)/give", [
     check("amount").isInt({ min: 0 }),
     checkParam,
   ], tc.give.bind(tc));
+
+  // router.get("/user/:qrid([a-z0-9]+)", uc.getQrData.bind(uc));
+
   // router.post("/user/:qrid([a-z0-9]+)/give", [
   //   check("amount").isInt({ min: 0 }),
   //   checkParam,
   // ], tc.giveQr.bind(tc));
+
+  // checkPlayStatus not yet been implemented
 
   // router.post("/user/:qrid([a-z0-9]+)/play", [
   //   limitAccess([UserRole.TENANT]),
