@@ -1,0 +1,6 @@
+{
+    "name": "hahaha",  
+    "difficulty": "2",
+    "problem": { "1": { "a": "s1ad", "b": "1sad", "c": "sad1" },  "2": { "a": "s1ad", "b": "1sad", "c": "sad1" } },
+    "answer": { "1": "a", "2": "b"}
+}

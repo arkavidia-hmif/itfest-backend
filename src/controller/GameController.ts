@@ -57,7 +57,6 @@ export class GameController {
 
   async playGame(request: Request, response: Response) {
     const userId = response.locals.auth.id;
-    // const userId = request.body.userId;
     const gameId : any = +request.params.id;
 
     const user = await this.userRepository.findOne(userId);
@@ -96,11 +95,51 @@ export class GameController {
   }
 
   async addGame(request: Request, response: Response){
-
+    const tenantId = response.locals.auth.id;
+    const difficulty = request.body.difficulty;
+    try{
+      await this.gameRepository.save({
+        name: request.body.name,  
+        tenant: tenantId,
+        problem: JSON.stringify(request.body.problem),
+        answer: JSON.stringify(request.body.answer), 
+        difficulty: difficulty
+      })
+      return responseGenerator(response, 201, "created");
+    } catch (error) {
+      if (typeof error === "string") {
+        return responseGenerator(response, 400, error);
+      } else {
+        console.error(error);
+        return responseGenerator(response, 500, "unknown-error");
+      }
+    }
   }
 
   async deleteGame(request: Request, response: Response){
+    const id = response.locals.auth.id;
 
+    const gameId = request.params.id;
+
+    const game = await this.gameRepository.findOne(gameId);
+
+    if(!game){
+      return responseGenerator(response, 404, "game-not-found");
+    }
+
+    const user = await this.userRepository.findOne(id);
+
+    if (!user) {
+      return responseGenerator(response, 404, "user-not-found");
+    }
+
+    if(user.role !== UserRole.ADMIN || user.id !== game.tenant.userId.id){
+      return responseGenerator(response, 403, "no-authorization");
+    }
+
+    await this.gameRepository.delete(gameId);
+
+    return responseGenerator(response, 204, "ok");
   }
 
   async submitGame(request: Request, response: Response) {
@@ -133,30 +172,38 @@ export class GameController {
     }
 
     try {
-      const score : number = this.evaluateScore("dataterima", "answer");
+      await getConnection().transaction(async transactionManager => {
+        const tmTenantRepository = transactionManager.getRepository(Tenant);
+        const tmVisitorRepository = transactionManager.getRepository(Visitor);
+        const tmFeedbackRepository = transactionManager.getRepository(Feedback);
+        const tmTransactionRepository = transactionManager.getRepository(Transaction);
+        const tmGameStateRepository = transactionManager.getRepository(GameState);
+        const tmScoreboardRepository = transactionManager.getRepository(Scoreboard);
+        
+        const score : number = this.evaluateScore("dataterima", "answer", "difficulty");
 
-      // TODO: update scoreboard
-      await this.scoreboardRepository.save({
-        user: userId,
-        game: gameId,
-        score: score,
-        playedAt: gameState.startTime
-      });
+        // TODO: update scoreboard
+        await tmScoreboardRepository.save({
+          user: userId,
+          game: gameId,
+          score: score,
+          playedAt: gameState.startTime
+        });
 
-      await this.gameStateRepository.save({
-        game: gameId,
-        user: userId,
-        submitTime: new Date(),
-        isSubmit: true
-      });
+        await tmGameStateRepository.save({
+          game: gameId,
+          user: userId,
+          submitTime: new Date(),
+          isSubmit: true
+        });
 
-      // TODO: masukkan score ke trasaction from: tenant, to: user
-      await this.transactionRepository.save({
-        from: game.tenant.userId,
-        to: userId,
-        amount: score
+        // TODO: masukkan score ke trasaction from: tenant, to: user
+        await tmTransactionRepository.save({
+          from: game.tenant.userId,
+          to: userId,
+          amount: score
+        })
       })
-
     } catch (error) {
       if (typeof error === "string") {
         return responseGenerator(response, 400, error);
@@ -165,11 +212,10 @@ export class GameController {
         return responseGenerator(response, 500, "unknown-error");
       }
     }
-
     return responseGenerator(response, 200, "ok");
   }
 
-  evaluateScore(a: string, b: string) : number{
+  evaluateScore(a: string, b: string, diff: any) : number{
   // if (game.type == GameType.QUIZ) {
   //   Object.keys(data).forEach((key) => {
   //     if (data[key] == game.answer[key]) {

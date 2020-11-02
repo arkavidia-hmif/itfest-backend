@@ -5,6 +5,7 @@
   "devDependencies": {
     "@types/bcrypt": "^3.0.0",
     "@types/cors": "^2.8.6",
+    "@types/faker": "^5.1.4",
     "@types/jsonwebtoken": "^8.3.3",
     "@types/mustache": "^4.0.0",
     "@types/node": "^12.7.4",
@@ -31,7 +32,8 @@
     "reflect-metadata": "^0.1.13",
     "socket.io": "^2.3.0",
     "sqlite3": "^4.0.3",
-    "typeorm": "0.2.21"
+    "typeorm": "0.2.21",
+    "typeorm-seeding": "^1.6.1"
   },
   "scripts": {
     "start": "ts-node src/index.ts",

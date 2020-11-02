@@ -34,9 +34,13 @@ export default () => {
         limitAccess([UserRole.VISITOR, UserRole.ADMIN])
     ], gc.submitGame.bind(gc));
 
-    router.post('/game/register', [
-        limitAccess([UserRole.TENANT, UserRole.ADMIN])
-    ]);
+    // router.post('/game/register', [
+    //     limitAccess([UserRole.TENANT, UserRole.ADMIN])
+    // ]);
+
+    router.post('/game/', [
+        limitAccess([UserRole.TENANT])
+    ], gc.addGame.bind(gc));
 
     // router.put("/game/:id([0-9]+)", [
     //     limitAccess([UserRole.ADMIN, UserRole.TENANT]),
