@@ -23,7 +23,7 @@ export class Game {
   })
   name: string;
 
-  @ManyToOne((type) => Tenant, { nullable: false })
+  @ManyToOne((type) => Tenant, { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn()
   tenant: Tenant;
 

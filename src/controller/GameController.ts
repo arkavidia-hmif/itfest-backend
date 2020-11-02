@@ -52,7 +52,8 @@ export class GameController {
     delete game.tenant;
     delete game.answer;
 
-    return responseGenerator(response, 200, 'ok', { ...game });
+    return responseGenerator(response, 200, 'ok', JSON.parse(game.problem));
+    // return responseGenerator(response, 200, 'ok', { "questions": game.problem });
   }
 
   async playGame(request: Request, response: Response) {
@@ -119,27 +120,31 @@ export class GameController {
   async deleteGame(request: Request, response: Response){
     const id = response.locals.auth.id;
 
+    const role = response.locals.auth.role;
+
     const gameId = request.params.id;
 
-    const game = await this.gameRepository.findOne(gameId);
+    try{
+      const game = await this.gameRepository.findOne(gameId, { relations: ["tenant", "tenant.userId"] });
 
-    if(!game){
-      return responseGenerator(response, 404, "game-not-found");
+      if(!game){
+        return responseGenerator(response, 404, "game-not-found");
+      }
+
+      if(role !== UserRole.ADMIN && id !== game.tenant.userId.id){
+        return responseGenerator(response, 403, "no-authorization");
+      }
+
+      await this.gameRepository.delete(gameId);
+      return responseGenerator(response, 204, "ok");
+    } catch (error) {
+      if (typeof error === "string") {
+        return responseGenerator(response, 400, error);
+      } else {
+        console.error(error);
+        return responseGenerator(response, 500, "unknown-error");
+      }
     }
-
-    const user = await this.userRepository.findOne(id);
-
-    if (!user) {
-      return responseGenerator(response, 404, "user-not-found");
-    }
-
-    if(user.role !== UserRole.ADMIN || user.id !== game.tenant.userId.id){
-      return responseGenerator(response, 403, "no-authorization");
-    }
-
-    await this.gameRepository.delete(gameId);
-
-    return responseGenerator(response, 204, "ok");
   }
 
   async submitGame(request: Request, response: Response) {

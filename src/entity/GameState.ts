@@ -8,10 +8,10 @@ export class GameState {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne((type) => Game, (game) => game.id, { nullable: false })
+  @ManyToOne((type) => Game, (game) => game.id, { nullable: false, onDelete: 'CASCADE' })
   game: Game;
 
-  @ManyToOne((type) => User, (user) => user.id, { nullable: false })
+  @ManyToOne((type) => User, (user) => user.id, { nullable: false, onDelete: 'CASCADE' })
   user: User;
 
   @Column()

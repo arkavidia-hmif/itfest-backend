@@ -23,11 +23,11 @@ export default () => {
     const sc = new ScoreboardController();
 
     router.get("/game/:id([0-9]+)", [
-        limitAccess([UserRole.VISITOR, UserRole.ADMIN, UserRole.VISITOR])
+        limitAccess([UserRole.VISITOR])
     ], gc.getGame.bind(gc));
 
     router.post('/game/:id([0-9]+)/play', [
-        limitAccess([UserRole.VISITOR, UserRole.ADMIN])
+        limitAccess([UserRole.VISITOR])
     ], gc.playGame.bind(gc));
 
     router.post('/game/:id([0-9]+)/submit', [
@@ -41,6 +41,10 @@ export default () => {
     router.post('/game/', [
         limitAccess([UserRole.TENANT])
     ], gc.addGame.bind(gc));
+
+    router.delete('/game/:id([0-9]+)', [
+        limitAccess([UserRole.TENANT, UserRole.ADMIN])
+    ], gc.deleteGame.bind(gc));
 
     // router.put("/game/:id([0-9]+)", [
     //     limitAccess([UserRole.ADMIN, UserRole.TENANT]),
