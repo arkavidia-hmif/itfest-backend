@@ -3,7 +3,7 @@ import { getConnection, getRepository } from "typeorm";
 
 import config from "../config";
 import { Feedback } from "../entity/Feedback";
-import { Game } from "../entity/Game";
+import { Game, GameType } from "../entity/Game";
 import { GameState } from "../entity/GameState";
 import { Scoreboard } from "../entity/Scoreboard";
 import { Tenant, User, UserRole, Visitor } from "../entity/User";
@@ -185,7 +185,7 @@ export class GameController {
         const tmGameStateRepository = transactionManager.getRepository(GameState);
         const tmScoreboardRepository = transactionManager.getRepository(Scoreboard);
         
-        const score : number = this.evaluateScore("dataterima", "answer", "difficulty");
+        const score : number = this.evaluateScore(game, data);
 
         // TODO: update scoreboard
         await tmScoreboardRepository.save({
@@ -220,15 +220,16 @@ export class GameController {
     return responseGenerator(response, 200, "ok");
   }
 
-  evaluateScore(a: string, b: string, diff: any) : number{
-  // if (game.type == GameType.QUIZ) {
-  //   Object.keys(data).forEach((key) => {
-  //     if (data[key] == game.answer[key]) {
-  //       // point++
-  //     }
-  //   })
-  // }
-    return 0;
+  evaluateScore(game: Game, userAnswer: object) : number {
+    let point = 0;
+    if (game.type == GameType.QUIZ) {
+      Object.keys(userAnswer).forEach((key) => {
+        if (userAnswer[key] == game.answer[key]) {
+          point += 1
+        }
+      })
+    }
+    return point;
   }
 
   async listGame(request: Request, response: Response) {
