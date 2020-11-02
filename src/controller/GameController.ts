@@ -14,7 +14,6 @@ import { partialUpdate } from "../utils/partialUpdateEntity";
 import { globalSocket } from "../routes/socket";
 
 export class GameController {
-
   private userRepository = getRepository(User);
   private feedbackRepository = getRepository(Feedback);
   private visitorRepository = getRepository(Visitor);
@@ -59,7 +58,7 @@ export class GameController {
   async playGame(request: Request, response: Response) {
     const userId = response.locals.auth.id;
     // const userId = request.body.userId;
-    const gameId = request.body.gameId;
+    const gameId : any = +request.params.id;
 
     const user = await this.userRepository.findOne(userId);
 
@@ -93,7 +92,7 @@ export class GameController {
       }
     }
 
-    return responseGenerator(response, 200, "ok");
+    return responseGenerator(response, 204, "ok");
   }
 
   async addGame(request: Request, response: Response){

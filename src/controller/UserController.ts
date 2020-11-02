@@ -423,6 +423,7 @@ export class UserController {
     });
   }
 
+  // BELOW METHOD FOR TESTING PURPOSE ONLY
   regisAdmin = async() => {
     try {
       await getConnection().transaction(async transactionManager => {
