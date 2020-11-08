@@ -149,8 +149,8 @@ export class GameController {
 
   async submitGame(request: Request, response: Response) {
     const userId = response.locals.auth.id;
-    const gameId: any = +request.params.gameId;
-    const data = request.body.data || {};
+    const gameId: any = request.params.id;
+    const { data = {} } = request.body;
 
     const game = await this.gameRepository.findOne(gameId);
 
@@ -203,11 +203,11 @@ export class GameController {
         });
 
         // TODO: masukkan score ke trasaction from: tenant, to: user
-        await tmTransactionRepository.save({
-          from: game.tenant.userId,
-          to: userId,
-          amount: score
-        })
+        // await tmTransactionRepository.save({
+        //   from: game.tenant.userId, // Ini masih error
+        //   to: userId,
+        //   amount: score
+        // })
       })
     } catch (error) {
       if (typeof error === "string") {

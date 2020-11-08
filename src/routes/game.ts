@@ -31,7 +31,8 @@ export default () => {
     ], gc.playGame.bind(gc));
 
     router.post('/game/:id([0-9]+)/submit', [
-        limitAccess([UserRole.VISITOR, UserRole.ADMIN])
+        limitAccess([UserRole.VISITOR, UserRole.ADMIN]),
+        checkParam
     ], gc.submitGame.bind(gc));
 
     // router.post('/game/register', [
