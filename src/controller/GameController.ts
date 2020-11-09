@@ -96,8 +96,14 @@ export class GameController {
   }
 
   async addGame(request: Request, response: Response){
-    const tenantId = response.locals.auth.id;
+    let tenantId = response.locals.auth.id;
+    const role = response.locals.auth.role;
     const difficulty = request.body.difficulty;
+
+    if (role === UserRole.ADMIN) {
+      tenantId = request.body.tenantId
+    }
+
     try{
       await this.gameRepository.save({
         name: request.body.name,  
@@ -152,7 +158,7 @@ export class GameController {
     const gameId: any = request.params.id;
     const { data = {} } = request.body;
 
-    const game = await this.gameRepository.findOne(gameId);
+    const game = await this.gameRepository.findOne(gameId, { relations: ["tenant", "tenant.userId"] });
 
     if (!game) {
       return responseGenerator(response, 404, "game-not-found");
@@ -202,12 +208,11 @@ export class GameController {
           isSubmit: true
         });
 
-        // TODO: masukkan score ke trasaction from: tenant, to: user
-        // await tmTransactionRepository.save({
-        //   from: game.tenant.userId, // Ini masih error
-        //   to: userId,
-        //   amount: score
-        // })
+        await tmTransactionRepository.save({
+          from: game.tenant.userId,
+          to: userId,
+          amount: score
+        })
       })
     } catch (error) {
       if (typeof error === "string") {

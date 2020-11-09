@@ -22,6 +22,12 @@ export default () => {
     const ic = new InventoryController();
     const sc = new ScoreboardController();
 
+    const nameCheck = () => check("name").isAscii().withMessage("must not contain special character");
+    const tenantCheck = () => check("tenant").isInt({ min: 1 }).withMessage("must be valid id");
+    const problemCheck = () => check("owner").isString().withMessage("must be json stringify");
+    const answerCheck = () => check("answer").isString().withMessage("must be json stringify");
+    const diffCheck = () => check("difficulty").isInt({ min: 1 }).withMessage("must be valid difficulty");
+
     router.get("/game/:id([0-9]+)", [
         limitAccess([UserRole.VISITOR])
     ], gc.getGame.bind(gc));
@@ -29,6 +35,15 @@ export default () => {
     router.post('/game/:id([0-9]+)/play', [
         limitAccess([UserRole.VISITOR])
     ], gc.playGame.bind(gc));
+
+    router.post('/game/', [
+        limitAccess([UserRole.ADMIN, UserRole.TENANT]),
+        nameCheck(),
+        tenantCheck().optional(),
+        diffCheck(),
+        problemCheck(),
+        answerCheck()
+    ], gc.addGame.bind(gc));
 
     router.post('/game/:id([0-9]+)/submit', [
         limitAccess([UserRole.VISITOR, UserRole.ADMIN]),
