@@ -10,8 +10,27 @@ export class GlobalScoreboardController {
     private scoreboardRepository = getRepository(GlobalScoreboard);
 
     getScoreboard = async (req : Request, res : Response) => {
-        const scoreboard = await this.scoreboardRepository.find();
-
-        responseGenerator(res, 200, "ok", scoreboard);
+        try {
+            var scoreboard;
+            if(req.query.limit !== undefined){
+                scoreboard = await this.scoreboardRepository
+                        .createQueryBuilder("global_scoreboard")
+                        .orderBy("global_scoreboard.score", "DESC");
+            } else {
+                scoreboard = await this.scoreboardRepository
+                        .createQueryBuilder("global_scoreboard")
+                        .orderBy("global_scoreboard.score", "DESC")
+                        .take(+(req.query.limit));
+            }
+            
+            return responseGenerator(res, 200, "ok", scoreboard);
+        } catch (error) {
+            if (typeof error === "string") {
+                return responseGenerator(response, 400, error);
+            } else {
+                console.error(error);
+                return responseGenerator(response, 500, "unknown-error");
+            }
+        }
     }
 }   

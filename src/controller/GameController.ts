@@ -6,6 +6,7 @@ import { Feedback } from "../entity/Feedback";
 import { Game, GameType } from "../entity/Game";
 import { GameState } from "../entity/GameState";
 import { Scoreboard } from "../entity/Scoreboard";
+import { GlobalScoreboard } from "../entity/GlobalScoreboard";
 import { Tenant, User, UserRole, Visitor } from "../entity/User";
 import { Transaction, TransactionType } from "../entity/Transaction";
 import { responseGenerator } from "../utils/responseGenerator";
@@ -190,8 +191,19 @@ export class GameController {
         const tmTransactionRepository = transactionManager.getRepository(Transaction);
         const tmGameStateRepository = transactionManager.getRepository(GameState);
         const tmScoreboardRepository = transactionManager.getRepository(Scoreboard);
+        const tmGlobalScoreboardRepository = transactionManager.getRepository(GlobalScoreboard);
         
         const score : number = this.evaluateScore(game, data);
+
+        const globalBoard : GlobalScoreboard = await tmGlobalScoreboardRepository.findOne(userId);
+
+        const globalScore : number = (globalBoard == null)? score : score + globalBoard.score; 
+
+        await tmGlobalScoreboardRepository.save({
+          userId: userId,
+          score: globalScore,
+          lastUpdated: Date.now()
+        });
 
         // TODO: update scoreboard
         await tmScoreboardRepository.save({

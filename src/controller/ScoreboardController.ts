@@ -15,13 +15,30 @@ export class ScoreboardController {
 
     async getScoreboard(req : Request, res : Response){
         const gameId: any = +req.params.gameId;
-        const scoreboard = await this.scoreboardRepository.find({
-                            where: {
-                                gameId:  gameId,
-                            }
-                        })
+        try {
+            var scoreboard;
+            if(req.query.limit !== undefined){
+                scoreboard = await this.scoreboardRepository
+                        .createQueryBuilder("global_scoreboard")
+                        .where("scoreboard.gameId = :gameId", { gameId: gameId })
+                        .orderBy("global_scoreboard.score", "DESC");
+            } else {
+                scoreboard = await this.scoreboardRepository
+                        .createQueryBuilder("global_scoreboard")
+                        .where("scoreboard.gameId = :gameId", { gameId: gameId })
+                        .orderBy("global_scoreboard.score", "DESC")
+                        .take(+(req.query.limit));
+            }
 
-        return responseGenerator(res, 200, "ok", scoreboard);
+            return responseGenerator(res, 200, "ok", scoreboard);
+        } catch (error) {
+            if (typeof error === "string") {
+                return responseGenerator(response, 400, error);
+            } else {
+                console.error(error);
+                return responseGenerator(response, 500, "unknown-error");
+            }
+        }
     }
 
     async submitScore(req : Request, res : Response){

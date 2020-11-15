@@ -11,6 +11,12 @@ function getConfig() {
     "subscribers": [
       "src/subscriber/**/*.ts"
     ],
+    "seeds": [
+      'src/seed/**/*{.ts,.js}'
+    ],
+    "factories": [
+      'src/factory/**/*{.ts,.js}'
+    ],
     "cli": {
       "entitiesDir": "src/entity",
       "migrationsDir": "src/migration",
@@ -23,7 +29,7 @@ function getConfig() {
     "port": 3306,
     "username": "root",
     "password": "root",
-    "database": "itfest",
+    "database": "itfest2",
     "insecureAuth" : true,
     ...config
   }
