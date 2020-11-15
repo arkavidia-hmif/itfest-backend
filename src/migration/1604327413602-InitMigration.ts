@@ -1,6 +1,6 @@
 import { getRepository, MigrationInterface, QueryRunner } from "typeorm";
-import { GameSeed } from "../seed/game.seed";
-import { UserSeed } from "../seed/user.seed";
+import { GameSeed } from "../seed/game";
+import { UserSeed } from "../seed/user";
 
 export class InitMigration1604327413602 implements MigrationInterface {
     name = 'InitMigration1604327413602'
