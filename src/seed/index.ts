@@ -1,27 +1,54 @@
 import { getRepository, getManager, createConnection, Connection } from "typeorm";
 
-import { User } from '../entity/User';
+import { User, Tenant, Visitor } from '../entity/User';
 import { UserSeed } from './user';
 
 import { Game } from '../entity/Game';
 import { GameSeed } from './game';
 
+import { TenantSeed } from './tenant';
+import { VisitorSeed } from './visitor';
+
+
 async function seedData(){
-    try {
-        const connection: Connection = await createConnection();
+    const connection: Connection = await createConnection();
 
-        const userRepository = getRepository(User);
-        const gameRepository = getRepository(Game);
+    const userRepository = getRepository(User);
+    const tenantRepository = getRepository(Tenant);
+    const visitorRepository = getRepository(Visitor);
+    const gameRepository = getRepository(Game);
 
-        await userRepository.save(UserSeed);
-        console.log("user data successfully added");
+    await userRepository.save(UserSeed)
+            .then(user => {
+                console.log("user data successfully added");
+            })
+            .catch(err => {
+                console.log(err.message)
+            });
 
-        await gameRepository.save(GameSeed);
-        console.log("game data successfully added");
+    await tenantRepository.save(TenantSeed)
+            .then(user => {
+                console.log("tenant data successfully added");
+            })
+            .catch(err => {
+                console.log(err.message)
+            });
 
-    } catch (error){
-        console.log(error.message)
-    }
+    await visitorRepository.save(VisitorSeed)
+            .then(visitor => {
+                console.log("visitor data successfully added");
+            })
+            .catch(err => {
+                console.log(err.message)
+            });
+
+    await gameRepository.save(GameSeed)
+            .then(game => {
+                console.log("game data successfully added");
+            })
+            .catch(err => {
+                console.log(err.message)
+            });
 }
 
 seedData();
