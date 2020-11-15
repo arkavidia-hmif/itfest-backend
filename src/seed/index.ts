@@ -6,8 +6,18 @@ import { UserSeed } from './user';
 import { Game } from '../entity/Game';
 import { GameSeed } from './game';
 
+import { Item } from '../entity/Item';
+import { ItemSeed } from './item';
+
+import { Inventory } from '../entity/Inventory';
+import { InventorySeed } from './inventory';
+
+import { Feedback } from '../entity/Feedback';
+import { FeedbackSeed } from './feedback';
+
 import { TenantSeed } from './tenant';
 import { VisitorSeed } from './visitor';
+import { exit } from "process";
 
 
 async function seedData(){
@@ -17,6 +27,10 @@ async function seedData(){
     const tenantRepository = getRepository(Tenant);
     const visitorRepository = getRepository(Visitor);
     const gameRepository = getRepository(Game);
+    const feedbackRepository = getRepository(Feedback);
+    const itemRepository = getRepository(Item);
+    const inventoryRepository = getRepository(Inventory);
+
 
     await userRepository.save(UserSeed)
             .then(user => {
@@ -49,6 +63,8 @@ async function seedData(){
             .catch(err => {
                 console.log(err.message)
             });
+    
+    exit(0);
 }
 
 seedData();

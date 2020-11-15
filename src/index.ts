@@ -11,6 +11,7 @@ import transactionRoutes from "./routes/transaction";
 import userRoutes from "./routes/user";
 import gameRoutes from "./routes/game";
 import tenantRoutes from "./routes/tenant";
+import scoreboardRoutes from "./routes/scoreboard";
 
 import { UserController } from "./controller/UserController";
 
@@ -23,11 +24,7 @@ createConnection().then(async connection => {
   app.use(inventoryRoutes());
   app.use(tenantRoutes());
   app.use(gameRoutes());
-
-  // const crtUser = new UserController();
-  // await crtUser.regisAdmin();
-  // await crtUser.regisTenant();
-  // await crtUser.regisVisitor();
+  // app.use(scoreboardRoutes());
 
   const server = http.createServer(app);
 
