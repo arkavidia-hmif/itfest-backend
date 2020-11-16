@@ -9,5 +9,13 @@ export default() => {
     const sc = new ScoreboardController();
     const gsc = new GlobalScoreboardController();
 
+    router.get('/scoreboard/:id([0-9]+)', [
 
+    ], sc.getScoreboard.bind(sc));
+
+    router.get('/scoreboard/global', [
+
+    ], gsc.getScoreboard.bind(sc));
+
+    return router;
 }

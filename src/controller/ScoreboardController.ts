@@ -14,7 +14,7 @@ export class ScoreboardController {
     private scoreboardRepository = getRepository(Scoreboard);
 
     async getScoreboard(req : Request, res : Response){
-        const gameId: any = +req.params.gameId;
+        const gameId: any = +req.params.id;
         try {
             var scoreboard;
             if(req.query.limit !== undefined){
