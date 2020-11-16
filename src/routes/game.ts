@@ -28,6 +28,10 @@ export default () => {
     const answerCheck = () => check("answer").isString().withMessage("must be json stringify");
     const diffCheck = () => check("difficulty").isInt({ min: 1 }).withMessage("must be valid difficulty");
 
+    router.get("/game",
+        limitAccess([UserRole.ADMIN]),
+        gc.listGame.bind(gc));
+
     router.get("/game/:id([0-9]+)", [
         limitAccess([UserRole.VISITOR])
     ], gc.getGame.bind(gc));
@@ -69,9 +73,9 @@ export default () => {
     //     checkParam,
     // ], gc.updateGame.bind(gc));
 
-    // router.delete("/game/:id([0-9]+)", [
-    //     limitAccess([UserRole.ADMIN, UserRole.TENANT])
-    // ], gc.deleteGame.bind(gc));
+    router.delete("/game/:id([0-9]+)", [
+        limitAccess([UserRole.ADMIN, UserRole.TENANT])
+    ], gc.deleteGame.bind(gc));
 
     return router;
 }

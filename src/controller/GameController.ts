@@ -45,7 +45,7 @@ export class GameController {
     if (!gameState) {
       return responseGenerator(response, 400, "game-havent-started");
     }
-    
+
     if (gameState.isSubmit) {
       return responseGenerator(response, 400, "user-already-play");
     }
@@ -59,7 +59,7 @@ export class GameController {
 
   async playGame(request: Request, response: Response) {
     const userId = response.locals.auth.id;
-    const gameId : any = +request.params.id;
+    const gameId: any = +request.params.id;
 
     const user = await this.userRepository.findOne(userId);
 
@@ -96,7 +96,7 @@ export class GameController {
     return responseGenerator(response, 204, "ok");
   }
 
-  async addGame(request: Request, response: Response){
+  async addGame(request: Request, response: Response) {
     let tenantId = response.locals.auth.id;
     const role = response.locals.auth.role;
     const difficulty = request.body.difficulty;
@@ -105,12 +105,12 @@ export class GameController {
       tenantId = request.body.tenantId
     }
 
-    try{
+    try {
       await this.gameRepository.save({
-        name: request.body.name,  
+        name: request.body.name,
         tenant: tenantId,
         problem: JSON.stringify(request.body.problem),
-        answer: JSON.stringify(request.body.answer), 
+        answer: JSON.stringify(request.body.answer),
         difficulty: difficulty
       })
       return responseGenerator(response, 201, "created");
@@ -124,21 +124,21 @@ export class GameController {
     }
   }
 
-  async deleteGame(request: Request, response: Response){
+  async deleteGame(request: Request, response: Response) {
     const id = response.locals.auth.id;
 
     const role = response.locals.auth.role;
 
     const gameId = request.params.id;
 
-    try{
+    try {
       const game = await this.gameRepository.findOne(gameId, { relations: ["tenant", "tenant.userId"] });
 
-      if(!game){
+      if (!game) {
         return responseGenerator(response, 404, "game-not-found");
       }
 
-      if(role !== UserRole.ADMIN && id !== game.tenant.userId.id){
+      if (role !== UserRole.ADMIN && id !== game.tenant.userId.id) {
         return responseGenerator(response, 403, "no-authorization");
       }
 
@@ -192,12 +192,12 @@ export class GameController {
         const tmGameStateRepository = transactionManager.getRepository(GameState);
         const tmScoreboardRepository = transactionManager.getRepository(Scoreboard);
         const tmGlobalScoreboardRepository = transactionManager.getRepository(GlobalScoreboard);
-        
-        const score : number = this.evaluateScore(game, data);
 
-        const globalBoard : GlobalScoreboard = await tmGlobalScoreboardRepository.findOne(userId);
+        const score: number = this.evaluateScore(game, data);
 
-        const globalScore : number = (globalBoard == null)? score : score + globalBoard.score; 
+        const globalBoard: GlobalScoreboard = await tmGlobalScoreboardRepository.findOne(userId);
+
+        const globalScore: number = (globalBoard == null) ? score : score + globalBoard.score;
 
         await tmGlobalScoreboardRepository.save({
           userId: userId,
@@ -237,7 +237,7 @@ export class GameController {
     return responseGenerator(response, 200, "ok");
   }
 
-  evaluateScore(game: Game, userAnswer: object) : number {
+  evaluateScore(game: Game, userAnswer: object): number {
     let point = 0;
     if (game.type == GameType.QUIZ) {
       Object.keys(userAnswer).forEach((key) => {
