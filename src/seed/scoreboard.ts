@@ -1,10 +1,8 @@
-const gameId1: any = 1;
-
 export const ScoreboardSeed = [
     {
         game: { id: 1 },
         user: { id: 3 },
-        score : 500,
+        score : 200,
         playedAt: new Date()
     },
     {
