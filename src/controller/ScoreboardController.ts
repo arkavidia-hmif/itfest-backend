@@ -1,14 +1,10 @@
 import { Request, response, Response } from "express";
 import { getConnection, getRepository } from "typeorm";
+
 import config from "../config";
 import { Tenant, User, UserRole, Visitor } from "../entity/User";
 import { Scoreboard } from "../entity/Scoreboard";
 import { responseGenerator } from "../utils/responseGenerator";
-import { TransactionController } from "./TransactionController";
-import { readFileSync } from "fs";
-import { join } from "path";
-import { Result } from "express-validator";
-
 
 export class ScoreboardController {
     private scoreboardRepository = getRepository(Scoreboard);

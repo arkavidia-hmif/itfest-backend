@@ -18,6 +18,9 @@ export class GlobalScoreboard {
     @JoinColumn({ name : 'userId' })
     userId : number;
 
+    // @ManyToOne((type) => User, (user) => user.id, { nullable: false, onDelete: 'CASCADE' })
+    // user: User;
+
     @Column({ default : () => 0 })
     score : number;
 

@@ -17,6 +17,13 @@ import { FeedbackSeed } from './feedback';
 
 import { TenantSeed } from './tenant';
 import { VisitorSeed } from './visitor';
+
+import { Scoreboard } from '../entity/Scoreboard';
+import { ScoreboardSeed } from './scoreboard';
+
+import { GlobalScoreboard } from '../entity/GlobalScoreboard';
+import { GlobalScoreboardSeed } from './globalScoreboard';
+
 import { exit } from "process";
 
 
@@ -30,6 +37,8 @@ async function seedData(){
     const feedbackRepository = getRepository(Feedback);
     const itemRepository = getRepository(Item);
     const inventoryRepository = getRepository(Inventory);
+    const scoreboardRepository = getRepository(Scoreboard);
+    const globalScoreboardRepository = getRepository(GlobalScoreboard);
 
 
     await userRepository.save(UserSeed)
@@ -59,6 +68,22 @@ async function seedData(){
     await gameRepository.save(GameSeed)
             .then(game => {
                 console.log("game data successfully added");
+            })
+            .catch(err => {
+                console.log(err.message)
+            });
+
+    await globalScoreboardRepository.save(GlobalScoreboardSeed)
+            .then(gsc => {
+                console.log("global scoreboard data successfully added");
+            })
+            .catch(err => {
+                console.log(err.message)
+            });
+
+    await scoreboardRepository.save(ScoreboardSeed)
+            .then(sc => {
+                console.log("scoreboard data successfully added");
             })
             .catch(err => {
                 console.log(err.message)
