@@ -13,18 +13,16 @@ import gameRoutes from "./routes/game";
 import tenantRoutes from "./routes/tenant";
 import scoreboardRoutes from "./routes/scoreboard";
 
-import { UserController } from "./controller/UserController";
-
 createConnection().then(async connection => {
   const app = express();
   app.use(express.json());
   app.use(cors());
   app.use(userRoutes());
+  app.use(scoreboardRoutes());
   app.use(transactionRoutes());
   app.use(inventoryRoutes());
   app.use(tenantRoutes());
   app.use(gameRoutes());
-  // app.use(scoreboardRoutes());
 
   const server = http.createServer(app);
 

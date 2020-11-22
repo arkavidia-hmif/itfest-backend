@@ -13,17 +13,19 @@ export class ScoreboardController {
         const gameId: any = +req.params.id;
         try {
             var scoreboard;
-            if(req.query.limit !== undefined){
+            if(req.query.limit === undefined){
                 scoreboard = await this.scoreboardRepository
                         .createQueryBuilder("global_scoreboard")
                         .where("scoreboard.gameId = :gameId", { gameId: gameId })
-                        .orderBy("global_scoreboard.score", "DESC");
+                        .orderBy("global_scoreboard.score", "DESC")
+                        .getMany();
             } else {
                 scoreboard = await this.scoreboardRepository
                         .createQueryBuilder("global_scoreboard")
                         .where("scoreboard.gameId = :gameId", { gameId: gameId })
                         .orderBy("global_scoreboard.score", "DESC")
-                        .take(+(req.query.limit));
+                        .take(+req.query.limit)
+                        .getMany();
             }
 
             return responseGenerator(res, 200, "ok", scoreboard);

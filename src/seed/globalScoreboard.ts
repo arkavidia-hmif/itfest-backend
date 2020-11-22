@@ -1,7 +1,7 @@
 export const GlobalScoreboardSeed = [
     {
         userId: 3,
-        score: 500,
+        score: 200,
         lastUpdated: new Date()
     },
     {

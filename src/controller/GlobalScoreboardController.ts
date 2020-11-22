@@ -12,15 +12,18 @@ export class GlobalScoreboardController {
     getScoreboard = async (req : Request, res : Response) => {
         try {
             var scoreboard;
-            if(req.query.limit !== undefined){
+
+            if(req.query.limit === undefined){
                 scoreboard = await this.scoreboardRepository
                         .createQueryBuilder("global_scoreboard")
-                        .orderBy("global_scoreboard.score", "DESC");
+                        .orderBy("global_scoreboard.score", "DESC")
+                        .getMany();
             } else {
                 scoreboard = await this.scoreboardRepository
                         .createQueryBuilder("global_scoreboard")
                         .orderBy("global_scoreboard.score", "DESC")
-                        .take(+(req.query.limit));
+                        .take(+req.query.limit)
+                        .getMany();
             }
             
             return responseGenerator(res, 200, "ok", scoreboard);
