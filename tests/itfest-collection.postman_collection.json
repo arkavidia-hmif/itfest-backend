@@ -1,0 +1,258 @@
+{
+	"info": {
+		"_postman_id": "24567ba9-9282-4a0c-b7ee-9fe920bebf0f",
+		"name": "itfest-collection",
+		"description": "IT Fest Backend Endpoint Automation Test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "scoreboard and global",
+			"item": [
+				{
+					"name": "getScoreboard",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f9902443-1c45-4603-8d7a-4c87519d6f14",
+								"exec": [
+									"pm.test(\"get-scoreboard\", () => {\r",
+									"    pm.response.to.have.status(200)\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:3000/scoreboard/1?limit=1",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"scoreboard",
+								"1"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getGlobalScoreboard",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "80b3d407-769e-45c1-812d-6e4734b340c0",
+								"exec": [
+									"pm.test(\"get-global-scoreboard\", () => {\r",
+									"    pm.response.to.have.status(200)\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "authorization",
+								"value": "Bearer=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJ2aXNpdG9yIiwiZW1haWwiOiJ2QGcuY29tIiwicm9sZSI6InZpc2l0b3IiLCJpYXQiOjE2MDYwNzE2NzZ9.ZNRBkCGRL9mWtroQFffiKYwCzoVwjnRa7NFaDKKI3v8",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "localhost:3000/scoreboard/global?limit=1",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"scoreboard",
+								"global"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "auth-admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bb3c1397-2209-4b40-bf52-39ace055b098",
+								"exec": [
+									"pm.test(\"auth-admin\", () => {\r",
+									"    pm.response.to.have.status(200)\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"a@g.com\",\r\n    \"password\": \"12345678\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/login",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "auth-tenant",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d7837d59-3ce3-4604-8ba2-d9c879a92593",
+								"exec": [
+									"pm.test(\"auth-tenant\", () => {\r",
+									"    pm.response.to.have.status(200)\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"t@g.com\",\r\n    \"password\": \"12345678\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/login",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "auth-visitor",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bc353366-8c51-4209-ae92-cf1e430c0886",
+								"exec": [
+									"pm.test(\"auth-visitor\", () => {\r",
+									"    pm.response.to.have.status(200)\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"v@g.com\",\r\n    \"password\": \"12345678\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/login",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "game",
+			"item": [],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "e422bffc-5362-4e72-bdc0-c370ea6af704",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "56102724-5dea-4633-a185-65996454ed88",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"protocolProfileBehavior": {}
+}
