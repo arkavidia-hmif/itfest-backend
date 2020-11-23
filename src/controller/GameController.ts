@@ -106,14 +106,14 @@ export class GameController {
     }
 
     try {
-      await this.gameRepository.save({
+      const game = await this.gameRepository.save({
         name: request.body.name,
         tenant: tenantId,
         problem: JSON.stringify(request.body.problem),
         answer: JSON.stringify(request.body.answer),
         difficulty: difficulty
       })
-      return responseGenerator(response, 201, "created");
+      return responseGenerator(response, 201, "created", { id: game.id });
     } catch (error) {
       if (typeof error === "string") {
         return responseGenerator(response, 400, error);
