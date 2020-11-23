@@ -3,6 +3,7 @@ import "reflect-metadata";
 import * as cors from "cors";
 import * as express from "express";
 import * as http from "http";
+import * as morgan from "morgan";
 import { createConnection } from "typeorm";
 
 import inventoryRoutes from "./routes/inventory";
@@ -16,6 +17,7 @@ import scoreboardRoutes from "./routes/scoreboard";
 createConnection().then(async connection => {
   const app = express();
   app.use(express.json());
+  app.use(morgan("tiny"));
   app.use(cors());
   app.use(userRoutes());
   app.use(scoreboardRoutes());
