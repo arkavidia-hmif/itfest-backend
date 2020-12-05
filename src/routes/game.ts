@@ -32,22 +32,22 @@ export default () => {
         limitAccess([UserRole.ADMIN]),
         gc.listGame.bind(gc));
 
+    router.post('/game/', [
+            limitAccess([UserRole.ADMIN, UserRole.TENANT]),
+            nameCheck(),
+            tenantCheck().optional(),
+            diffCheck(),
+            problemCheck(),
+            answerCheck()
+        ], gc.addGame.bind(gc));
+
     router.get("/game/:id([0-9]+)", [
         limitAccess([UserRole.VISITOR])
     ], gc.getGame.bind(gc));
 
     router.post('/game/:id([0-9]+)/play', [
-        limitAccess([UserRole.VISITOR])
+        limitAccess([UserRole.VISITOR, UserRole.ADMIN])
     ], gc.playGame.bind(gc));
-
-    router.post('/game/', [
-        limitAccess([UserRole.ADMIN, UserRole.TENANT]),
-        nameCheck(),
-        tenantCheck().optional(),
-        diffCheck(),
-        problemCheck(),
-        answerCheck()
-    ], gc.addGame.bind(gc));
 
     router.post('/game/:id([0-9]+)/submit', [
         limitAccess([UserRole.VISITOR, UserRole.ADMIN]),
@@ -61,10 +61,6 @@ export default () => {
     router.post('/game/', [
         limitAccess([UserRole.TENANT])
     ], gc.addGame.bind(gc));
-
-    router.delete('/game/:id([0-9]+)', [
-        limitAccess([UserRole.TENANT, UserRole.ADMIN])
-    ], gc.deleteGame.bind(gc));
 
     // router.put("/game/:id([0-9]+)", [
     //     limitAccess([UserRole.ADMIN, UserRole.TENANT]),
