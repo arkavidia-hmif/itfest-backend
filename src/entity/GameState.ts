@@ -21,7 +21,7 @@ export class GameState {
   // @CreateDateColumn()
   startTime: Date;
 
-  @Column({ type: 'timestamp', default: () => "CURRENT_TIMESTAMP"})
+  @Column({ type: 'timestamp', nullable: true})
   // @CreateDateColumn()
   submitTime: Date;
 }

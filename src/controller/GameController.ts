@@ -93,7 +93,7 @@ export class GameController {
       }
     }
 
-    return responseGenerator(response, 204, "ok");
+    return responseGenerator(response, 200, "ok");
   }
 
   async addGame(request: Request, response: Response) {
@@ -172,7 +172,6 @@ export class GameController {
       }
     });
 
-
     if (!gameState) {
       return responseGenerator(response, 400, "user-not-play");
     }
@@ -219,12 +218,9 @@ export class GameController {
           playedAt: gameState.startTime
         });
 
-        await tmGameStateRepository.save({
-          game: gameId,
-          user: userId,
-          submitTime: new Date(),
-          isSubmit: true
-        });
+        gameState.isSubmit = true
+        gameState.submitTime = new Date()
+        await tmGameStateRepository.save(gameState);
 
         // const reducer = (acc, current) => {
         //   acc += config.gamePoint[current];

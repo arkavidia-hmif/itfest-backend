@@ -13,7 +13,7 @@ import { User } from "./User";
 
 @Entity()
 export class GlobalScoreboard {
-    @PrimaryColumn()
+    @PrimaryGeneratedColumn()
     @OneToOne(type => User)
     @JoinColumn({ name : 'userId' })
     userId : number;
