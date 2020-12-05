@@ -93,7 +93,7 @@ export class GameController {
       }
     }
 
-    return responseGenerator(response, 204, "ok");
+    return responseGenerator(response, 200, "ok");
   }
 
   async addGame(request: Request, response: Response) {
@@ -172,7 +172,6 @@ export class GameController {
       }
     });
 
-
     if (!gameState) {
       return responseGenerator(response, 400, "user-not-play");
     }
@@ -197,13 +196,19 @@ export class GameController {
 
         const globalBoard: GlobalScoreboard = await tmGlobalScoreboardRepository.findOne(userId);
 
-        const globalScore: number = (globalBoard == null) ? score : score + globalBoard.score;
-
-        await tmGlobalScoreboardRepository.save({
-          userId: userId,
-          score: globalScore,
-          lastUpdated: Date.now()
-        });
+        if (globalBoard) {
+          await tmGlobalScoreboardRepository.remove(globalBoard);
+          globalBoard.userId = userId;
+          globalBoard.score += score;
+          globalBoard.lastUpdated = new Date();
+          await tmGlobalScoreboardRepository.insert(globalBoard);
+        } else {
+          await tmGlobalScoreboardRepository.save({
+            userId: userId,
+            score: score,
+            lastUpdated: new Date()
+          });
+        }
 
         // TODO: update scoreboard
         await tmScoreboardRepository.save({
@@ -213,12 +218,9 @@ export class GameController {
           playedAt: gameState.startTime
         });
 
-        await tmGameStateRepository.save({
-          game: gameId,
-          user: userId,
-          submitTime: new Date(),
-          isSubmit: true
-        });
+        gameState.isSubmit = true
+        gameState.submitTime = new Date()
+        await tmGameStateRepository.save(gameState);
 
         await tmTransactionRepository.save({
           from: game.tenant.userId,
