@@ -196,14 +196,20 @@ export class GameController {
         const score: number = this.evaluateScore(game, data);
 
         const globalBoard: GlobalScoreboard = await tmGlobalScoreboardRepository.findOne(userId);
-
-        const globalScore: number = (globalBoard == null) ? score : score + globalBoard.score;
-
-        await tmGlobalScoreboardRepository.save({
-          userId: userId,
-          score: globalScore,
-          lastUpdated: Date.now()
-        });
+        
+        if(globalBoard) {
+          await tmGlobalScoreboardRepository.remove(globalBoard);
+          globalBoard.userId = userId;
+          globalBoard.score += score;
+          globalBoard.lastUpdated = new Date();
+          await tmGlobalScoreboardRepository.insert(globalBoard);
+        } else {
+          await tmGlobalScoreboardRepository.save({
+            userId: userId,
+            score: score,
+            lastUpdated: new Date()
+          });
+        }
 
         // TODO: update scoreboard
         await tmScoreboardRepository.save({
@@ -219,6 +225,46 @@ export class GameController {
           submitTime: new Date(),
           isSubmit: true
         });
+
+        // const reducer = (acc, current) => {
+        //   acc += config.gamePoint[current];
+        //   return acc;
+        // }
+
+        // const pointDelta = difficulties.reduce(reducer, 0);
+
+        // const tenant = await tmTenantRepository.findOne(tenantId, { relations: ["userId"] });
+
+        // if (tenant.point < pointDelta) {
+        //   throw "not-enough-point";
+        // }
+
+        // tenant.point -= pointDelta;
+
+        // await tmTenantRepository.save(tenant);
+
+        // const visitor = await tmVisitorRepository.findOne(user.id, { relations: ["userId"] });
+
+        // visitor.point += pointDelta;
+
+        // await tmVisitorRepository.save(visitor);
+
+        // const feedback = await tmFeedbackRepository.findOne({
+        //   where: {
+        //     from: visitor,
+        //     to: tenant
+        //   }
+        // });
+
+        // if (feedback) {
+        //   throw "already-play-game";
+        // }
+
+        // await tmFeedbackRepository.save({
+        //   from: visitor,
+        //   to: tenant,
+        //   rated: false
+        // });
 
         await tmTransactionRepository.save({
           from: game.tenant.userId,
@@ -341,25 +387,3 @@ export class GameController {
     return responseGenerator(response, 200, "ok", { review });
   }
 }
-
-
-    // type == 1
-
-    // problem = {
-    //   question: {
-    //     1: {
-    //       text: 'Apa?',
-    //       choice: ['1', '2', '3']
-    //     }
-    //   }
-    // }
-
-    // answer = {
-    //   1: '1',
-    //   2: '1'
-    // }
-
-    // data = {
-    //   1: '2',
-    //   2: '1'
-    // }
