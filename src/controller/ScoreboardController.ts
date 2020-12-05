@@ -10,23 +10,25 @@ export class ScoreboardController {
     private scoreboardRepository = getRepository(Scoreboard);
 
     async getScoreboard(req : Request, res : Response){
-        const gameId: any = +req.params.id;
         try {
-            var scoreboard;
-            if(req.query.limit === undefined){
-                scoreboard = await this.scoreboardRepository
-                        .createQueryBuilder("scoreboard")
-                        .where("scoreboard.gameId = :gameId", { gameId: gameId })
-                        .orderBy("scoreboard.score", "DESC")
-                        .getMany();
-            } else {
-                scoreboard = await this.scoreboardRepository
-                        .createQueryBuilder("scoreboard")
-                        .where("scoreboard.gameId = :gameId", { gameId: gameId })
-                        .orderBy("scoreboard.score", "DESC")
-                        .take(+req.query.limit)
-                        .getMany();
+            const gameId: any = +req.params.id;
+            var limit: number = 1000; //dafault
+            var offset: number = 0;// default
+
+            if(req.query.limit !== undefined){
+                limit = +req.query.limit;
             }
+            if(req.query.offset !== undefined){
+                offset = +req.query.offset;
+            }
+
+            const  scoreboard = await this.scoreboardRepository
+                    .createQueryBuilder("scoreboard")
+                    .where("scoreboard.gameId = :gameId", { gameId: gameId })
+                    .orderBy("scoreboard.score", "DESC")
+                    .offset(offset)
+                    .take(limit)
+                    .getMany();
 
             return responseGenerator(res, 200, "ok", scoreboard);
         } catch (error) {

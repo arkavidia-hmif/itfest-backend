@@ -11,20 +11,22 @@ export class GlobalScoreboardController {
 
     getScoreboard = async (req : Request, res : Response) => {
         try {
-            var scoreboard;
+            var limit: number = 1000; //dafault
+            var offset: number = 0;// default
 
-            if(req.query.limit === undefined){
-                scoreboard = await this.scoreboardRepository
-                        .createQueryBuilder("global_scoreboard")
-                        .orderBy("global_scoreboard.score", "DESC")
-                        .getMany();
-            } else {
-                scoreboard = await this.scoreboardRepository
-                        .createQueryBuilder("global_scoreboard")
-                        .orderBy("global_scoreboard.score", "DESC")
-                        .take(+req.query.limit)
-                        .getMany();
+            if(req.query.limit !== undefined){
+                limit = +req.query.limit;
             }
+            if(req.query.offset !== undefined){
+                offset = +req.query.offset;
+            }
+
+            const scoreboard = await this.scoreboardRepository
+                    .createQueryBuilder("global_scoreboard")
+                    .orderBy("global_scoreboard.score", "DESC")
+                    .offset(offset)
+                    .take(limit)
+                    .getMany();
             
             return responseGenerator(res, 200, "ok", scoreboard);
         } catch (error) {
