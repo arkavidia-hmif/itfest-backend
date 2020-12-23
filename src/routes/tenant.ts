@@ -41,13 +41,13 @@ export default () => {
 
   // giveFeedback not yet been implemented 
 
-  // router.post("/tenant/:id([0-9]+)/review", [
-  //   limitAccess([UserRole.VISITOR]),
-  //   check("score").isInt({ min: 0, max: 5 }).withMessage("must be an integer from 0 to 5"),
-  //   check("praise").isArray().withMessage("must be an array"),
-  //   check("comment").isString().withMessage("must be a string"),
-  //   checkParam,
-  // ], gc.giveFeedback.bind(gc));
+  router.post("/tenant/:id([0-9]+)/review", [
+    limitAccess([UserRole.VISITOR]),
+    check("score").isInt({ min: 0, max: 5 }).withMessage("must be an integer from 0 to 5"),
+    check("praise").isArray().withMessage("must be an array"),
+    check("comment").isString().withMessage("must be a string"),
+    checkParam,
+  ], gc.giveFeedback.bind(gc));
 
   // router.get("/tenant/:id([0-9]+)/review", [
   //   limitAccess([UserRole.ADMIN, UserRole.TENANT]),

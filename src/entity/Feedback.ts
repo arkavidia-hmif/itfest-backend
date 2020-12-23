@@ -27,6 +27,6 @@ export class Feedback {
   @Column({ nullable: false, default: "" })
   comment: string;
 
-  @Column({ nullable: false, default: false })
-  rated: boolean;
+  // @Column({ nullable: false, default: false })
+  // rated: boolean;
 }

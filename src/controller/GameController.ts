@@ -155,6 +155,8 @@ export class GameController {
   }
 
   async submitGame(request: Request, response: Response) {
+    const pointMultiplier = 0.5 // Score to point Multiplier
+
     const userId = response.locals.auth.id;
     const gameId: any = request.params.id;
     const { data = {} } = request.body;
@@ -227,23 +229,23 @@ export class GameController {
         //   return acc;
         // }
 
-        // const pointDelta = difficulties.reduce(reducer, 0);
+        const pointDelta = score * pointMultiplier;
 
-        // const tenant = await tmTenantRepository.findOne(tenantId, { relations: ["userId"] });
+        const tenant = await tmTenantRepository.findOne(game.tenant, { relations: ["userId"] });
 
-        // if (tenant.point < pointDelta) {
-        //   throw "not-enough-point";
-        // }
+        if (tenant.point < pointDelta) {
+          throw "not-enough-point";
+        }
 
-        // tenant.point -= pointDelta;
+        tenant.point -= pointDelta;
 
-        // await tmTenantRepository.save(tenant);
+        await tmTenantRepository.save(tenant);
 
-        // const visitor = await tmVisitorRepository.findOne(user.id, { relations: ["userId"] });
+        const visitor = await tmVisitorRepository.findOne(userId, { relations: ["userId"] });
 
-        // visitor.point += pointDelta;
+        visitor.point += pointDelta;
 
-        // await tmVisitorRepository.save(visitor);
+        await tmVisitorRepository.save(visitor);
 
         // const feedback = await tmFeedbackRepository.findOne({
         //   where: {
@@ -265,7 +267,7 @@ export class GameController {
         await tmTransactionRepository.save({
           from: game.tenant.userId,
           to: userId,
-          amount: score
+          amount: pointDelta
         })
       })
     } catch (error) {
@@ -328,6 +330,12 @@ export class GameController {
 
     const visitor = await this.visitorRepository.findOne(userId, { relations: ["userId"] });
 
+    const scoreGame = await this.scoreboardRepository.findOne(userId, { relations: ["game", "game.tenant", "game.tenant.userId"]})
+
+    if (scoreGame.game.tenant.userId.id !== +tenantId) {
+      return responseGenerator(response, 404, "not-play-already");
+    }
+
     const feedback = await this.feedbackRepository.findOne({
       where: {
         from: visitor,
@@ -335,16 +343,17 @@ export class GameController {
       }
     });
 
-    if (feedback.rated) {
-      return responseGenerator(response, 400, "already-reviewed");
+    if (feedback) {
+      return responseGenerator(response, 400, "already-give-feedback");
+    } else {
+      await this.feedbackRepository.save({
+        from: visitor,
+        to: tenant,
+        rating: score,
+        remark: praise.join(", "),
+        comment: comment || ""
+      });
     }
-
-    feedback.rated = true;
-    feedback.rating = score;
-    feedback.remark = praise.join(", ");
-    feedback.comment = comment || "";
-
-    await this.feedbackRepository.save(feedback);
 
     return responseGenerator(response, 200, "ok");
   }
