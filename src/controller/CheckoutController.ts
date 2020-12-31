@@ -29,8 +29,8 @@ export class CheckoutController {
         return responseGenerator(response, 200, "ok", checkout);
     }
 
-    async makeCheckout(request: Request, response: Response) {
-        const { waContact, lineContact, address } = request.body;
+    async createCheckout(request: Request, response: Response) {
+        const { waContact, lineContact, address, isSent } = request.body;
         const items = request.body.items;
         const id = response.locals.auth.id;
 
@@ -40,7 +40,7 @@ export class CheckoutController {
         // }]
 
         if (!waContact && !lineContact) {
-            return responseGenerator(response, 400, "fill-contact");
+            return responseGenerator(response, 400, "no-fill-contact");
         }
 
         if (!items || items.length === 0 ) {
@@ -60,6 +60,7 @@ export class CheckoutController {
                 let price = 0;
                 const prices : number[] = []
                 const itemsDB : Item[] = []
+                let hasPhysical: boolean = false;
                 
                 for (let i = 0; i < items.length; i++) {
                     const item = await tmItemRepository.findOne(items[i].id);
@@ -78,6 +79,10 @@ export class CheckoutController {
                     prices.push(item.price * items[i].quantity);
                     itemsDB.push(item);
                     price += prices[i];
+
+                    if(!hasPhysical){
+                        hasPhysical = item.hasPhysical;
+                    }
                 }
 
                 if (price > visitor.point) {
@@ -93,6 +98,7 @@ export class CheckoutController {
                     waContact,
                     lineContact,
                     address,
+                    isSent,
                     totalPoint: price
                 });
 
@@ -104,7 +110,11 @@ export class CheckoutController {
                     })
                 }
 
-                
+                if(!hasPhysical){
+                    return responseGenerator(response, 200, "ok", { message: "item being send by email" })
+                } else {
+                    return responseGenerator(response, 200, "ok", { message: "item being prepared" })
+                }
             })
         } catch (error) {
             if (typeof error === "string") {

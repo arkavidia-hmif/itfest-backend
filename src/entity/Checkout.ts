@@ -21,7 +21,7 @@ export class Checkout{
     waContact: String;
 
     @Column({ default: false })
-    isSent: Boolean;
+    isSent: boolean;
 
     @Column({ default: "-" })
     address: String;

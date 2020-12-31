@@ -24,6 +24,9 @@ import { ScoreboardSeed } from './scoreboard';
 import { GlobalScoreboard } from '../entity/GlobalScoreboard';
 import { GlobalScoreboardSeed } from './globalScoreboard';
 
+import { Checkout, CheckoutItem } from '../entity/Checkout';
+import { CheckoutSeed, CheckoutItemSeed } from './checkout';
+
 import { exit } from "process";
 
 
@@ -39,7 +42,8 @@ async function seedData(){
     const inventoryRepository = getRepository(Inventory);
     const scoreboardRepository = getRepository(Scoreboard);
     const globalScoreboardRepository = getRepository(GlobalScoreboard);
-
+    const checkoutRepository = getRepository(Checkout);
+    const checkoutItemRepository = getRepository(CheckoutItem);
 
     await userRepository.save(UserSeed)
             .then(user => {
@@ -88,7 +92,39 @@ async function seedData(){
             .catch(err => {
                 console.log(err.message)
             });
-    
+
+    await itemRepository.save(ItemSeed)
+            .then(sc => {
+                console.log("item data successfully added");
+            })
+            .catch(err => {
+                console.log(err.message)
+            });
+
+    await inventoryRepository.save(InventorySeed)
+            .then(sc => {
+                console.log("inventory data successfully added");
+            })
+            .catch(err => {
+                console.log(err.message)
+            });
+
+    await checkoutRepository.save(CheckoutSeed)
+            .then(sc => {
+                console.log("checkout data successfully added");
+            })
+            .catch(err => {
+                console.log(err.message)
+            });
+
+    await checkoutItemRepository.save(CheckoutItemSeed)
+            .then(sc => {
+                console.log("checkout-item data successfully added");
+            })
+            .catch(err => {
+                console.log(err.message)
+            });    
+
     exit(0);
 }
 
