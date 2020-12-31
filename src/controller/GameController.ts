@@ -265,6 +265,7 @@ export class GameController {
         // });
 
         await tmTransactionRepository.save({
+          type: TransactionType.PLAY,
           from: game.tenant.userId,
           to: userId,
           amount: pointDelta

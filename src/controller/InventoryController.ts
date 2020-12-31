@@ -228,29 +228,19 @@ export class InventoryController {
   }
 
   async redeem(request: Request, response: Response) {
-    const adminId = response.locals.auth.id;
+    const visitorId = response.locals.auth.id;
+    const shopId = request.body.shopId;
+
     const itemId = request.body.item;
     const amount = request.body.amount || 1;
-
-    const userString = decodeQr(request.params.qrid);
-
-    let visitorId: number;
-
-    try {
-      const userData = JSON.parse(userString);
-      visitorId = userData.id;
-    } catch (error) {
-      console.error(error);
-      return responseGenerator(response, 400, "invalid-qrid");
-    }
 
     try {
       await getConnection().transaction(async transactionManager => {
 
         const tmInventoryRepository = transactionManager.getRepository(Inventory);
 
-        const adminUser = await transactionManager.findOneOrFail(User, adminId);
-        const visitorUser = await transactionManager.findOneOrFail(Visitor, visitorId, { relations: ["userId"] });
+        const visitorUser = await transactionManager.findOneOrFail(User, visitorId);
+        const shop = await transactionManager.findOneOrFail(Visitor, visitorId, { relations: ["userId"] });
         const inventory = await tmInventoryRepository.findOne({
           where: {
             item: itemId

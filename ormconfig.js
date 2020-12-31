@@ -40,6 +40,8 @@ function getConfig() {
     "type": "mysql",
     "host": "localhost",
     "port": 3306,
+    // "username": "debian-sys-maint",
+    // "password": "DAoicYZ8uK582Zjg",
     "username": "root",
     "password": "root",
     "database": "itfest2",
