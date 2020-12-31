@@ -27,21 +27,19 @@ export class Checkout{
     address: String;
 
     @Column({ default: 0 })
-    totalPoint: number;
+    totalPrice: number;
 }
 
 @Entity()
 export class CheckoutItem {
   @PrimaryColumn({ type: 'int', name: 'checkoutId'})
   @ManyToOne((type) => Checkout)
-  @JoinColumn({ name: "checkoutId" })
-  checkout: Checkout;
+  checkoutId: number;
 
   @PrimaryColumn({ type: 'int', name: 'itemId'})
-  @JoinColumn({ name: "itemId" })
-  item: Item;
+  itemId: number;
 
   @Column({nullable: false})
   @IsPositive()
-  qty: number;
+  quantity: number;
 }

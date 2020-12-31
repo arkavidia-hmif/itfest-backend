@@ -20,6 +20,7 @@ export class CheckoutController {
 
         let checkout;
 
+        // TODO: Perlu add relationnya juga
         if (id) {
             checkout = await this.checkoutRepository.findOne(id);
         } else {
@@ -99,14 +100,14 @@ export class CheckoutController {
                     lineContact,
                     address,
                     isSent,
-                    totalPoint: price
+                    totalPrice: price
                 });
 
                 for (let i = 0; i < items.length; i++) {
                     tmCheckoutItemRepository.save({
-                        checkout: checkout,
-                        item: itemsDB[i],
-                        quantity: items[i].quantity
+                        checkoutId: checkout.id,
+                        itemId: itemsDB[i].id,
+                        quantity: +items[i].quantity
                     })
                 }
 

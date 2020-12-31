@@ -24,8 +24,8 @@ export class Item {
   @JoinColumn({ name: "ownerId" })
   owner: User;
 
-  @Column({ nullable: false })
-  ownerId: number;
+  // @Column({ nullable: false })
+  // ownerId: number;
 
   @Column()
   @IsPositive()
