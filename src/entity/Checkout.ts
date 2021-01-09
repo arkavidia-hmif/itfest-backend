@@ -32,12 +32,15 @@ export class Checkout{
 
 @Entity()
 export class CheckoutItem {
+  @PrimaryGeneratedColumn()
+  id: number;
+
   @PrimaryColumn({ type: 'int', name: 'checkoutId'})
   @ManyToOne((type) => Checkout)
   checkoutId: number;
 
-  @PrimaryColumn({ type: 'int', name: 'itemId'})
-  itemId: number;
+  @ManyToOne((type) => Item, { nullable: false })
+  item: Item;
 
   @Column({nullable: false})
   @IsPositive()

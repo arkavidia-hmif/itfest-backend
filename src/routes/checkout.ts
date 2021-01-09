@@ -20,12 +20,12 @@ export default () => {
 
     router.use(checkJWT);
 
-    router.get("/:id([0-9]{0,})", [
+    router.get("/checkout/:id([0-9]{0,})", [
         limitAccess([UserRole.ADMIN, UserRole.TENANT, UserRole.VISITOR])
     ], cc.getCheckout.bind(cc));
 
-    router.post("/", [
-        limitAccess([UserRole.ADMIN, UserRole.TENANT, UserRole.VISITOR])
+    router.post("/checkout/", [
+        limitAccess([UserRole.VISITOR])
     ], cc.createCheckout.bind(cc));
 
     return router;

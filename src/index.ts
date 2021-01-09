@@ -11,6 +11,7 @@ import socketRoutes from "./routes/socket";
 import transactionRoutes from "./routes/transaction";
 import userRoutes from "./routes/user";
 import gameRoutes from "./routes/game";
+import checkoutRoutes from "./routes/checkout";
 import tenantRoutes from "./routes/tenant";
 import scoreboardRoutes from "./routes/scoreboard";
 
@@ -25,6 +26,7 @@ createConnection().then(async connection => {
   app.use(inventoryRoutes());
   app.use(tenantRoutes());
   app.use(gameRoutes());
+  app.use(checkoutRoutes());
 
   const server = http.createServer(app);
 

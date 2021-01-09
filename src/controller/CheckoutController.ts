@@ -48,8 +48,6 @@ export class CheckoutController {
             return responseGenerator(response, 400, "no-item-selected");
         }
 
-        const visitor = await this.visitorRepository.findOne(id);
-
         try {
             await getConnection().transaction(async transactionManager => {
                 const tmCheckoutRepository = transactionManager.getRepository(Checkout);
@@ -59,10 +57,9 @@ export class CheckoutController {
                 const tmInventoryRepository = transactionManager.getRepository(Inventory);
 
                 let price = 0;
-                const prices : number[] = []
-                const itemsDB : Item[] = []
                 let hasPhysical: boolean = false;
-                
+                const visitor = await tmVisitorRepository.findOne(id, { relations: ["userId"] })
+
                 for (let i = 0; i < items.length; i++) {
                     const item = await tmItemRepository.findOne(items[i].id);
                     const invItem = await tmInventoryRepository.findOne({
@@ -74,12 +71,11 @@ export class CheckoutController {
                     if (invItem.qty < items[i].quantity) {
                         throw "insufficient-quantity";
                     }
+
                     invItem.qty -= items[i].quantity;
                     tmInventoryRepository.save(invItem)
 
-                    prices.push(item.price * items[i].quantity);
-                    itemsDB.push(item);
-                    price += prices[i];
+                    price += item.price * items[i].quantity;
 
                     if(!hasPhysical){
                         hasPhysical = item.hasPhysical;
@@ -89,11 +85,9 @@ export class CheckoutController {
                 if (price > visitor.point) {
                     throw "insufficient-point";
                 }
+                visitor.point -= price;
 
-                tmVisitorRepository.save({
-                    userId: visitor.userId,
-                    point: visitor.point - price
-                });
+                await tmVisitorRepository.save(visitor);
 
                 const checkout = await tmCheckoutRepository.save({
                     waContact,
@@ -103,13 +97,13 @@ export class CheckoutController {
                     totalPrice: price
                 });
 
-                for (let i = 0; i < items.length; i++) {
-                    tmCheckoutItemRepository.save({
+                items.forEach(async item => {
+                    await tmCheckoutItemRepository.save({
                         checkoutId: checkout.id,
-                        itemId: itemsDB[i].id,
-                        quantity: +items[i].quantity
+                        item: item,
+                        quantity: +item.quantity
                     })
-                }
+                })
 
                 if(!hasPhysical){
                     return responseGenerator(response, 200, "ok", { message: "item being send by email" })
