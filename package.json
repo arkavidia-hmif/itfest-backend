@@ -28,6 +28,7 @@
     "mustache": "^4.0.0",
     "mysql2": "^1.7.0",
     "nodemailer": "^6.4.2",
+    "nodemon": "^2.0.4",
     "pg": "^7.17.1",
     "readline-sync": "^1.4.10",
     "reflect-metadata": "^0.1.13",
@@ -39,6 +40,7 @@
   "scripts": {
     "build": "tsc",
     "start": "ts-node src/index.ts",
+    "dev": "nodemon src/index.ts",
     "serve": "ts-node -F src/index.ts",
     "watch": "ts-node-dev --no-notify src/index.ts",
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
