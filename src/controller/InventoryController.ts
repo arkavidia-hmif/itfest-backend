@@ -81,7 +81,7 @@ export class InventoryController {
     });
 
     const finalArray = userArray.map((entry) => {
-      const filteredInventory = inventoryArray.filter((inventory) => inventory.item.ownerId == entry.id);
+      const filteredInventory = inventoryArray.filter((inventory) => +inventory.item.owner == entry.id);
       const userInventory = filteredInventory.map((inventory) => {
         return {
           id: inventory.item.id,
@@ -176,7 +176,7 @@ export class InventoryController {
       return responseGenerator(response, 404, "item-not-found");
     }
 
-    if (response.locals.auth.role !== UserRole.ADMIN && item.ownerId !== response.locals.auth.id) {
+    if (response.locals.auth.role !== UserRole.ADMIN && item.owner !== response.locals.auth.id) {
       return responseGenerator(response, 403, "forbidden");
     }
 
@@ -212,7 +212,7 @@ export class InventoryController {
       return responseGenerator(response, 404, "item-not-found");
     }
 
-    if (response.locals.auth.role !== UserRole.ADMIN && item.ownerId !== response.locals.auth.id) {
+    if (response.locals.auth.role !== UserRole.ADMIN && item.owner !== response.locals.auth.id) {
       return responseGenerator(response, 403, "forbidden");
     }
 
@@ -237,10 +237,10 @@ export class InventoryController {
     try {
       await getConnection().transaction(async transactionManager => {
 
+        const tmTransactionRepository = transactionManager.getRepository(Transaction);
         const tmInventoryRepository = transactionManager.getRepository(Inventory);
 
-        const visitorUser = await transactionManager.findOneOrFail(User, visitorId);
-        const shop = await transactionManager.findOneOrFail(Visitor, visitorId, { relations: ["userId"] });
+        const visitorUser = await transactionManager.findOneOrFail(Visitor, visitorId);
         const inventory = await tmInventoryRepository.findOne({
           where: {
             item: itemId
@@ -264,9 +264,9 @@ export class InventoryController {
         }
 
         for (let i = 0; i < amount; i++) {
-          await transactionManager.save(Transaction, {
+          await tmTransactionRepository.save({
             from: visitorUser.userId,
-            to: adminUser,
+            to: shopId,
             amount: item.price,
             type: TransactionType.REDEEM,
             item: item
