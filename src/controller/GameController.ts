@@ -3,7 +3,7 @@ import { getConnection, getRepository } from "typeorm";
 
 import config from "../config";
 import { Feedback } from "../entity/Feedback";
-import { Game, GameType } from "../entity/Game";
+import { Game, GameType, GameSystem, GameQuiz, GameCrossword } from "../entity/Game";
 import { GameState } from "../entity/GameState";
 import { Scoreboard } from "../entity/Scoreboard";
 import { GlobalScoreboard } from "../entity/GlobalScoreboard";
@@ -197,13 +197,13 @@ export class GameController {
         const score: number = this.evaluateScore(game, data);
 
         const globalBoard: GlobalScoreboard = await tmGlobalScoreboardRepository.findOne(userId);
-        
-        if(globalBoard) {
-          await tmGlobalScoreboardRepository.remove(globalBoard);
-          globalBoard.userId = userId;
-          globalBoard.score += score;
-          globalBoard.lastUpdated = new Date();
-          await tmGlobalScoreboardRepository.insert(globalBoard);
+
+        if (globalBoard) {
+          await transactionManager.increment(GlobalScoreboard, { user: userId }, "score", score);
+          await tmGlobalScoreboardRepository.save({
+            userId: userId,
+            lastUpdated: new Date()
+          });
         } else {
           await tmGlobalScoreboardRepository.save({
             userId: userId,
@@ -283,15 +283,13 @@ export class GameController {
   }
 
   evaluateScore(game: Game, userAnswer: object): number {
-    let point = 0;
+    let gs: GameSystem;
     if (game.type == GameType.QUIZ) {
-      Object.keys(userAnswer).forEach((key) => {
-        if (userAnswer[key] == game.answer[key]) {
-          point += 1
-        }
-      })
+      gs = new GameQuiz(game, userAnswer);
+    } else if (game.type == GameType.CROSSWORD) {
+      gs = new GameCrossword(game, userAnswer);
     }
-    return point;
+    return gs.evaluateScore();
   }
 
   async listGame(request: Request, response: Response) {
@@ -331,7 +329,7 @@ export class GameController {
 
     const visitor = await this.visitorRepository.findOne(userId, { relations: ["userId"] });
 
-    const scoreGame = await this.scoreboardRepository.findOne(userId, { relations: ["game", "game.tenant", "game.tenant.userId"]})
+    const scoreGame = await this.scoreboardRepository.findOne(userId, { relations: ["game", "game.tenant", "game.tenant.userId"] })
 
     if (scoreGame.game.tenant.userId.id !== +tenantId) {
       return responseGenerator(response, 404, "not-play-already");

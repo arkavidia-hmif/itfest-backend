@@ -1,4 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import game from "../routes/game";
 
 import { Tenant } from "./User";
 
@@ -46,4 +47,45 @@ export class Game {
 
   @Column()
   answer: string;
+}
+
+export interface GameSystem {
+  game: Game;
+  evaluateScore: Function;
+}
+
+export class GameQuiz implements GameSystem {
+  game: Game;
+  userAnswer: Object;
+
+  constructor(game: Game, userAnswer: Object) {
+    this.game = game;
+    this.userAnswer = userAnswer;
+  }
+
+  // TODO: Fill
+  evaluateScore() {
+    let point = 0;
+    Object.keys(this.userAnswer).forEach((key) => {
+      if (this.userAnswer[key] == this.game.answer[key]) {
+        point += 1
+      }
+    });
+    return point;
+  }
+}
+
+export class GameCrossword implements GameSystem {
+  game: Game;
+  userAnswer: Object;
+
+  constructor(game: Game, userAnswer: Object) {
+    this.game = game;
+    this.userAnswer = userAnswer;
+  }
+
+  // TODO: Fill
+  evaluateScore(data: object) {
+    return 0;
+  }
 }
