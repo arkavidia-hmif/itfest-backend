@@ -87,7 +87,9 @@ export class InventoryController {
           id: inventory.item.id,
           name: inventory.item.name,
           price: inventory.item.price,
-          qty: inventory.qty
+          qty: inventory.qty,
+          hasPhysical: inventory.item.hasPhysical,
+          imageUrl: inventory.item.imageUrl
         };
       });
 
@@ -107,7 +109,7 @@ export class InventoryController {
   }
 
   async createItem(request: Request, response: Response) {
-    const { name, price, qty } = request.body;
+    const { name, price, qty, hasPhysical, imageUrl } = request.body;
     let ownerId = response.locals.auth.id;
     const userRole = response.locals.auth.role;
 
@@ -136,7 +138,9 @@ export class InventoryController {
       const newItem = await this.itemRepository.save({
         name,
         price,
-        owner
+        owner,
+        hasPhysical,
+        imageUrl
       });
 
       await this.inventoryRepository.save({
@@ -168,7 +172,7 @@ export class InventoryController {
 
   async editItem(request: Request, response: Response) {
     const id = request.params.id;
-    const { name, price, qty } = request.body;
+    const { name, price, qty, hasPhysical, imageUrl } = request.body;
 
     const item = await this.itemRepository.findOne(id);
 
@@ -188,9 +192,11 @@ export class InventoryController {
         await this.inventoryRepository.save(inventory);
       }
 
-      if (name || price) {
+      if (name || price || hasPhysical || imageUrl) {
         item.name = name || item.name;
         item.price = price || item.price;
+        item.hasPhysical= hasPhysical || item.hasPhysical;
+        item.imageUrl = imageUrl || item.imageUrl;
         await this.itemRepository.save(item);
       }
     } catch (error) {

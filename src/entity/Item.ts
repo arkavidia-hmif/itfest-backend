@@ -31,6 +31,9 @@ export class Item {
   @IsPositive()
   price: number;
 
+  @Column({ default: "-" })
+  imageUrl: string;
+
   @Column({ default: true })
   hasPhysical: boolean;
 
