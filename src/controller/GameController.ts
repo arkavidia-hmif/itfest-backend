@@ -3,7 +3,7 @@ import { getConnection, getRepository } from "typeorm";
 
 import config from "../config";
 import { Feedback } from "../entity/Feedback";
-import { Game, GameType, GameSystem, GameQuiz, GameCrossword } from "../entity/Game";
+import { Game, GameFactory } from "../entity/Game";
 import { GameState } from "../entity/GameState";
 import { Scoreboard } from "../entity/Scoreboard";
 import { GlobalScoreboard } from "../entity/GlobalScoreboard";
@@ -283,12 +283,7 @@ export class GameController {
   }
 
   evaluateScore(game: Game, userAnswer: object): number {
-    let gs: GameSystem;
-    if (game.type == GameType.QUIZ) {
-      gs = new GameQuiz(game, userAnswer);
-    } else if (game.type == GameType.CROSSWORD) {
-      gs = new GameCrossword(game, userAnswer);
-    }
+    const gs = GameFactory.createGame(game, userAnswer);
     return gs.evaluateScore();
   }
 

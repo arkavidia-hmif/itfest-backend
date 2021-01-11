@@ -51,7 +51,20 @@ export class Game {
 
 export interface GameSystem {
   game: Game;
-  evaluateScore: Function;
+  evaluateScore(): number;
+}
+
+export class GameFactory {
+  static createGame(game: Game, userAnswer: object): GameSystem {
+    switch (game.type) {
+      case GameType.QUIZ:
+        return new GameQuiz(game, userAnswer);        
+      case GameType.CROSSWORD:
+        return new GameCrossword(game, userAnswer);
+      default:
+        return null;
+    }
+  }
 }
 
 export class GameQuiz implements GameSystem {
@@ -85,7 +98,7 @@ export class GameCrossword implements GameSystem {
   }
 
   // TODO: Fill
-  evaluateScore(data: object) {
+  evaluateScore() {
     return 0;
   }
 }
