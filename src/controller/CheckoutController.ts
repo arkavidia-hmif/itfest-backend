@@ -72,8 +72,9 @@ export class CheckoutController {
                         throw "insufficient-quantity";
                     }
 
-                    invItem.qty -= items[i].quantity;
-                    tmInventoryRepository.save(invItem)
+                    // invItem.qty -= items[i].quantity;
+                    // tmInventoryRepository.save(invItem);
+                    transactionManager.decrement(Inventory, { item: item }, "qty", items[i].quantity);
 
                     price += item.price * items[i].quantity;
 
@@ -85,9 +86,10 @@ export class CheckoutController {
                 if (price > visitor.point) {
                     throw "insufficient-point";
                 }
-                visitor.point -= price;
 
-                await tmVisitorRepository.save(visitor);
+                // visitor.point -= price;
+                // await tmVisitorRepository.save(visitor);
+                transactionManager.decrement(Visitor, { id: id }, "point", price);
 
                 const checkout = await tmCheckoutRepository.save({
                     waContact,

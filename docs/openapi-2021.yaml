@@ -1908,6 +1908,69 @@ components:
             updatedAt:
               type: string
               format: date-time
+    ItemData:
+      description: "Item object"
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        price:
+          type: integer
+          minimum: 0
+        hasPhysical:
+          type: boolean
+          default: true
+        imageUrl:
+          type: string
+          default: "-"
+        ownerId:
+          type: integer
+    InventoryData:
+      description: "Inventory object"
+      type: object
+      properties:
+        qty:
+          type: number
+        item:
+          $ref: "#/components/schemas/ItemData"
+    CheckoutData:
+      description: Data when someone checkout (buy) some item(s)
+      type: object
+      properties:
+        id:
+          type: number
+          minimum: 1
+        lineContact:
+          type: string
+          default: "-"
+        waContact:
+          type: string
+          default: "-"
+        isSent:
+          type: boolean
+          default: false
+        address:
+          type: string
+          default: "-"
+        totalPrice:
+          type: number
+          minimum: 1
+    CheckoutItemData:
+      description: Item that being bought on a checkout
+      type: object
+      properties:
+        id:
+          type: number
+        checkoutId:
+          type: number
+          minimum: 1
+        item:
+          $ref: "#/components/schemas/ItemData"
+        quantity:
+          type: number
+          minimum: 1
     GameData:
       description: "Game object"
       type: object
@@ -1934,27 +1997,6 @@ components:
           type: string
           format: json
           example: "{[1:'a']}"
-    ItemData:
-      description: "Item object"
-      type: object
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-        price:
-          type: integer
-          minimum: 0
-        ownerId:
-          type: integer
-    InventoryData:
-      description: "Inventory object"
-      type: object
-      properties:
-        qty:
-          type: number
-        item:
-          $ref: "#/components/schemas/ItemData"
     ScoreboardData:
       description: Scoreboard Object
       type: object
