@@ -875,6 +875,30 @@ paths:
                         message: "must contain @"
                       - part: "password"
                         message: "must contain capital letter and number"
+  # /checkout/{id}:
+  #   get:
+  #     description: "getting specified (or all) checkouts"
+  #     tags:
+  #       - checkout
+  #     requestBody:
+  #     responses:
+  #       "200":
+  #       "404":
+  # /checkout:
+  #   post:
+  #     description: "make a new checkout with it's specified item(s) that being bought/redeemed"
+  #     tags:
+  #       - checkout
+  #     requestBody:
+  #     responses:
+  #     "200":
+  #     "500":
+  # 
+  # 
+  # 
+  # 
+  # 
+  # 
   # /game:
   #   get:
   #     tags:

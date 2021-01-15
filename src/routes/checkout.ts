@@ -24,7 +24,7 @@ export default () => {
         limitAccess([UserRole.ADMIN, UserRole.TENANT, UserRole.VISITOR])
     ], cc.getCheckout.bind(cc));
 
-    router.post("/checkout/", [
+    router.post("/checkout", [
         limitAccess([UserRole.VISITOR])
     ], cc.createCheckout.bind(cc));
 

@@ -10,10 +10,10 @@ import { responseGenerator } from "../utils/responseGenerator";
 import { User, Visitor } from "../entity/User";
 
 export class CheckoutController {
-    private userRepository = getRepository(User);
-    private visitorRepository = getRepository(Visitor);
+    // private userRepository = getRepository(User);
+    // private visitorRepository = getRepository(Visitor);
+    // private checkoutItemRepository = getRepository(CheckoutItem);
     private checkoutRepository = getRepository(Checkout);
-    private checkoutItemRepository = getRepository(CheckoutItem);
 
     async getCheckout(request: Request, response: Response) {
         const id = request.params.id;
@@ -22,9 +22,13 @@ export class CheckoutController {
 
         // TODO: Perlu add relationnya juga
         if (id) {
-            checkout = await this.checkoutRepository.findOne(id);
+            checkout = await this.checkoutRepository.findOne(id, { relations: ["item"] });
         } else {
-            checkout = await this.checkoutRepository.find();
+            checkout = await this.checkoutRepository.find({ relations: ["item"] });
+        }
+
+        if(!checkout){
+            return responseGenerator(response, 404, "not-found");
         }
 
         return responseGenerator(response, 200, "ok", checkout);

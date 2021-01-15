@@ -5,8 +5,10 @@ import {
   PrimaryGeneratedColumn,
   PrimaryColumn,
   ManyToOne,
+  OneToMany,
   JoinColumn
 } from "typeorm";
+import { CheckoutItemSeed } from "../seed/checkout";
 import { Item } from "./Item";
 
 @Entity()
@@ -28,6 +30,9 @@ export class Checkout{
 
     @Column({ default: 0 })
     totalPrice: number;
+
+    @OneToMany(() => CheckoutItem, checkoutItem => checkoutItem.checkoutId)
+    items: CheckoutItem[];
 }
 
 @Entity()
