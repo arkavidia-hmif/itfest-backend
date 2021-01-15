@@ -90,4 +90,10 @@ export class Tenant {
 
   @Column({ nullable: false })
   point: number;
+
+  @Column({ nullable: false })
+  x: number;
+
+  @Column({ nullable: false })
+  y: number;
 }
