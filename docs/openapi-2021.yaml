@@ -861,6 +861,8 @@ paths:
               name: "Tenant"
               username: "tenant"
               password: "password1234"
+              x: 0
+              y: 0
 
       responses:
         "200":
@@ -881,6 +883,10 @@ paths:
                         message: "must contain @"
                       - part: "password"
                         message: "must contain capital letter and number"
+                      - part: "x"
+                        message: "required and must number"
+                      - part: "y"
+                        message: "required and must number"
   # /checkout/{id}:
   #   get:
   #     description: "getting specified (or all) checkouts"
