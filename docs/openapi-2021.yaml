@@ -850,6 +850,12 @@ paths:
                   type: number
                   minimum: 0
                   description: "Override initial point"
+                x:
+                  description: "Position X for tenant"
+                  type: number
+                y:
+                  description: "Position Y for tenant"
+                  type: number
 
             example:
               name: "Tenant"
@@ -1860,6 +1866,10 @@ components:
         - properties:
             point:
               type: integer
+            x:
+              type: number
+            y:
+              type: number
         - description: "User (tenant) object"
     TransactionData:
       description: "Transaction object"
