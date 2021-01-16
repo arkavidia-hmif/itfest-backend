@@ -24,7 +24,15 @@ export class CheckoutController {
         if (id) {
             checkout = await this.checkoutRepository.findOne(id, { relations: ["item"] });
         } else {
-            checkout = await this.checkoutRepository.find({ relations: ["item"] });
+            const page = parseInt(request.query.page, 10) || 1;
+            const itemPerPage = parseInt(request.query.itemPerPage, 10) || 10;
+
+            // checkout = await this.checkoutRepository.find({ relations: ["item"] });
+            checkout = await this.checkoutRepository.findAndCount({
+                take: itemPerPage,
+                skip: (page - 1) * itemPerPage,
+                relations: ["item"]
+              })
         }
 
         if(!checkout){
@@ -112,9 +120,9 @@ export class CheckoutController {
                 })
 
                 if(!hasPhysical){
-                    return responseGenerator(response, 200, "ok", { message: "item being send by email" })
+                    return responseGenerator(response, 200, "ok", { message: "item(s) being send by email" })
                 } else {
-                    return responseGenerator(response, 200, "ok", { message: "item being prepared" })
+                    return responseGenerator(response, 200, "ok", { message: "item(s) being prepared" })
                 }
             })
         } catch (error) {
