@@ -9,26 +9,27 @@ import { responseGenerator } from "../utils/responseGenerator";
 export class ScoreboardController {
     private scoreboardRepository = getRepository(Scoreboard);
 
-    async getScoreboard(req : Request, res : Response){
+    async getScoreboard(req: Request, res: Response) {
         try {
             const gameId: any = +req.params.id;
-            var limit: number = 1000; //dafault
-            var offset: number = 0;// default
+            let limit: number = 1000; //dafault
+            let offset: number = 0;// default
 
-            if(req.query.limit !== undefined){
+            console.log(req.query)
+            if (req.query.limit !== undefined && (req.query.limit instanceof Number)) {
                 limit = +req.query.limit;
             }
-            if(req.query.offset !== undefined){
+            if (req.query.offset !== undefined && (req.query.offset instanceof Number)) {
                 offset = +req.query.offset;
             }
 
-            const  scoreboard = await this.scoreboardRepository
-                    .createQueryBuilder("scoreboard")
-                    .where("scoreboard.gameId = :gameId", { gameId: gameId })
-                    .orderBy("scoreboard.score", "DESC")
-                    .offset(offset)
-                    .take(limit)
-                    .getMany();
+            const scoreboard = await this.scoreboardRepository
+                .createQueryBuilder("scoreboard")
+                .where("scoreboard.gameId = :gameId", { gameId: gameId })
+                .orderBy("scoreboard.score", "DESC")
+                .offset(offset)
+                .take(limit)
+                .getMany();
 
             return responseGenerator(res, 200, "ok", scoreboard);
         } catch (error) {
@@ -49,7 +50,7 @@ export class ScoreboardController {
     //                                 userId : authData.id
     //                             }
     //                         });
-                            
+
     //     // found condition 
     //     if(scoreRecord !== null){
     //         responseGenerator(res, 400, "Bad Request");
