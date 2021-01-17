@@ -7,24 +7,29 @@ import { Checkout, CheckoutItem } from '../entity/Checkout'
 import { Item } from '../entity/Item'
 import { Inventory } from '../entity/Inventory'
 import { responseGenerator } from "../utils/responseGenerator";
-import { User, Visitor } from "../entity/User";
+import { UserRole, User, Visitor } from "../entity/User";
 
 export class CheckoutController {
     // private userRepository = getRepository(User);
     // private visitorRepository = getRepository(Visitor);
     // private checkoutItemRepository = getRepository(CheckoutItem);
     private checkoutRepository = getRepository(Checkout);
+    private userRepository = getRepository(User);
 
     async getCheckout(request: Request, response: Response) {
+        const userId = response.locals.auth.id;
         const id = request.params.id;
 
+        const user = await this.userRepository.findOne(userId);
         let checkout;
 
-        // TODO: Perlu add relationnya juga
         if (id) {
-            checkout = await this.checkoutRepository.findOne(id, { relations: ["item"] });
+            checkout = await this.checkoutRepository.findOne(id, { relations: ["items"] });
         } else {
-            checkout = await this.checkoutRepository.find({ relations: ["item"] });
+            if (user.role !== UserRole.ADMIN) {
+                return responseGenerator(response, 403, "forbidden");
+            }
+            checkout = await this.checkoutRepository.find({ relations: ["items"] });
         }
 
         if(!checkout){

@@ -32,6 +32,7 @@ export class Checkout{
     totalPrice: number;
 
     @OneToMany(() => CheckoutItem, checkoutItem => checkoutItem.checkoutId)
+    @JoinColumn({ name: "items" })
     items: CheckoutItem[];
 }
 
