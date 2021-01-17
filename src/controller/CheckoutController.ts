@@ -10,9 +10,6 @@ import { responseGenerator } from "../utils/responseGenerator";
 import { UserRole, User, Visitor } from "../entity/User";
 
 export class CheckoutController {
-    // private userRepository = getRepository(User);
-    // private visitorRepository = getRepository(Visitor);
-    // private checkoutItemRepository = getRepository(CheckoutItem);
     private checkoutRepository = getRepository(Checkout);
     private userRepository = getRepository(User);
 
@@ -29,7 +26,14 @@ export class CheckoutController {
             if (user.role !== UserRole.ADMIN) {
                 return responseGenerator(response, 403, "forbidden");
             }
-            checkout = await this.checkoutRepository.find({ relations: ["items"] });
+            const page = parseInt(request.query.page, 10) || 1;
+            const itemPerPage = parseInt(request.query.itemPerPage, 10) || 10;
+
+            checkout = await this.checkoutRepository.findAndCount({
+                take: itemPerPage,
+                skip: (page - 1) * itemPerPage,
+                relations: ["items"]
+              })
         }
 
         if(!checkout){
@@ -81,8 +85,6 @@ export class CheckoutController {
                         throw "insufficient-quantity";
                     }
 
-                    // invItem.qty -= items[i].quantity;
-                    // tmInventoryRepository.save(invItem);
                     transactionManager.decrement(Inventory, { item: item }, "qty", items[i].quantity);
 
                     price += item.price * items[i].quantity;
@@ -96,8 +98,6 @@ export class CheckoutController {
                     throw "insufficient-point";
                 }
 
-                // visitor.point -= price;
-                // await tmVisitorRepository.save(visitor);
                 transactionManager.decrement(Visitor, { id: id }, "point", price);
 
                 const checkout = await tmCheckoutRepository.save({
@@ -117,9 +117,9 @@ export class CheckoutController {
                 })
 
                 if(!hasPhysical){
-                    return responseGenerator(response, 200, "ok", { message: "item being send by email" })
+                    return responseGenerator(response, 200, "ok", { message: "item(s) being send by email" })
                 } else {
-                    return responseGenerator(response, 200, "ok", { message: "item being prepared" })
+                    return responseGenerator(response, 200, "ok", { message: "item(s) being prepared" })
                 }
             })
         } catch (error) {
