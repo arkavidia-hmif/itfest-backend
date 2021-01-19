@@ -11,17 +11,9 @@ export class ScoreboardController {
 
     async getScoreboard(req: Request, res: Response) {
         try {
-            const gameId: any = +req.params.id;
-            let limit: number = 1000; //dafault
-            let offset: number = 0;// default
-
-            console.log(req.query)
-            if (req.query.limit !== undefined && (req.query.limit instanceof Number)) {
-                limit = +req.query.limit;
-            }
-            if (req.query.offset !== undefined && (req.query.offset instanceof Number)) {
-                offset = +req.query.offset;
-            }
+            const gameId: number = +req.params.id;
+            let limit: number = +req.query.limit || 1000; //dafault
+            let offset: number = +req.query.offset || 0;// default
 
             const scoreboard = await this.scoreboardRepository
                 .createQueryBuilder("scoreboard")

@@ -11,15 +11,8 @@ export class GlobalScoreboardController {
 
     getScoreboard = async (req : Request, res : Response) => {
         try {
-            var limit: number = 1000; //dafault
-            var offset: number = 0;// default
-
-            if(req.query.limit !== undefined){
-                limit = +req.query.limit;
-            }
-            if(req.query.offset !== undefined){
-                offset = +req.query.offset;
-            }
+            let limit: number = +req.query.limit || 1000; //dafault
+            let offset: number = +req.query.offset || 0;// default
 
             const scoreboard = await this.scoreboardRepository
                     .createQueryBuilder("global_scoreboard")

@@ -180,7 +180,7 @@ export class InventoryController {
       return responseGenerator(response, 404, "item-not-found");
     }
 
-    if (response.locals.auth.role !== UserRole.ADMIN && item.owner !== response.locals.auth.id) {
+    if (response.locals.auth.role !== UserRole.ADMIN && item.owner.id !== response.locals.auth.id) {
       return responseGenerator(response, 403, "forbidden");
     }
 
