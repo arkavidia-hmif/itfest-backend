@@ -12,20 +12,21 @@ function getConfig() {
       "src/subscriber/**/*.ts"
     ],
     "seeds": [
-      'src/seed/**/*{.ts,.js}'
+      "src/seed/**/*{.ts,.js}"
     ],
     "factories": [
-      'src/factory/**/*{.ts,.js}'
+      "src/factory/**/*{.ts,.js}"
     ],
     "cli": {
       "entitiesDir": "src/entity",
       "migrationsDir": "src/migration",
       "subscribersDir": "src/subscriber"
     }
-  }
+  };
+
   if (process.env.DB_URL) {
     return {
-      "type": process.env.DB_TYPE,
+      "type": "postgres",
       "database": process.env.DB_NAME,
       "url": process.env.DB_URL,
       ...config

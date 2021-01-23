@@ -12,7 +12,7 @@ Some admin setting will be provided at
 ## Environment
 To run this project please specify the following environment variable
 ```bash
-DB_TYPE #Type of database, this project support mysql or postgres
+# Only Postgres are supported
 DB_NAME #Name of database
 DB_URL #URL of database including auth
 
