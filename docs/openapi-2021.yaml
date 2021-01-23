@@ -1,0 +1,2202 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: "Backend IT-Fest"
+  description: "Ini adalah dokumentasi backend untuk acara IT Festival Arkavidia 6.0"
+servers:
+  - url: http://localhost:3000
+tags:
+  - name: user
+    description: "Everything about user"
+  - name: auth
+    description: "Everything about authentication"
+  - name: inventory
+    description: "Everything about inventory and item"
+  - name: game
+    description: "Everything about game"
+security:
+  - bearerAuth: []
+paths:
+  /user:
+    get:
+      tags:
+        - user
+      summary: "List all user"
+      description: |
+        **Only allowed for admin**
+      parameters:
+        - $ref: "#/components/parameters/itemPerPage"
+        - $ref: "#/components/parameters/page"
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Response"
+                  - properties:
+                      data:
+                        allOf:
+                          - properties:
+                              array:
+                                type: array
+                                items:
+                                  $ref: "#/components/schemas/BaseUserData"
+                          - $ref: "#/components/schemas/Pagination"
+
+              example:
+                status: 200
+                code: ok
+                data:
+                  array:
+                    - id: 1
+                      email:
+                      username: admin
+                      name: Administrator
+                      role: admin
+                      createdAt: "2020-01-29T00:14:42.648Z"
+                      updatedAt: "2020-01-29T00:14:42.648Z"
+                    - id: 2
+                      email: tenant@email.com
+                      username: tenant
+                      name: Tenantaaa
+                      role: tenant
+                      createdAt: "2020-01-29T00:15:42.965Z"
+                      updatedAt: "2020-01-29T00:15:42.965Z"
+                    - id: 3
+                      email: visitor@email.com
+                      username: visitor
+                      name: Joshua visitor
+                      role: visitor
+                      createdAt: "2020-01-29T00:16:05.210Z"
+                      updatedAt: "2020-01-29T00:16:05.210Z"
+                  page: 1
+                  itemPerPage: 10
+                  total: 3
+
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /user/visitor:
+    get:
+      tags:
+        - user
+      summary: "List all visitor"
+      description: |
+        **Only allowed for admin**
+      parameters:
+        - $ref: "#/components/parameters/itemPerPage"
+        - $ref: "#/components/parameters/page"
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Response"
+                  - properties:
+                      data:
+                        allOf:
+                          - properties:
+                              array:
+                                type: array
+                                items:
+                                  $ref: "#/components/schemas/VisitorData"
+                          - $ref: "#/components/schemas/Pagination"
+
+              example:
+                status: 200
+                code: ok
+                data:
+                  array:
+                    - id: 3
+                      email: visitor@email.com
+                      username: visitor
+                      name: Joshua visitor
+                      role: visitor
+                      createdAt: "2020-01-29T00:16:05.210Z"
+                      updatedAt: "2020-01-29T00:16:05.210Z"
+                      dob: "1999-10-10T00:00:00.000Z"
+                      gender: 2
+                      interest:
+                        - Gaming
+                        - FinTech
+                      point: 1023
+                  page: 1
+                  itemPerPage: 10
+                  total: 1
+
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /user/tenant:
+    get:
+      tags:
+        - user
+      summary: "List all tenant"
+      description: |
+        **Only allowed for admin**
+      parameters:
+        - $ref: "#/components/parameters/itemPerPage"
+        - $ref: "#/components/parameters/page"
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Response"
+                  - properties:
+                      data:
+                        allOf:
+                          - properties:
+                              array:
+                                type: array
+                                items:
+                                  $ref: "#/components/schemas/TenantData"
+                          - $ref: "#/components/schemas/Pagination"
+
+              example:
+                status: 200
+                code: ok
+                data:
+                  array:
+                    - id: 2
+                      email: tenant@email.com
+                      username: tenant
+                      name: Tenantaaa
+                      role: tenant
+                      createdAt: "2020-01-29T00:15:42.965Z"
+                      updatedAt: "2020-01-29T00:15:42.965Z"
+                      point: 876
+                  page: 1
+                  itemPerPage: 10
+                  total: 1
+
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /user/item:
+    get:
+      tags:
+        - user
+        - inventory
+      summary: "Get user and their inventory"
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              example:
+                status: 200
+                code: ok
+                data:
+                  array:
+                    - id: 1
+                      name: Administrator
+                      items:
+                        - id: 4
+                          name: Samsung S11
+                          price: 10
+                          qty: 2
+                        - id: 6
+                          name: Samsung S12
+                          price: 1
+                          qty: 2
+                    - id: 2
+                      name: Joshuaa
+                      items:
+                        - id: 1
+                          name: Samsung S11
+                          price: 11
+                          qty: 1
+                    - id: 3
+                      name: Joshuaa
+                      items:
+                        - id: 5
+                          name: Samsung S11
+                          price: 1
+                          qty: 2
+                    - id: 5
+                      name: Joshua visitor
+                      items: []
+                    - id: 6
+                      name: visitor3@email.com
+                      items: []
+                    - id: 7
+                      name: Tenantaaa
+                      items:
+                        - id: 3
+                          name: Samsung S8
+                          price: 5
+                          qty: 2
+                  page: 1
+                  itemPerPage: 10
+                  total: 6
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /user/me:
+    get:
+      tags:
+        - user
+      summary: "Get profile of self"
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Response"
+                  - properties:
+                      data:
+                        oneOf:
+                          - $ref: "#/components/schemas/BaseUserData"
+                          - $ref: "#/components/schemas/VisitorData"
+                          - $ref: "#/components/schemas/TenantData"
+              example:
+                status: 200
+                code: "ok"
+                data:
+                  id: 15
+                  email: null
+                  username: "admin"
+                  name: "Joshua"
+                  dob: "1998-10-12"
+                  gender: 1
+                  interest:
+                    - "Fintech"
+                    - "Operating system"
+                  role: "admin"
+                  createdAt: "2019-09-22T10:53:44.199Z"
+                  updatedAt: "2019-09-22T10:53:44.199Z"
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+    put:
+      tags:
+        - user
+      summary: "Edit profile of self"
+      description: |
+        User can only update email, username, and/or email
+      requestBody:
+        description: "Modified user data"
+        content:
+          application/json:
+            schema:
+              type: object
+              description: "Changed key value"
+            examples:
+              "Change name":
+                value:
+                  name: "Nama baru"
+      responses:
+        "200":
+          $ref: "#/components/responses/OK"
+        "400":
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InputErrorResponse"
+              examples:
+                "Invalid username and email":
+                  value:
+                    status: 400
+                    code: "invalid-input"
+                    data:
+                      - part: "username"
+                        message: "must be unique"
+                      - part: "email"
+                        message: "must contains @"
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+  /user/me/transaction:
+    get:
+      tags:
+        - user
+      summary: "Get list of transaction of self"
+      parameters:
+        - $ref: "#/components/parameters/itemPerPage"
+        - $ref: "#/components/parameters/page"
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Response"
+                  - properties:
+                      data:
+                        allOf:
+                          - properties:
+                              array:
+                                type: array
+                                items:
+                                  $ref: "#/components/schemas/TransactionData"
+                          - $ref: "#/components/schemas/Pagination"
+
+              example:
+                status: 200
+                code: "ok"
+                data:
+                  array:
+                    - id: 1
+                      createdAt: "2020-01-31T00:14:49.370Z"
+                      amount: 123
+                      type: "give"
+                      from:
+                        id: 28
+                        email:
+                        username: "admin"
+                        name: "Joshua-admin"
+                        role: "admin"
+                        createdAt: "2020-01-28T11:31:31.642Z"
+                        updatedAt: "2020-01-28T11:31:31.642Z"
+                      to:
+                        id: 26
+                        email: "tenant10@email.com"
+                        username: "tenant10"
+                        name: "tenant10@email.com"
+                        role: "tenant"
+                        createdAt: "2020-01-28T05:12:35.917Z"
+                        updatedAt: "2020-01-28T05:12:35.917Z"
+                    - id: 2
+                      createdAt: "2020-01-31T00:14:49.370Z"
+                      amount: 123
+                      type: "give"
+                      from:
+                        id: 28
+                        email:
+                        username: "admin"
+                        name: "Joshua-admin"
+                        role: "admin"
+                        createdAt: "2020-01-28T11:31:31.642Z"
+                        updatedAt: "2020-01-28T11:31:31.642Z"
+                      to:
+                        id: 26
+                        email: "tenant10@email.com"
+                        username: "tenant10"
+                        name: "tenant10@email.com"
+                        role: "tenant"
+                        createdAt: "2020-01-28T05:12:35.917Z"
+                        updatedAt: "2020-01-28T05:12:35.917Z"
+                    - id: 3
+                      createdAt: "2020-01-31T00:14:49.370Z"
+                      amount: 123
+                      type: "give"
+                      from:
+                        id: 28
+                        email:
+                        username: "admin"
+                        name: "Joshua-admin"
+                        role: "admin"
+                        createdAt: "2020-01-28T11:31:31.642Z"
+                        updatedAt: "2020-01-28T11:31:31.642Z"
+                      to:
+                        id: 26
+                        email: "tenant10@email.com"
+                        username: "tenant10"
+                        name: "tenant10@email.com"
+                        role: "tenant"
+                        createdAt: "2020-01-28T05:12:35.917Z"
+                        updatedAt: "2020-01-28T05:12:35.917Z"
+                  page: 1
+                  itemPerPage: 10
+                  totalItem: 3
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+  /user/me/qrid:
+    get:
+      tags:
+        - user
+      summary: "Get id for qr code generation"
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Response"
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          qrid:
+                            type: string
+              example:
+                status: 200
+                code: "ok"
+                data:
+                  qrid: "e4c34a765085fc61b54466b26dc6f00a2680d573b7cca46ad2f7a56acacdd285"
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+  /user/{id}:
+    get:
+      tags:
+        - user
+      summary: "Get user profile of specified id"
+      description: |
+        **Only allowed for admin**
+      parameters:
+        - name: id
+          in: path
+          description: "ID of user to get"
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Response"
+                  - properties:
+                      data:
+                        oneOf:
+                          - $ref: "#/components/schemas/BaseUserData"
+                          - $ref: "#/components/schemas/VisitorData"
+                          - $ref: "#/components/schemas/TenantData"
+              example:
+                status: 200
+                code: "ok"
+                data:
+                  id: 15
+                  email: null
+                  username: "admin"
+                  name: "Joshua"
+                  role: "admin"
+                  createdAt: "2019-09-22T10:53:44.199Z"
+                  updatedAt: "2019-09-22T10:53:44.199Z"
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    put:
+      tags:
+        - user
+      summary: "Edit profile of specific user id"
+      description: |
+        **Only allowed for admin**
+        User can only update email, username, and/or email
+      parameters:
+        - name: id
+          in: path
+          description: "ID of user to modify"
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: "Modified user data"
+        content:
+          application/json:
+            schema:
+              type: object
+              description: "Changed key value"
+            examples:
+              "Change name":
+                value:
+                  name: "Nama baru"
+      responses:
+        "200":
+          $ref: "#/components/responses/OK"
+        "400":
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InputErrorResponse"
+              examples:
+                "Invalid username and email":
+                  value:
+                    status: 400
+                    code: "invalid-input"
+                    data:
+                      - part: "username"
+                        message: "must be unique"
+                      - part: "email"
+                        message: "must contains @"
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /user/{id}/transaction:
+    get:
+      tags:
+        - user
+      summary: "Get list of transaction of user with specified id"
+      description: |
+        **Only allowed for admin**
+      parameters:
+        - name: id
+          in: path
+          description: "ID of user to get"
+          required: true
+          schema:
+            type: integer
+        - $ref: "#/components/parameters/itemPerPage"
+        - $ref: "#/components/parameters/page"
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Response"
+                  - properties:
+                      data:
+                        allOf:
+                          - properties:
+                              array:
+                                type: array
+                                items:
+                                  $ref: "#/components/schemas/TransactionData"
+                          - $ref: "#/components/schemas/Pagination"
+
+              example:
+                status: 200
+                code: "ok"
+                data:
+                  array:
+                    - id: 1
+                      createdAt: "2020-01-31T00:14:49.370Z"
+                      amount: 123
+                      type: "give"
+                      from:
+                        id: 28
+                        email:
+                        username: "admin"
+                        name: "Joshua-admin"
+                        role: "admin"
+                        createdAt: "2020-01-28T11:31:31.642Z"
+                        updatedAt: "2020-01-28T11:31:31.642Z"
+                      to:
+                        id: 26
+                        email: "tenant10@email.com"
+                        username: "tenant10"
+                        name: "tenant10@email.com"
+                        role: "tenant"
+                        createdAt: "2020-01-28T05:12:35.917Z"
+                        updatedAt: "2020-01-28T05:12:35.917Z"
+                    - id: 2
+                      createdAt: "2020-01-31T00:14:49.370Z"
+                      amount: 123
+                      type: "give"
+                      from:
+                        id: 28
+                        email:
+                        username: "admin"
+                        name: "Joshua-admin"
+                        role: "admin"
+                        createdAt: "2020-01-28T11:31:31.642Z"
+                        updatedAt: "2020-01-28T11:31:31.642Z"
+                      to:
+                        id: 26
+                        email: "tenant10@email.com"
+                        username: "tenant10"
+                        name: "tenant10@email.com"
+                        role: "tenant"
+                        createdAt: "2020-01-28T05:12:35.917Z"
+                        updatedAt: "2020-01-28T05:12:35.917Z"
+                    - id: 3
+                      createdAt: "2020-01-31T00:14:49.370Z"
+                      amount: 123
+                      type: "give"
+                      from:
+                        id: 28
+                        email:
+                        username: "admin"
+                        name: "Joshua-admin"
+                        role: "admin"
+                        createdAt: "2020-01-28T11:31:31.642Z"
+                        updatedAt: "2020-01-28T11:31:31.642Z"
+                      to:
+                        id: 26
+                        email: "tenant10@email.com"
+                        username: "tenant10"
+                        name: "tenant10@email.com"
+                        role: "tenant"
+                        createdAt: "2020-01-28T05:12:35.917Z"
+                        updatedAt: "2020-01-28T05:12:35.917Z"
+                  page: 1
+                  itemPerPage: 10
+                  totalItem: 3
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /user/{id}/give:
+    post:
+      tags:
+        - user
+      summary: "Transfer point to user with specified id"
+      description: |
+        **Only allowed for admin**
+      parameters:
+        - name: id
+          in: path
+          description: "ID of user to give"
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: "Amount to be transfered"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: integer
+            example:
+              amount: 100
+      responses:
+        "200":
+          $ref: "#/components/responses/OK"
+        "404":
+          description: "User not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+              example:
+                status: 404
+                code: "user-not-found"
+        "400":
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+              examples:
+                "Not enough point":
+                  value:
+                    status: 400
+                    code: "not-enough-point"
+                "Transfer to same user":
+                  value:
+                    status: 400
+                    code: "same-user-transfer"
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /login:
+    post:
+      security: []
+      tags:
+        - auth
+      requestBody:
+        description: |
+          User credential
+
+          Email and username field are interchangeable
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  nullable: true
+                  type: string
+                username:
+                  nullable: true
+                  type: string
+                password:
+                  type: string
+            examples:
+              "With email":
+                value:
+                  email: "admin@email.com"
+                  password: "password1234"
+              "With username":
+                value:
+                  username: "admin"
+                  password: "password1234"
+      responses:
+        "200":
+          $ref: "#/components/responses/OKAuth"
+        "401":
+          description: "Invalid credential"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+              example:
+                status: 401
+                code: "invalid-auth"
+        "404":
+          description: "User not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+              example:
+                status: 404
+                code: "user-not-found"
+  /register/visitor:
+    post:
+      security: []
+      description: "Activate (register) a visitor account"
+      tags:
+        - auth
+      requestBody:
+        description: "Activation information"
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - voucher
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+                voucher:
+                  type: string
+                name:
+                  type: string
+                dob:
+                  type: string
+                  format: date
+                gender:
+                  description: "1 untuk pria dan 2 untuk wanita"
+                  type: number
+                  minimum: 1
+                  maximum: 2
+                interest:
+                  type: array
+                  items:
+                    type: string
+
+            example:
+              email: "visitor@email.com"
+              name: "Visitor name"
+              password: "password1234"
+              voucher: "abc123"
+              dob: "1999-10-10"
+              gender: 1
+              interest:
+                - "Gaming"
+                - "FinTech"
+
+      responses:
+        "200":
+          $ref: "#/components/responses/OKAuth"
+        "400":
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+              examples:
+                "Invalid voucher":
+                  value:
+                    status: 400
+                    code: "invalid-voucher"
+                "Invalid input(email)":
+                  value:
+                    status: 400
+                    code: "invalid-input"
+                    data:
+                      - part: "email"
+                      - message: "must contains @"
+  /register/tenant:
+    post:
+      security: []
+      description: "Register a tenant account (only allowed by admin)"
+      tags:
+        - auth
+      requestBody:
+        description: "Registration information"
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+                - name
+              properties:
+                username:
+                  type: string
+                name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+                point:
+                  type: number
+                  minimum: 0
+                  description: "Override initial point"
+                x:
+                  description: "Position X for tenant"
+                  type: number
+                y:
+                  description: "Position Y for tenant"
+                  type: number
+
+            example:
+              name: "Tenant"
+              username: "tenant"
+              password: "password1234"
+              x: 0
+              y: 0
+
+      responses:
+        "200":
+          $ref: "#/components/responses/OKAuth"
+        "400":
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InputErrorResponse"
+              examples:
+                "Invalid input":
+                  value:
+                    status: 400
+                    code: "invalid-input"
+                    data:
+                      - part: "email"
+                        message: "must contain @"
+                      - part: "password"
+                        message: "must contain capital letter and number"
+                      - part: "x"
+                        message: "required and must number"
+                      - part: "y"
+                        message: "required and must number"
+  /checkout/{id}:
+    get:
+      description: "getting checkout by it's id"
+      tags:
+        - checkout
+      parameters:
+        - name: id
+          in: path
+          description: "id of the checkout"
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CheckoutData"
+        "400":
+          description: "Bad Request"
+        "404":
+          description: "Not Found"
+        "500":
+          description: "unknown-error"
+  /checkout:
+    get:
+      description: "getting specified (or all) checkouts"
+      tags:
+        - checkout
+      parameters:
+        - name: page
+          in: query
+          description: "current shown page"
+          required: false
+          schema:
+            type: integer
+        - name: itemPerPage
+          in: query
+          description: "number items per page"
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CheckoutData"
+        "400":
+          description: "Bad Request"
+        "404":
+          description: "Not Found"
+        "500":
+          description: "unknown-error"
+    post:
+      description: "make a new checkout with it's specified item(s) that being bought/redeemed"
+      tags:
+        - checkout
+      requestBody:
+        description: "New Game Data"
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CheckoutData"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "400":
+          description: "Bad Request"
+        "500":
+          description: "unknown-error"
+
+
+  # /game:
+  #   get:
+  #     tags:
+  #       - game
+  #     summary: List all game owned by a tenant or everything (if loggedin as an admin)
+  #     parameters:
+  #       - $ref: "#/components/parameters/itemPerPage"
+  #       - $ref: "#/components/parameters/page"
+  #     responses:
+  #       "200":
+  #         description: "Success"
+  #         content:
+  #           application/json:
+  #             schema:
+  #               allOf:
+  #                 - $ref: "#/components/schemas/Response"
+  #                 - properties:
+  #                     data:
+  #                       allOf:
+  #                         - properties:
+  #                             array:
+  #                               type: array
+  #                               items:
+  #                                 $ref: "#/components/schemas/GameData"
+  #                         - $ref: "#/components/schemas/Pagination"
+
+  #             example:
+  #               status: 200
+  #               code: "ok"
+  #               data:
+  #                 array:
+  #                   - id: 1
+  #                     name: "Lempar PC"
+  #                     difficulty: 3
+  #                   - id: 2
+  #                     name: "Makan RAM"
+  #                     difficulty: 2
+  #                 page: 1
+  #                 itemPerPage: 10
+  #                 totalItem: 2
+  #       "401":
+  #         $ref: "#/components/responses/InvalidBearer"
+  #       "403":
+  #         $ref: "#/components/responses/Forbidden"
+  #   post:
+  #     description: |
+  #       **Only allowed for tenant and admin**
+  #     tags:
+  #       - game
+  #     summary: Create a new game
+  #     requestBody:
+  #       description: "Game information"
+  #       content:
+  #         application/json:
+  #           schema:
+  #             type: object
+  #             required:
+  #               - name
+  #               - difficulty
+  #             properties:
+  #               name:
+  #                 type: string
+  #               difficulty:
+  #                 description: "easy(1), medium(2), hard(3)"
+  #                 type: number
+  #                 minimum: 1
+  #                 maximum: 3
+  #               tenant:
+  #                 description: "User id of tenant if requesting user is admin"
+  #                 type: number
+
+  #           examples:
+  #             "Requested by tenant":
+  #               value:
+  #                 name: "Lempar PC"
+  #                 difficulty: 3
+  #             "Requested by admin":
+  #               value:
+  #                 name: "Lempar PC"
+  #                 difficulty: 3
+  #                 tenant: 1
+  #     responses:
+  #       "200":
+  #         $ref: "#/components/responses/OK"
+  #       "404":
+  #         description: "Tenant not found"
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/Response"
+  #             example:
+  #               status: 404
+  #               code: "tenant-not-found"
+  #       "400":
+  #         description: "Bad request"
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/Response"
+  #             examples:
+  #               "Admin request without tenant id":
+  #                 value:
+  #                   status: 400
+  #                   code: "admin-no-tenant-id"
+  #               "Invalid input (difficulty)":
+  #                 value:
+  #                   status: 400
+  #                   code: "invalid-input"
+  #                   data:
+  #                     - part: "difficulty"
+  #                       message: "must be between 1 to 3"
+  #       "401":
+  #         $ref: "#/components/responses/InvalidBearer"
+  #       "403":
+  #         $ref: "#/components/responses/Forbidden"
+  # /game/{id}:
+  #   get:
+  #     tags:
+  #       - game
+  #     summary: "Get game detail of specific id"
+  #     description: |
+  #       **Only allowed for admin and tenant**
+  #     parameters:
+  #       - name: id
+  #         in: path
+  #         description: "ID of game to get"
+  #         required: true
+  #         schema:
+  #           type: integer
+  #     responses:
+  #       "200":
+  #         description: "Success"
+  #         content:
+  #           application/json:
+  #             schema:
+  #               allOf:
+  #                 - $ref: "#/components/schemas/Response"
+  #                 - properties:
+  #                     data:
+  #                       $ref: "#/components/schemas/GameData"
+  #             example:
+  #               status: 200
+  #               code: "ok"
+  #               data:
+  #                 id: 15
+  #                 name: "Bola bekel"
+  #                 difficulty: 2
+  #       "404":
+  #         description: "Game not found"
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/Response"
+  #             example:
+  #               status: 404
+  #               code: "game-not-found"
+  #       "401":
+  #         $ref: "#/components/responses/InvalidBearer"
+  #       "403":
+  #         $ref: "#/components/responses/Forbidden"
+  #   put:
+  #     tags:
+  #       - game
+  #     summary: "Edit game detail of specific id"
+  #     description: |
+  #       **Only allowed for tenant and admin**
+  #     parameters:
+  #       - name: id
+  #         in: path
+  #         description: "ID of game to get"
+  #         required: true
+  #         schema:
+  #           type: integer
+  #     requestBody:
+  #       description: "Modified game data"
+  #       content:
+  #         application/json:
+  #           schema:
+  #             type: object
+  #             properties:
+  #               name:
+  #                 type: string
+  #               difficulty:
+  #                 description: "easy(1), medium(2), hard(3)"
+  #                 type: number
+  #                 minimum: 1
+  #                 maximum: 3
+  #           examples:
+  #             "Change name":
+  #               value:
+  #                 name: "Nama baru"
+  #     responses:
+  #       "200":
+  #         $ref: "#/components/responses/OK"
+  #       "400":
+  #         description: "Bad request"
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/InputErrorResponse"
+  #             examples:
+  #               "Invalid difficulty":
+  #                 value:
+  #                   status: 400
+  #                   code: "invalid-input"
+  #                   data:
+  #                     - part: "price"
+  #                       message: "must be between 1 to 3"
+  #       "404":
+  #         description: "Game not found"
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/Response"
+  #             example:
+  #               status: 404
+  #               code: "game-not-found"
+  #       "401":
+  #         $ref: "#/components/responses/InvalidBearer"
+  #       "403":
+  #         $ref: "#/components/responses/Forbidden"
+  #   delete:
+  #     tags:
+  #       - game
+  #     summary: "Delete game of specific id"
+  #     description: |
+  #       **Only allowed for tenant and admin**
+  #     parameters:
+  #       - name: id
+  #         in: path
+  #         description: "ID of game to delete"
+  #         required: true
+  #         schema:
+  #           type: integer
+  #     responses:
+  #       "200":
+  #         $ref: "#/components/responses/OK"
+  #       "404":
+  #         description: "Game not found"
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/Response"
+  #             example:
+  #               status: 404
+  #               code: "game-not-found"
+  #       "401":
+  #         $ref: "#/components/responses/InvalidBearer"
+  #       "403":
+  #         $ref: "#/components/responses/Forbidden"
+  /tenant/{id}/review:
+    get:
+      tags:
+        - game
+      summary: "Get tenant review of specific id"
+      description: |
+        **Only allowed for tenant and admin**
+      parameters:
+        - name: id
+          in: path
+          description: "ID of tenant to get"
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Response"
+                  - properties:
+                      data:
+                        type: object
+                        properties:
+                          review:
+                            type: number
+              example:
+                status: 200
+                code: "ok"
+                data:
+                  review: 3.4
+        "404":
+          description: "Tenant not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+              examples:
+                "Game not found":
+                  value:
+                    status: 404
+                    code: "tenant-not-found"
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+    post:
+      tags:
+        - game
+      summary: "Submit review for a tenant"
+      description: |
+        **Only allowed after playing**
+      parameters:
+        - name: id
+          in: path
+          description: "ID of tenant to review"
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: "Review data"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                score:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                praise:
+                  type: array
+                  items:
+                    type: string
+                comment:
+                  type: string
+            example:
+              score: 5
+              praise:
+                - "fun"
+                - "addicting"
+              comment: "Please make the game easier"
+      responses:
+        "200":
+          $ref: "#/components/responses/OK"
+        "400":
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InputErrorResponse"
+              examples:
+                "Invalid score":
+                  value:
+                    status: 400
+                    code: "invalid-input"
+                    data:
+                      - part: "score"
+                        message: "must be between 1 to 5"
+                "Already reviewed":
+                  value:
+                    status: 400
+                    code: "already-reviewed"
+        "404":
+          description: "Tenant not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+              example:
+                status: 404
+                code: "tenant-not-found"
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /item:
+    get:
+      tags:
+        - inventory
+      summary: List all inventory
+      parameters:
+        - $ref: "#/components/parameters/itemPerPage"
+        - $ref: "#/components/parameters/page"
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Response"
+                  - properties:
+                      data:
+                        allOf:
+                          - properties:
+                              array:
+                                type: array
+                                items:
+                                  $ref: "#/components/schemas/InventoryData"
+                          - $ref: "#/components/schemas/Pagination"
+
+              example:
+                status: 200
+                code: "ok"
+                data:
+                  array:
+                    - qty: 2
+                      createdAt: "2020-01-31T13:23:39.852Z"
+                      updatedAt: "2020-01-31T13:23:39.852Z"
+                      item:
+                        id: 1
+                        name: "Samsung S11"
+                        price: 1
+                        createdAt: "2020-01-31T13:23:39.832Z"
+                        updatedAt: "2020-01-31T13:23:39.832Z"
+                        ownerId: 2
+                  page: 1
+                  itemPerPage: 10
+                  total: 1
+
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+    post:
+      description: |
+        **Only allowed for tenant and admin**
+      tags:
+        - inventory
+      summary: Create a new item
+      requestBody:
+        description: "Item information"
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - price
+              properties:
+                name:
+                  type: string
+                price:
+                  type: integer
+                  minimum: 0
+                ownerId:
+                  description: "Create item as another user, only allowed for admin"
+                  type: integer
+                qty:
+                  type: integer
+                  minimum: 0
+            example:
+              name: "Es krim"
+              price: 2
+
+      responses:
+        "200":
+          $ref: "#/components/responses/OK"
+        "400":
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InputErrorResponse"
+              examples:
+                "Invalid difficulty":
+                  value:
+                    status: 400
+                    code: "invalid-input"
+                    data:
+                      - part: "price"
+                        message: "must be >=0"
+        "404":
+          description: "Tenant not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+              example:
+                status: 404
+                code: "tenant-not-found"
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /item/{id}:
+    get:
+      tags:
+        - inventory
+      summary: "Get game detail of specific id"
+      parameters:
+        - name: id
+          in: path
+          description: "ID of item to get"
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Response"
+                  - properties:
+                      data:
+                        $ref: "#/components/schemas/InventoryData"
+              example:
+                status: 200
+                code: "ok"
+                data:
+                  qty: 2
+                  createdAt: "2020-01-31T13:23:39.852Z"
+                  updatedAt: "2020-01-31T13:23:39.852Z"
+                  item:
+                    id: 1
+                    name: "Samsung S11"
+                    price: 1
+                    createdAt: "2020-01-31T13:23:39.832Z"
+                    updatedAt: "2020-01-31T13:23:39.832Z"
+                    ownerId: 2
+        "404":
+          description: "Item not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+              example:
+                status: 404
+                code: "item-not-found"
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+    put:
+      tags:
+        - inventory
+      summary: "Edit item detail of specific id"
+      description: |
+        **Only allowed for tenant and admin**
+      parameters:
+        - name: id
+          in: path
+          description: "ID of item to edit"
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: "Modified item data"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                qty:
+                  type: integer
+                  minimum: 0
+                name:
+                  type: string
+                price:
+                  type: integer
+                  minimum: 0
+            examples:
+              "Change name":
+                value:
+                  name: "Nama baru"
+      responses:
+        "200":
+          $ref: "#/components/responses/OK"
+        "400":
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InputErrorResponse"
+              examples:
+                "Invalid difficulty":
+                  value:
+                    status: 400
+                    code: "invalid-input"
+                    data:
+                      - part: "price"
+                        message: "must be >=0"
+        "404":
+          description: "Game not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+              example:
+                status: 404
+                code: "game-not-found"
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    delete:
+      tags:
+        - inventory
+      summary: "Delete item of specific id"
+      description: |
+        **Only allowed for tenant and admin**
+      parameters:
+        - name: id
+          in: path
+          description: "ID of game to delete"
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          $ref: "#/components/responses/OK"
+        "404":
+          description: "Game not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+              example:
+                status: 404
+                code: "game-not-found"
+        "401":
+          $ref: "#/components/responses/InvalidBearer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /game:
+    get:
+      tags:
+        - game
+      summary: Get list of all game
+      description: |
+        **ADMIN ACCESS**
+      parameters:
+        - name: page
+          in: query
+          description: "current shown page"
+          required: false
+          schema:
+            type: integer
+        - name: itemPerPage
+          in: query
+          description: "number items per page"
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Return list of games
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  code:
+                    type: string
+                    example: "ok"
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/GameData"
+        "400":
+          description: "Bad Request"
+        "500":
+          description: "unknown-error"
+    post:
+      tags:
+        - game
+      summary: Adding a new game
+      description: |
+        **ADMIN & TENANT ACCESS**
+      requestBody:
+        description: "New Game Data"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: A/B Quiz
+                difficulty:
+                  type: integer
+                  minimum: 1
+                  maximum: 3
+                  example: 1
+                problem:
+                  type: string
+                  format: json
+                  example: "{[1:{'a': 'opt1', 'b': 'opt2'}]}"
+                answer:
+                  type: string
+                  format: json
+                  example: "{[1:'a']}"
+      responses:
+        "201":
+          description: Game successfully created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 201
+                  code:
+                    type: string
+                    example: "created"
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 12
+                        description: Id of newly created game
+        "400":
+          description: "Bad Request"
+        "500":
+          description: "unknown-error"
+          
+  /game/{id}:
+    delete:
+      tags:
+        - game
+      summary: delete specified game
+      description: |
+        **ADMIN & TENANT ACCESS**
+      parameters:
+        - name: id
+          in: path
+          description: "ID of selected game"
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: "ok"
+        "400":
+          description: "Bad Request"
+        "500":
+          description: "unknown-error"
+  /game/{id}/play:
+    post:
+      tags:
+        - game
+      summary: start playing specified game
+      description: |
+        **VISITOR & ADMIN ACCESS**
+      parameters:
+        - name: id
+          in: path
+          description: "ID of selected game"
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: "ok"
+        "400":
+          description: user-already-played or Other handled error
+        "500":
+          description: "unknown-error"
+  /game/{id}/submit:
+    post:
+      tags:
+        - game
+      summary: submitting a specified game that already started
+      description: |
+        **VISITOR & ADMIN ACCESS**
+      parameters:
+        - name: id
+          in: path
+          description: "ID of selected game"
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: "ok"
+        "400":
+          description: bad request related error
+        "500":
+          description: "unknown-error"
+  /scoreboard/{id}:
+    get:
+      tags:
+        - scoreboard
+      summary: showing scoreboard/leaderboard for specific game
+      description: |
+        **Allowed for all users**
+      parameters:
+        - name: id
+          in: path
+          description: "ID of selected game"
+          required: true
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          description: "limitation of shown rank"
+          required: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          description: "number of skipped records"
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Return scoreboard entries
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  code:
+                    type: string
+                    example: "ok"
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ScoreboardData"
+        "400":
+          description: "Bad Request"
+        "500":
+          description: "unknown-error"
+  /scoreboard/global:
+    get:
+      tags:
+        - global scoreboard
+      summary: showing global scoreboard/leaderboard
+      description: |
+        **Allowed for all users**
+      parameters:
+        - name: limit
+          in: query
+          description: "limitation of shown rank"
+          required: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          description: "number of skipped records"
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Return scoreboard entries
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  code:
+                    type: string
+                    example: "ok"
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/GlobalScoreboardData"
+        "400":
+          description: "Bad Request"
+        "500":
+          description: "unknown-error"
+components:
+  parameters:
+    itemPerPage:
+      in: query
+      name: "itemPerPage"
+      schema:
+        type: integer
+      description: "Item returned per request for pagination"
+    page:
+      in: query
+      name: "page"
+      schema:
+        type: integer
+      description: "Page for pagination"
+    qrid:
+      in: path
+      name: qrid
+      description: "QRid of user"
+      required: true
+      schema:
+        type: string
+  schemas:
+    Response:
+      description: "Standard response schema"
+      type: object
+      properties:
+        status:
+          type: integer
+        code:
+          type: string
+    InputErrorResponse:
+      description: "Response for input validation error"
+      allOf:
+        - $ref: "#/components/schemas/Response"
+        - properties:
+            data:
+              $ref: "#/components/schemas/InputErrorArray"
+    InputErrorArray:
+      description: "Array containing all input validation error"
+      type: array
+      items:
+        title: "InputError"
+        type: object
+        properties:
+          part:
+            description: "The problematic input key"
+            type: string
+          message:
+            description: "Description of error"
+            type: string
+    BaseUserData:
+      description: "Base user object"
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          nullable: true
+          type: string
+          format: email
+        username:
+          type: string
+        name:
+          type: string
+        role:
+          type: string
+          enum: [admin, tenant, visitor]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    VisitorData:
+      allOf:
+        - $ref: "#/components/schemas/BaseUserData"
+        - properties:
+            dob:
+              type: string
+              format: date
+            gender:
+              type: integer
+            interest:
+              type: array
+              items:
+                type: string
+            point:
+              type: integer
+        - description: "User (visitor) object"
+    TenantData:
+      allOf:
+        - $ref: "#/components/schemas/BaseUserData"
+        - properties:
+            point:
+              type: integer
+            x:
+              type: number
+            y:
+              type: number
+        - description: "User (tenant) object"
+    TransactionData:
+      description: "Transaction object"
+      type: object
+      properties:
+        id:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        amount:
+          type: integer
+        type:
+          type: string
+          enum: [redeem, give, play]
+        from:
+          type: object
+          properties:
+            id:
+              type: integer
+            email:
+              type: string
+              format: email
+            username:
+              type: string
+            name:
+              type: string
+            role:
+              type: string
+              enum: [admin, tenant, visitor]
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+        to:
+          type: object
+          properties:
+            id:
+              type: integer
+            email:
+              type: string
+              format: email
+            username:
+              type: string
+            name:
+              type: string
+            role:
+              type: string
+              enum: [admin, tenant, visitor]
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+        item:
+          type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            price:
+              type: integer
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+    ItemData:
+      description: "Item object"
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        price:
+          type: integer
+          minimum: 0
+        hasPhysical:
+          type: boolean
+          default: true
+        imageUrl:
+          type: string
+          default: "-"
+        ownerId:
+          type: integer
+    InventoryData:
+      description: "Inventory object"
+      type: object
+      properties:
+        qty:
+          type: number
+        item:
+          $ref: "#/components/schemas/ItemData"
+    CheckoutData:
+      description: Data when someone checkout (buy) some item(s)
+      type: object
+      properties:
+        id:
+          type: number
+          minimum: 1
+        lineContact:
+          type: string
+          default: "-"
+        waContact:
+          type: string
+          default: "-"
+        isSent:
+          type: boolean
+          default: false
+        address:
+          type: string
+          default: "-"
+        totalPrice:
+          type: number
+          minimum: 1
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/CheckoutItemData"
+    CheckoutItemData:
+      description: Item that being bought on a checkout
+      type: object
+      properties:
+        id:
+          type: number
+        checkoutId:
+          type: number
+          minimum: 1
+        item:
+          $ref: "#/components/schemas/ItemData"
+        quantity:
+          type: number
+          minimum: 1
+    GameData:
+      description: "Game object"
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: A/B quiz
+        difficulty:
+          type: integer
+          minimum: 1
+          maximum: 3
+          description: "easy(1), medium(2), hard(3)"
+        type:
+          type: string
+          example: Crossword
+        problem:
+          type: string
+          format: json
+          example: "{[1:{'a': 'opt1', 'b': 'opt2'}]}"
+        answer:
+          type: string
+          format: json
+          example: "{[1:'a']}"
+    ScoreboardData:
+      description: Scoreboard Object
+      type: object
+      properties:
+        id:
+          type: integer
+        score:
+          type: integer
+          minimum: 0
+          default: 0
+        playedAt:
+          type: string
+          format: date
+        game:
+          $ref: "#/components/schemas/GameData"
+        user: 
+          $ref: "#/components/schemas/BaseUserData"
+    GlobalScoreboardData:
+      description: Global Scoreboard Object
+      type: object
+      properties:
+        user_id:
+          description: referencing to id in `BaseUserData`
+          type: integer
+        score:
+          type: integer
+          minimum: 0
+          default: 0
+        lastUpdated:
+          type: string
+          format: date
+    Pagination:
+      description: "Pagination helper object"
+      type: object
+      properties:
+        page:
+          type: integer
+        itemPerPage:
+          type: integer
+        totalItem:
+          type: integer
+  responses:
+    OKAuth:
+      description: "Success"
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/Response"
+              - properties:
+                  data:
+                    type: object
+                    properties:
+                      jwt:
+                        type: string
+          example:
+            status: 200
+            code: "ok"
+            data:
+              jwt: "a jwt token"
+    OK:
+      description: "Success"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Response"
+          example:
+            status: 200
+            code: "ok"
+    InvalidBearer:
+      description: "JWT token is missing or invalid"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Response"
+          examples:
+            invalid:
+              value:
+                status: 401
+                code: "invalid-jwt"
+            missing:
+              value:
+                status: 401
+                code: "no-bearer"
+
+    Forbidden:
+      description: "User doesn't have enough permission"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Response"
+          example:
+            status: 403
+            code: "forbidden"
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

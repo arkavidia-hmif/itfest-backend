@@ -81,13 +81,15 @@ export class InventoryController {
     });
 
     const finalArray = userArray.map((entry) => {
-      const filteredInventory = inventoryArray.filter((inventory) => inventory.item.ownerId == entry.id);
+      const filteredInventory = inventoryArray.filter((inventory) => +inventory.item.owner == entry.id);
       const userInventory = filteredInventory.map((inventory) => {
         return {
           id: inventory.item.id,
           name: inventory.item.name,
           price: inventory.item.price,
-          qty: inventory.qty
+          qty: inventory.qty,
+          hasPhysical: inventory.item.hasPhysical,
+          imageUrl: inventory.item.imageUrl
         };
       });
 
@@ -107,7 +109,7 @@ export class InventoryController {
   }
 
   async createItem(request: Request, response: Response) {
-    const { name, price, qty } = request.body;
+    const { name, price, qty, hasPhysical, imageUrl } = request.body;
     let ownerId = response.locals.auth.id;
     const userRole = response.locals.auth.role;
 
@@ -136,7 +138,9 @@ export class InventoryController {
       const newItem = await this.itemRepository.save({
         name,
         price,
-        owner
+        owner,
+        hasPhysical,
+        imageUrl
       });
 
       await this.inventoryRepository.save({
@@ -168,7 +172,7 @@ export class InventoryController {
 
   async editItem(request: Request, response: Response) {
     const id = request.params.id;
-    const { name, price, qty } = request.body;
+    const { name, price, qty, hasPhysical, imageUrl } = request.body;
 
     const item = await this.itemRepository.findOne(id);
 
@@ -176,7 +180,7 @@ export class InventoryController {
       return responseGenerator(response, 404, "item-not-found");
     }
 
-    if (response.locals.auth.role !== UserRole.ADMIN && item.ownerId !== response.locals.auth.id) {
+    if (response.locals.auth.role !== UserRole.ADMIN && item.owner.id !== response.locals.auth.id) {
       return responseGenerator(response, 403, "forbidden");
     }
 
@@ -188,9 +192,11 @@ export class InventoryController {
         await this.inventoryRepository.save(inventory);
       }
 
-      if (name || price) {
+      if (name || price || hasPhysical || imageUrl) {
         item.name = name || item.name;
         item.price = price || item.price;
+        item.hasPhysical= hasPhysical || item.hasPhysical;
+        item.imageUrl = imageUrl || item.imageUrl;
         await this.itemRepository.save(item);
       }
     } catch (error) {
@@ -212,7 +218,7 @@ export class InventoryController {
       return responseGenerator(response, 404, "item-not-found");
     }
 
-    if (response.locals.auth.role !== UserRole.ADMIN && item.ownerId !== response.locals.auth.id) {
+    if (response.locals.auth.role !== UserRole.ADMIN && item.owner !== response.locals.auth.id) {
       return responseGenerator(response, 403, "forbidden");
     }
 
@@ -228,29 +234,19 @@ export class InventoryController {
   }
 
   async redeem(request: Request, response: Response) {
-    const adminId = response.locals.auth.id;
+    const visitorId = response.locals.auth.id;
+    const shopId = request.body.shopId;
+
     const itemId = request.body.item;
     const amount = request.body.amount || 1;
-
-    const userString = decodeQr(request.params.qrid);
-
-    let visitorId: number;
-
-    try {
-      const userData = JSON.parse(userString);
-      visitorId = userData.id;
-    } catch (error) {
-      console.error(error);
-      return responseGenerator(response, 400, "invalid-qrid");
-    }
 
     try {
       await getConnection().transaction(async transactionManager => {
 
+        const tmTransactionRepository = transactionManager.getRepository(Transaction);
         const tmInventoryRepository = transactionManager.getRepository(Inventory);
 
-        const adminUser = await transactionManager.findOneOrFail(User, adminId);
-        const visitorUser = await transactionManager.findOneOrFail(Visitor, visitorId, { relations: ["userId"] });
+        const visitorUser = await transactionManager.findOneOrFail(Visitor, visitorId);
         const inventory = await tmInventoryRepository.findOne({
           where: {
             item: itemId
@@ -274,9 +270,9 @@ export class InventoryController {
         }
 
         for (let i = 0; i < amount; i++) {
-          await transactionManager.save(Transaction, {
+          await tmTransactionRepository.save({
             from: visitorUser.userId,
-            to: adminUser,
+            to: shopId,
             amount: item.price,
             type: TransactionType.REDEEM,
             item: item

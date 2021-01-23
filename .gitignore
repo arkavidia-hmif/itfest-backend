@@ -1,4 +1,6 @@
 node_modules/
+.vs/
 *.sqlite
 .vscode
 .idea
+.DS_Store

@@ -1,0 +1,561 @@
+{
+	"info": {
+		"_postman_id": "24567ba9-9282-4a0c-b7ee-9fe920bebf0f",
+		"name": "itfest-collection",
+		"description": "IT Fest Backend Endpoint Automation Test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "scoreboard and global",
+			"item": [
+				{
+					"name": "getScoreboard",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f9902443-1c45-4603-8d7a-4c87519d6f14",
+								"exec": [
+									"pm.test(\"get-scoreboard\", () => {\r",
+									"    pm.response.to.have.status(200)\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:3000/scoreboard/1",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"scoreboard",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getGlobalScoreboard",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "80b3d407-769e-45c1-812d-6e4734b340c0",
+								"exec": [
+									"pm.test(\"get-global-scoreboard\", () => {\r",
+									"    pm.response.to.have.status(200)\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "authorization",
+								"value": "Bearer=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJ2aXNpdG9yIiwiZW1haWwiOiJ2QGcuY29tIiwicm9sZSI6InZpc2l0b3IiLCJpYXQiOjE2MDYwNzE2NzZ9.ZNRBkCGRL9mWtroQFffiKYwCzoVwjnRa7NFaDKKI3v8",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "localhost:3000/scoreboard/global",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"scoreboard",
+								"global"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getScoreboardwithLimit",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "0bca3106-1464-4aae-a695-1ee303680c37",
+								"exec": [
+									"pm.test(\"get-scoreboard-with-limit\", () => {\r",
+									"    pm.response.to.have.status(200)\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:3000/scoreboard/1?limit=1",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"scoreboard",
+								"1"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getGlobalScoreboardWithLimit",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "11cfd069-7efa-4319-89fb-b181d9ee1bae",
+								"exec": [
+									"pm.test(\"get-global-scoreboard-with-limit\", () => {\r",
+									"    pm.response.to.have.status(200)\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:3000/scoreboard/global?limit=1",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"scoreboard",
+								"global"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "auth-admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bb3c1397-2209-4b40-bf52-39ace055b098",
+								"exec": [
+									"pm.test(\"auth-admin\", () => {\r",
+									"    pm.response.to.have.status(200)\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"a@g.com\",\r\n    \"password\": \"12345678\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/login",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "auth-tenant",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d7837d59-3ce3-4604-8ba2-d9c879a92593",
+								"exec": [
+									"pm.test(\"auth-tenant\", () => {\r",
+									"    pm.response.to.have.status(200)\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"t@g.com\",\r\n    \"password\": \"12345678\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/login",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "auth-visitor",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "bc353366-8c51-4209-ae92-cf1e430c0886",
+								"exec": [
+									"pm.test(\"auth-visitor\", () => {\r",
+									"    pm.response.to.have.status(200)\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"v@g.com\",\r\n    \"password\": \"12345678\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/login",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "game",
+			"item": [
+				{
+					"name": "Delete Game",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4a81ed30-e6d4-4a87-93e3-2d4c137f13d9",
+								"exec": [
+									"pm.test(\"Game has been deleted\", function () {",
+									"    pm.response.to.have.status(404); ",
+									"    pm.response.to.have.jsonBody({",
+									"        \"status\": 404,",
+									"        \"code\": \"game-not-found\"",
+									"    }); ",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJ0ZW5hbnQiLCJlbWFpbCI6InRAZy5jb20iLCJyb2xlIjoidGVuYW50IiwiaWF0IjoxNjA2MTM2Njk1fQ.c984-21VzbtqxqZeanrIvRC482skndxBqf6sz3iwUQ0",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:3000/game/2",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"game",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Game",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "277d17e6-da94-433e-be7a-fd35ee76270e",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200); ",
+									"});",
+									"",
+									"pm.test(\"Check Game Data\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    for(var i=0; i<jsonData.data.length; i++)",
+									"    {",
+									"        if (jsonData.data[i].name===\"awdawd\")",
+									"        {",
+									"            pm.expect(jsonData.data[i].id).to.equal(\"1\")",
+									"            pm.expect(jsonData.data[i].type).to.equal(\"1\")",
+									"            pm.expect(jsonData.data[i].difficulty).to.equal(\"1\")",
+									"        }   ",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwidXNlcm5hbWUiOiJhZG1pbiIsImVtYWlsIjoiYUBnLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTYwNjEzNjg4Mn0.K7TPFwFPxXgzoFqUccHBzj1HPnR3rmDx393CcH-6OtY",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:3000/game?itemPerPage=1&page=1",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"game"
+							],
+							"query": [
+								{
+									"key": "itemPerPage",
+									"value": "1"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Submit Game",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "9d3bad5c-dee6-41da-a9dc-703aab3aca60",
+								"exec": [
+									"pm.test(\"User not play\", function () {",
+									"    pm.response.to.have.status(404); ",
+									"    pm.response.to.have.jsonBody({",
+									"        \"status\": 404,",
+									"        \"code\": \"user-not-play\"",
+									"    }); ",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"warning": "This is a duplicate header and will be overridden by the Authorization header generated by Postman.",
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJ0ZW5hbnQiLCJlbWFpbCI6InRAZy5jb20iLCJyb2xlIjoidGVuYW50IiwiaWF0IjoxNjA2MTI3NDUwfQ.S9fkJVLv18Z_jQC4gR6BmjnR0Eqf4feCaWZvKES6pUY",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"data\": {\n        \"1\": \"a\",\n        \"2\": \"1\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/game/2/submit",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"game",
+								"2",
+								"submit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Game",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "aba1fb44-a8f3-4d32-b7c8-5f12bcdcc0f3",
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201); ",
+									"});",
+									"",
+									"pm.test(\"Game created\", function () {",
+									"    pm.response.to.have.jsonBody({",
+									"        status: 201,",
+									"        code: \"created\"",
+									"    }); ",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJ0ZW5hbnQiLCJlbWFpbCI6InRAZy5jb20iLCJyb2xlIjoidGVuYW50IiwiaWF0IjoxNjA2MTM2Njk1fQ.c984-21VzbtqxqZeanrIvRC482skndxBqf6sz3iwUQ0",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"haloo\",\n    \"tenantId\": 2,\n    \"problem\": {\n      \"question\": {\n        \"1\": {\n          \"text\": \"Apa?\",\n          \"choice\": [1, 2, 3]\n        }\n      }\n    },\n    \"answer\": {\n      \"1\": \"1\",\n      \"2\": \"1\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/game",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"game"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Play Game",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "e422bffc-5362-4e72-bdc0-c370ea6af704",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "56102724-5dea-4633-a185-65996454ed88",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"protocolProfileBehavior": {}
+}

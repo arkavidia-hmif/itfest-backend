@@ -183,7 +183,7 @@ export class UserController {
   }
 
   async registerTenant(request: Request, response: Response) {
-    const { email, username, password, point } = request.body;
+    const { email, username, password, point, x, y } = request.body;
     // const username: string = request.body.uemail.substring(0, email.indexOf("@"));
 
     const name = request.body.name || username;
@@ -220,7 +220,9 @@ export class UserController {
 
         await tmTenantRepository.save({
           userId: savedUser,
-          point: point || config.tenantInitial
+          point: point || config.tenantInitial,
+          x,
+          y
         });
 
         token = jwt.sign({
@@ -423,3 +425,4 @@ export class UserController {
     });
   }
 }
+
