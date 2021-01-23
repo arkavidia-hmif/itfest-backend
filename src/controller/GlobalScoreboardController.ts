@@ -9,18 +9,18 @@ import { join } from "path";
 export class GlobalScoreboardController {
     private scoreboardRepository = getRepository(GlobalScoreboard);
 
-    getScoreboard = async (req : Request, res : Response) => {
+    getScoreboard = async (req: Request, res: Response) => {
         try {
-            let limit: number = +req.query.limit || 1000; //dafault
-            let offset: number = +req.query.offset || 0;// default
+            const limit: number = +req.query.limit || 1000; //default
+            const offset: number = +req.query.offset || 0; //default
 
             const scoreboard = await this.scoreboardRepository
-                    .createQueryBuilder("global_scoreboard")
-                    .orderBy("global_scoreboard.score", "DESC")
-                    .offset(offset)
-                    .take(limit)
-                    .getMany();
-            
+                .createQueryBuilder("global_scoreboard")
+                .orderBy("global_scoreboard.score", "DESC")
+                .offset(offset)
+                .take(limit)
+                .getMany();
+
             return responseGenerator(res, 200, "ok", scoreboard);
         } catch (error) {
             if (typeof error === "string") {
