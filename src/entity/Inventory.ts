@@ -1,8 +1,8 @@
-import { IsPositive } from "class-validator";
-import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Check, Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Item } from "./Item";
 
 @Entity()
+@Check(`(qty >= 0)`)
 export class Inventory {
 
   @PrimaryGeneratedColumn()
@@ -13,7 +13,6 @@ export class Inventory {
   item: Item;
 
   @Column()
-  @IsPositive()
   qty: number;
 
   @Column()

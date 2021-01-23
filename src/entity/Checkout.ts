@@ -1,5 +1,5 @@
-import { IsPositive } from "class-validator";
 import {
+  Check,
   Column,
   Entity,
   PrimaryGeneratedColumn,
@@ -8,7 +8,6 @@ import {
   OneToMany,
   JoinColumn
 } from "typeorm";
-import { CheckoutItemSeed } from "../seed/checkout";
 import { Item } from "./Item";
 
 @Entity()
@@ -37,6 +36,7 @@ export class Checkout{
 }
 
 @Entity()
+@Check(`(quantity >= 0)`)
 export class CheckoutItem {
   @PrimaryGeneratedColumn()
   id: number;
@@ -49,6 +49,5 @@ export class CheckoutItem {
   item: Item;
 
   @Column({nullable: false})
-  @IsPositive()
   quantity: number;
 }
