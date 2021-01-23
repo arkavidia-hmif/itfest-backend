@@ -1,16 +1,16 @@
 import { Server } from "http";
 import * as jwt from "jsonwebtoken";
-import * as socketio from "socket.io";
+import { Server as SocketioServer } from "socket.io";
 
 import config from "../config";
 
 export const globalSocket = {};
 
 export default (server: Server) => {
-  const io = socketio(server);
+  const io = new SocketioServer(server);
 
   io.use((socket, next) => {
-    const token = socket.handshake.query.token;
+    const token = socket.handshake.auth["token"];
     if (!token) {
       return next(new Error("no-token"));
     }
