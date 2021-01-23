@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 function getConfig() {
   let config = {
     "synchronize": false,
@@ -30,7 +31,7 @@ function getConfig() {
       "database": process.env.DB_NAME,
       "url": process.env.DB_URL,
       ...config
-    }
+    };
   } else {
     console.error("Please specify database (check Readme)");
     process.exit(1);
