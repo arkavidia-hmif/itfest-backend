@@ -1,23 +1,24 @@
+/* eslint-disable no-console */
 import { createConnection } from "typeorm";
 import { UserRole } from "./entity/User";
 import { UserController } from "./controller/UserController";
+import * as readline from "readline-sync";
 
 const argv = process.argv;
 const argc = argv.length;
-const readline = require('readline-sync');
 
 // console.log(argv);
 
 async function printHelp() {
-  console.log('Avaiable command');
-  console.log('createadmin   - Create admin');
-  console.log('voucher - Generate voucher');
+  console.log("Avaiable command");
+  console.log("createadmin   - Create admin");
+  console.log("voucher - Generate voucher");
 }
 
 async function createAdmin() {
-  const name = readline.question('Name : ');
-  const username = readline.question('Username : ');
-  const password = readline.questionNewPassword('Password : ');
+  const name = readline.question("Name : ");
+  const username = readline.question("Username : ");
+  const password = readline.questionNewPassword("Password : ");
 
   const connection = await createConnection();
 
@@ -35,7 +36,7 @@ async function createAdmin() {
 }
 
 async function generateVoucher() {
-  const qty = readline.questionInt('Qty : ');
+  const qty = readline.questionInt("Qty : ");
 
   if (qty < 0) {
     console.error("Please enter positive qty");
@@ -54,7 +55,7 @@ async function generateVoucher() {
 
     codeResult.map((data) => {
       console.log(data);
-    })
+    });
   } catch (error) {
     console.error(error);
   }
@@ -64,16 +65,16 @@ async function generateVoucher() {
 
 if (argc > 2) {
   switch (argv[2]) {
-    case 'createadmin':
+    case "createadmin":
       createAdmin();
       break;
-    case 'voucher':
+    case "voucher":
       generateVoucher();
       break;
-    case 'help':
+    case "help":
       printHelp();
       break;
   }
 } else {
-  console.log('Invalid param, run help for avaiable commands');
+  console.log("Invalid param, run help for avaiable commands");
 }

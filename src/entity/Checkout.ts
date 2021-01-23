@@ -17,16 +17,16 @@ export class Checkout{
     id: number;
 
     @Column({ default: "-" })
-    lineContact: String;
+    lineContact: string;
 
     @Column({ default: "-" })
-    waContact: String;
+    waContact: string;
 
     @Column({ default: false })
     isSent: boolean;
 
     @Column({ default: "-" })
-    address: String;
+    address: string;
 
     @Column({ default: 0 })
     totalPrice: number;
@@ -41,7 +41,7 @@ export class CheckoutItem {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @PrimaryColumn({ type: 'int', name: 'checkoutId'})
+  @PrimaryColumn({ type: "int", name: "checkoutId"})
   @ManyToOne((type) => Checkout)
   checkoutId: number;
 

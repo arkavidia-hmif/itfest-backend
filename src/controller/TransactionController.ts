@@ -11,7 +11,7 @@ export class TransactionController {
 
   private transactionRepository = getRepository(Transaction);
 
-  async getTransaction(where?: object, page?: number, itemPerPage?: number) {
+  async getTransaction(where?: Record<string, unknown>, page?: number, itemPerPage?: number) {
     const [transactions, total] = await this.transactionRepository.findAndCount({
       where,
       take: itemPerPage,
@@ -33,7 +33,7 @@ export class TransactionController {
     const page = parseInt(request.query.page, 10) || 1;
     const itemPerPage = parseInt(request.query.itemPerPage, 10) || 10;
 
-    const [transactionsCleaned, total] = await this.getTransaction(null, page, itemPerPage)
+    const [transactionsCleaned, total] = await this.getTransaction(null, page, itemPerPage);
 
     return responseGenerator(response, 200, "ok", {
       array: transactionsCleaned,
@@ -45,7 +45,7 @@ export class TransactionController {
 
   async give(request: Request, response: Response) {
     const fromId = response.locals.auth.id;
-    const toId = request.params.id || -1;
+    const toId = request.params.id || "-1";
 
     try {
       await getConnection().transaction(async transactionManager => {
@@ -54,7 +54,7 @@ export class TransactionController {
         const toUser = await transactionManager.findOneOrFail(User, toId);
         const amount = parseInt(request.body.amount, 10);
 
-        if (fromId == toId) {
+        if (fromId === parseInt(toId, 10)) {
           throw "same-user-transfer";
         }
 
@@ -97,8 +97,8 @@ export class TransactionController {
         }
 
         if (globalSocket[toId]) {
-          globalSocket[toId].emit('transaction', {
-            type: 'give',
+          globalSocket[toId].emit("transaction", {
+            type: "give",
             from: {
               id: fromUser.id,
               name: fromUser.name || fromUser.username,
@@ -108,9 +108,9 @@ export class TransactionController {
         }
       });
     } catch (error) {
-      if (typeof error === 'string') {
+      if (typeof error === "string") {
         return responseGenerator(response, 400, error);
-      } else if (error.name === 'EntityNotFound') {
+      } else if (error.name === "EntityNotFound") {
         return responseGenerator(response, 404, "user-not-found");
       } else {
         return responseGenerator(response, 500, "unknown-error", error);

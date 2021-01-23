@@ -8,10 +8,10 @@ export class GameState {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne((type) => Game, (game) => game.id, { nullable: false, onDelete: 'CASCADE' })
+  @ManyToOne((type) => Game, (game) => game.id, { nullable: false, onDelete: "CASCADE" })
   game: Game;
 
-  @ManyToOne((type) => User, (user) => user.id, { nullable: false, onDelete: 'CASCADE' })
+  @ManyToOne((type) => User, (user) => user.id, { nullable: false, onDelete: "CASCADE" })
   user: User;
 
   @Column()
@@ -20,6 +20,6 @@ export class GameState {
   @CreateDateColumn()
   startTime: Date;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: "timestamp", nullable: true })
   submitTime: Date;
 }

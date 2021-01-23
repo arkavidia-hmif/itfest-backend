@@ -1,5 +1,4 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import game from "../routes/game";
 
 import { Tenant } from "./User";
 
@@ -24,7 +23,7 @@ export class Game {
   })
   name: string;
 
-  @ManyToOne((type) => Tenant, { nullable: false, onDelete: 'CASCADE' })
+  @ManyToOne((type) => Tenant, { nullable: false, onDelete: "CASCADE" })
   @JoinColumn()
   tenant: Tenant;
 
@@ -55,10 +54,10 @@ export interface GameSystem {
 }
 
 export class GameFactory {
-  static createGame(game: Game, userAnswer: object): GameSystem {
+  static createGame(game: Game, userAnswer: Record<string, unknown>): GameSystem {
     switch (game.type) {
       case GameType.QUIZ:
-        return new GameQuiz(game, userAnswer);        
+        return new GameQuiz(game, userAnswer);
       case GameType.CROSSWORD:
         return new GameCrossword(game, userAnswer);
       default:
@@ -69,19 +68,20 @@ export class GameFactory {
 
 export class GameQuiz implements GameSystem {
   game: Game;
-  userAnswer: Object;
+  userAnswer: Record<string, unknown>;
 
-  constructor(game: Game, userAnswer: Object) {
+  constructor(game: Game, userAnswer: Record<string, unknown>) {
     this.game = game;
     this.userAnswer = userAnswer;
   }
 
   // TODO: Fill
-  evaluateScore() {
+  evaluateScore(): number {
     let point = 0;
+
     Object.keys(this.userAnswer).forEach((key) => {
-      if (this.userAnswer[key] == this.game.answer[key]) {
-        point += 1
+      if (this.userAnswer[key] === this.game.answer[key]) {
+        point += 1;
       }
     });
     return point;
@@ -90,15 +90,15 @@ export class GameQuiz implements GameSystem {
 
 export class GameCrossword implements GameSystem {
   game: Game;
-  userAnswer: Object;
+  userAnswer: Record<string, unknown>;
 
-  constructor(game: Game, userAnswer: Object) {
+  constructor(game: Game, userAnswer: Record<string, unknown>) {
     this.game = game;
     this.userAnswer = userAnswer;
   }
 
   // TODO: Fill
-  evaluateScore() {
+  evaluateScore(): number {
     return 0;
   }
 }

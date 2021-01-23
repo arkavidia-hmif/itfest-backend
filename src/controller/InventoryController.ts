@@ -44,7 +44,7 @@ export class InventoryController {
     const page = parseInt(request.query.page, 10) || 1;
     const itemPerPage = parseInt(request.query.itemPerPage, 10) || 100;
 
-    let [userArray, userTotal] = await this.userRepository.findAndCount({
+    const [userArray, userTotal] = await this.userRepository.findAndCount({
       where: [
         {
           role: UserRole.ADMIN
@@ -64,7 +64,7 @@ export class InventoryController {
       };
     });
 
-    let [itemArray, itemTotal] = await this.itemRepository.findAndCount({
+    const [itemArray, itemTotal] = await this.itemRepository.findAndCount({
       where: tenantIdArray,
       select: ["id"]
     });
@@ -72,16 +72,16 @@ export class InventoryController {
     const itemIdArray = itemArray.map((entry) => {
       return {
         item: entry.id
-      }
-    })
+      };
+    });
 
-    let [inventoryArray, inventoryTotal] = await this.inventoryRepository.findAndCount({
+    const [inventoryArray, inventoryTotal] = await this.inventoryRepository.findAndCount({
       where: itemIdArray,
       relations: ["item"]
     });
 
     const finalArray = userArray.map((entry) => {
-      const filteredInventory = inventoryArray.filter((inventory) => +inventory.item.owner == entry.id);
+      const filteredInventory = inventoryArray.filter((inventory) => (+inventory.item.owner) === entry.id);
       const userInventory = filteredInventory.map((inventory) => {
         return {
           id: inventory.item.id,
@@ -97,7 +97,7 @@ export class InventoryController {
         id: entry.id,
         name: entry.name,
         items: userInventory
-      }
+      };
     });
 
     return responseGenerator(response, 200, "ok", {
@@ -120,7 +120,7 @@ export class InventoryController {
     const owner = await this.userRepository.findOne(ownerId);
 
     if (!owner) {
-      return responseGenerator(response, 400, "owner-not-found")
+      return responseGenerator(response, 400, "owner-not-found");
     }
 
     const existingItem = await this.itemRepository.findOne({
@@ -184,7 +184,7 @@ export class InventoryController {
       return responseGenerator(response, 403, "forbidden");
     }
 
-    const inventory = await this.inventoryRepository.findOne({ item: item })
+    const inventory = await this.inventoryRepository.findOne({ item: item });
 
     try {
       if (qty) {
@@ -195,7 +195,7 @@ export class InventoryController {
       if (name || price || hasPhysical || imageUrl) {
         item.name = name || item.name;
         item.price = price || item.price;
-        item.hasPhysical= hasPhysical || item.hasPhysical;
+        item.hasPhysical = hasPhysical || item.hasPhysical;
         item.imageUrl = imageUrl || item.imageUrl;
         await this.itemRepository.save(item);
       }

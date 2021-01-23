@@ -1,13 +1,13 @@
 import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    JoinColumn,
-    ManyToOne,
-    OneToOne,
-    PrimaryColumn,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn,
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToOne,
+  PrimaryColumn,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from "typeorm";
 import { User } from "./User";
 
@@ -17,7 +17,7 @@ export class Shop {
     id: number;
 
     @Column({ nullable: false })
-    name: String;
+    name: string;
 
     @ManyToOne((type) => User, (user) => user.id, { nullable: false, onDelete: "CASCADE" })
     owner: User;

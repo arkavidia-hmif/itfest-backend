@@ -172,7 +172,7 @@ export class UserController {
         username: user.username,
         email: user.email,
         role: user.role,
-      }, config.secret)
+      }, config.secret);
 
       return responseGenerator(response, 200, "ok", {
         jwt: token
@@ -207,7 +207,7 @@ export class UserController {
           }
         })) {
           throw "user-exists";
-        };
+        }
 
         const savedUser = await tmUserRepository.save({
           role: UserRole.TENANT,
@@ -230,8 +230,8 @@ export class UserController {
           username: savedUser.username,
           email: savedUser.email,
           role: savedUser.role,
-        }, config.secret)
-      })
+        }, config.secret);
+      });
     } catch (err) {
       if (err === "user-exists" || err.code === "ER_DUP_ENTRY") {
         return responseGenerator(response, 400, "user-exists");
@@ -252,12 +252,12 @@ export class UserController {
   async registerVisitor(request: Request, response: Response) {
     const password: string = request.body.password;
     const email: string = request.body.email;
-    const emailFrontPart: string = email.substring(0, email.indexOf("@"))
+    const emailFrontPart: string = email.substring(0, email.indexOf("@"));
     const username: string = request.body.username || emailFrontPart;
 
     delete request.body.password;
 
-    let name = request.body.name || email;
+    const name = request.body.name || email;
 
     const salt = bcrypt.genSaltSync(config.password.saltRounds);
 
@@ -265,7 +265,7 @@ export class UserController {
 
     const voucher = request.body.voucher;
 
-    const voucherItem = await this.voucherRepository.findOne({ where: { code: voucher } })
+    const voucherItem = await this.voucherRepository.findOne({ where: { code: voucher } });
 
     if (!voucherItem) {
       return responseGenerator(response, 400, "invalid-voucher");
@@ -298,7 +298,7 @@ export class UserController {
 
         const changes: any = partialUpdate({}, request.body, ["dob", "gender", "interest"]);
 
-        if (changes.interest && changes.interest.length == 0) {
+        if (changes.interest && changes.interest.length === 0) {
           delete changes.interest;
         }
 
@@ -315,8 +315,8 @@ export class UserController {
           username: savedUser.username,
           email: savedUser.email,
           role: savedUser.role,
-        }, config.secret)
-      })
+        }, config.secret);
+      });
     } catch (err) {
       if (err.code === "ER_DUP_ENTRY") {
         return responseGenerator(response, 400, "user-exists");
@@ -364,9 +364,9 @@ export class UserController {
           relations: ["userId"]
         });
 
-        const updatedVisitor: any = partialUpdate(visitor, request.body, ["dob", "gender", "interest"]);
+        const updatedVisitor = partialUpdate(visitor, request.body, ["dob", "gender", "interest"]);
 
-        if (updatedVisitor.interest && updatedVisitor.interest.length == 0) {
+        if (updatedVisitor.interest && updatedVisitor.interest.length === 0) {
           delete updatedVisitor.interest;
         }
 

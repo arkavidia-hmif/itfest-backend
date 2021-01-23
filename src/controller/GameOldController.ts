@@ -170,7 +170,7 @@ export class GameController {
 
     return responseGenerator(response, 200, "ok", {
       played: !!feedback,
-      rated: !!feedback ? feedback.rated : false
+      rated: feedback ? feedback.rated : false
     });
   }
 
@@ -197,13 +197,13 @@ export class GameController {
         await tmGameStateRepository.save({
           game: gameId,
           user: userId,
-          state: ''
-        })
+          state: ""
+        });
 
         const reducer = (acc, current) => {
           acc += config.gamePoint[current];
           return acc;
-        }
+        };
 
         const pointDelta = difficulties.reduce(reducer, 0);
 
@@ -255,7 +255,7 @@ export class GameController {
               name: tenant.userId.name
             },
             amount: pointDelta
-          })
+          });
         }
       });
     } catch (error) {
@@ -328,10 +328,10 @@ export class GameController {
 
     const reducer = (acc, current) => {
       if (current.rated) {
-        acc += current.rating
+        acc += current.rating;
       }
       return acc;
-    }
+    };
 
     const total = feedback.reduce(reducer, 0);
     const review = total / feedback.length;

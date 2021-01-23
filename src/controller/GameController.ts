@@ -53,7 +53,7 @@ export class GameController {
     delete game.tenant;
     delete game.answer;
 
-    return responseGenerator(response, 200, 'ok', JSON.parse(game.problem));
+    return responseGenerator(response, 200, "ok", JSON.parse(game.problem));
     // return responseGenerator(response, 200, 'ok', { "questions": game.problem });
   }
 
@@ -80,7 +80,7 @@ export class GameController {
           game: gameId,
           user: userId,
           isSubmit: false
-        })
+        });
       } else if (gameState.isSubmit) {
         return responseGenerator(response, 400, "user-already-play");
       }
@@ -102,7 +102,7 @@ export class GameController {
     const difficulty = request.body.difficulty;
 
     if (role === UserRole.ADMIN) {
-      tenantId = request.body.tenantId
+      tenantId = request.body.tenantId;
     }
 
     try {
@@ -112,7 +112,7 @@ export class GameController {
         problem: JSON.stringify(request.body.problem),
         answer: JSON.stringify(request.body.answer),
         difficulty: difficulty
-      })
+      });
       return responseGenerator(response, 201, "created", { id: game.id });
     } catch (error) {
       if (typeof error === "string") {
@@ -155,7 +155,7 @@ export class GameController {
   }
 
   async submitGame(request: Request, response: Response) {
-    const pointMultiplier = 0.5 // Score to point Multiplier
+    const pointMultiplier = 0.5; // Score to point Multiplier
 
     const userId = response.locals.auth.id;
     const gameId: any = request.params.id;
@@ -220,8 +220,8 @@ export class GameController {
           playedAt: gameState.startTime
         });
 
-        gameState.isSubmit = true
-        gameState.submitTime = new Date()
+        gameState.isSubmit = true;
+        gameState.submitTime = new Date();
         await tmGameStateRepository.save(gameState);
 
         // const reducer = (acc, current) => {
@@ -269,8 +269,8 @@ export class GameController {
           from: game.tenant.userId,
           to: userId,
           amount: pointDelta
-        })
-      })
+        });
+      });
     } catch (error) {
       if (typeof error === "string") {
         return responseGenerator(response, 400, error);
@@ -282,7 +282,7 @@ export class GameController {
     return responseGenerator(response, 200, "ok");
   }
 
-  evaluateScore(game: Game, userAnswer: object): number {
+  evaluateScore(game: Game, userAnswer: Record<string, unknown>): number {
     const gs = GameFactory.createGame(game, userAnswer);
     return gs.evaluateScore();
   }
@@ -324,7 +324,7 @@ export class GameController {
 
     const visitor = await this.visitorRepository.findOne(userId, { relations: ["userId"] });
 
-    const scoreGame = await this.scoreboardRepository.findOne(userId, { relations: ["game", "game.tenant", "game.tenant.userId"] })
+    const scoreGame = await this.scoreboardRepository.findOne(userId, { relations: ["game", "game.tenant", "game.tenant.userId"] });
 
     if (scoreGame.game.tenant.userId.id !== +tenantId) {
       return responseGenerator(response, 404, "not-play-already");
@@ -375,10 +375,10 @@ export class GameController {
 
     const reducer = (acc, current) => {
       if (current.rated) {
-        acc += current.rating
+        acc += current.rating;
       }
       return acc;
-    }
+    };
 
     const total = feedback.reduce(reducer, 0);
     const review = total / feedback.length;

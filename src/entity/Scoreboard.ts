@@ -1,13 +1,13 @@
 import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    PrimaryColumn,
-    JoinColumn,
-    ManyToOne,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn,
-    OneToOne,
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryColumn,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+  OneToOne,
 } from "typeorm";
 import { Game } from "./Game";
 import { User } from "./User";
@@ -18,10 +18,10 @@ export class Scoreboard {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne((type) => Game, (game) => game.id, { nullable: false, onDelete: 'CASCADE' })
+    @ManyToOne((type) => Game, (game) => game.id, { nullable: false, onDelete: "CASCADE" })
     game: Game;
 
-    @ManyToOne((type) => User, (user) => user.id, { nullable: false, onDelete: 'CASCADE' })
+    @ManyToOne((type) => User, (user) => user.id, { nullable: false, onDelete: "CASCADE" })
     user: User;
 
     @Column({ default : () => 0 })
