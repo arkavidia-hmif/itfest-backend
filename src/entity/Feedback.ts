@@ -9,11 +9,11 @@ export class Feedback {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne((type) => Visitor, { nullable: false })
+  @ManyToOne(() => Visitor, { nullable: false })
   @JoinColumn({ name: "fromVisitor" })
   from: Visitor;
 
-  @ManyToOne((type) => Tenant, { nullable: false })
+  @ManyToOne(() => Tenant, { nullable: false })
   @JoinColumn({ name: "tenantReviewed" })
   to: Tenant;
 
@@ -27,6 +27,6 @@ export class Feedback {
   @Column({ nullable: false, default: "" })
   comment: string;
 
-  // @Column({ nullable: false, default: false })
-  // rated: boolean;
+  @Column({ nullable: false, default: false })
+  rated: boolean;
 }
