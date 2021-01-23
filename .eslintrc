@@ -1,0 +1,29 @@
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint"
+  ],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "rules": {
+    "indent": [
+      "error",
+      2
+    ],
+    "semi": [
+      "error"
+    ],
+    "no-var": "error",
+    "eqeqeq": "error",
+    "no-console": "warn",
+    "curly": [
+      "error",
+      "multi-line"
+    ],
+    "quotes": "warn"
+  },
+  "settings": {}
+}
