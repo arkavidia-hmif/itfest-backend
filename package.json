@@ -18,7 +18,7 @@
     "typescript": "^3.3.3333"
   },
   "dependencies": {
-    "bcrypt": "^3.0.6",
+    "bcrypt": "^5.0.0",
     "class-validator": "^0.10.0",
     "cors": "^2.8.5",
     "express": "^4.15.4",
@@ -32,7 +32,7 @@
     "pg": "^7.17.1",
     "readline-sync": "^1.4.10",
     "reflect-metadata": "^0.1.13",
-    "socket.io": "^2.3.0",
+    "socket.io": "^2.4.0",
     "sqlite3": "^4.0.3",
     "typeorm": "0.2.21",
     "typeorm-seeding": "^1.6.1"
