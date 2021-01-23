@@ -13,5 +13,5 @@ ENV NODE_ENV=production
 
 # Run
 EXPOSE 3000
-CMD [ "npm", "run", "serve" ]
+CMD [ "/usr/src/app/start.sh" ]
 
