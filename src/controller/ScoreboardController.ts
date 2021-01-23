@@ -12,8 +12,8 @@ export class ScoreboardController {
     async getScoreboard(req: Request, res: Response) {
         try {
             const gameId: number = +req.params.id;
-            let limit: number = +req.query.limit || 1000; //dafault
-            let offset: number = +req.query.offset || 0;// default
+            const limit: number = +req.query.limit || 1000; //dafault
+            const offset: number = +req.query.offset || 0;// default
 
             const scoreboard = await this.scoreboardRepository
                 .createQueryBuilder("scoreboard")
@@ -33,27 +33,4 @@ export class ScoreboardController {
             }
         }
     }
-
-    // async submitScore(req : Request, res : Response){
-    //     const authData = res.locals.auth;
-    //     var scoreRecord = await this.scoreboardRepository.findOne({
-    //                             where: {
-    //                                 gameId: req.params.gameId, 
-    //                                 userId : authData.id
-    //                             }
-    //                         });
-
-    //     // found condition 
-    //     if(scoreRecord !== null){
-    //         responseGenerator(res, 400, "Bad Request");
-    //     }
-
-    //     var scoreRecord = await this.scoreboardRepository.save({
-    //                             userId: authData.id,
-    //                             gameId: +req.params.gameId, 
-    //                             score: 0, // EDIT THE SCORE
-    //                             playedAt: Date.now()
-    //                         } as unknown as Scoreboard);
-    //     responseGenerator(res, 201, "Created");
-    // }
 }

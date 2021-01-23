@@ -2,12 +2,12 @@ import {
     Column,
     CreateDateColumn,
     Entity,
-    PrimaryColumn,
     JoinColumn,
     ManyToOne,
+    OneToOne,
+    PrimaryColumn,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
-    OneToOne,
 } from "typeorm";
 import { User } from "./User";
 
@@ -19,10 +19,9 @@ export class Shop {
     @Column({ nullable: false })
     name: String;
 
-    @ManyToOne((type) => User, (user) => user.id, { nullable: false, onDelete: 'CASCADE' })
+    @ManyToOne((type) => User, (user) => user.id, { nullable: false, onDelete: "CASCADE" })
     owner: User;
-    
-    @Column({type: "timestamp", default: () => "CURRENT_TIMESTAMP"})
+
+    @CreateDateColumn()
     createdAt: Date;
 }
-
