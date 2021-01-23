@@ -1,7 +1,7 @@
-import { Request, Response, json } from "express";
+import { Request, Response } from "express";
 
 import { Transaction, TransactionType } from "../entity/Transaction";
-import { getRepository, getConnection } from "typeorm";
+import { getRepository, getConnection, FindOneOptions } from "typeorm";
 import { responseGenerator } from "../utils/responseGenerator";
 import { User, UserRole, Visitor, Tenant } from "../entity/User";
 import { decodeQr } from "../utils/qr";
@@ -11,7 +11,7 @@ export class TransactionController {
 
   private transactionRepository = getRepository(Transaction);
 
-  async getTransaction(where?: Record<string, unknown>, page?: number, itemPerPage?: number) {
+  async getTransaction<T>(where?: FindOneOptions<T>, page?: number, itemPerPage?: number): Promise<[Array<Transaction>, number]> {
     const [transactions, total] = await this.transactionRepository.findAndCount({
       where,
       take: itemPerPage,
