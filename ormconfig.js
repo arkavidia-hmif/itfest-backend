@@ -1,6 +1,6 @@
 function getConfig() {
   let config = {
-    "synchronize": true,
+    "synchronize": false,
     "logging": false,
     "entities": [
       "src/entity/**/*.ts"
