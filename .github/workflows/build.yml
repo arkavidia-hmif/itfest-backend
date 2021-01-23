@@ -15,7 +15,7 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
-          name: arkavidia-hmif/itfest-backend/itfest-builds
+          name: arkavidia-hmif/itfest-backend/itfest-backend
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           registry: docker.pkg.github.com
@@ -33,7 +33,7 @@ jobs:
         if: github.event_name == 'create'
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
-          name: arkavidia-hmif/itfest-backend/itfest-builds
+          name: arkavidia-hmif/itfest-backend/itfest-backend
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           registry: docker.pkg.github.com
