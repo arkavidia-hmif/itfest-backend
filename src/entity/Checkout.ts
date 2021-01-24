@@ -1,3 +1,4 @@
+import { IsPositive } from "class-validator";
 import {
   Check,
   Column,
@@ -49,5 +50,6 @@ export class CheckoutItem {
   item: Item;
 
   @Column({nullable: false})
+  @IsPositive()
   quantity: number;
 }

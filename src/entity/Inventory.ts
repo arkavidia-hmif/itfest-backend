@@ -1,3 +1,4 @@
+import { IsPositive } from "class-validator";
 import { Check, Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Item } from "./Item";
 
@@ -13,6 +14,7 @@ export class Inventory {
   item: Item;
 
   @Column()
+  @IsPositive()
   qty: number;
 
   @Column()

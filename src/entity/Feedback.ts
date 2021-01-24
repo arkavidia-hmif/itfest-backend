@@ -1,3 +1,4 @@
+import { IsPositive } from "class-validator";
 import { Check, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 import { Tenant, Visitor } from "./User";
@@ -18,6 +19,7 @@ export class Feedback {
   to: Tenant;
 
   @Column({ nullable: false, default: 0 })
+  @IsPositive()
   rating: number;
 
   @Column({ nullable: false, default: "" })

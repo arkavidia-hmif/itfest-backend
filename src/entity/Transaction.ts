@@ -1,3 +1,4 @@
+import { IsPositive } from "class-validator";
 import { Check, Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 import { Item } from "./Item";
@@ -27,6 +28,7 @@ export class Transaction {
   to: User;
 
   @Column()
+  @IsPositive()
   amount: number;
 
   @Column({
