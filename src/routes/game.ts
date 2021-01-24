@@ -26,6 +26,7 @@ export default () => {
   const tenantCheck = () => check("tenant").isInt({ min: 1 }).withMessage("must be valid id");
   const problemCheck = () => check("owner").isString().withMessage("must be json stringify");
   const answerCheck = () => check("answer").isString().withMessage("must be json stringify");
+  const answerObjCheck = () => check("answer").exists().withMessage("must include answer");
   const diffCheck = () => check("difficulty").isInt({ min: 1 }).withMessage("must be valid difficulty");
 
   router.get("/game",
@@ -51,6 +52,7 @@ export default () => {
 
   router.post("/game/:id([0-9]+)/submit", [
     limitAccess([UserRole.VISITOR, UserRole.ADMIN]),
+    answerObjCheck(),
     checkParam
   ], gc.submitGame.bind(gc));
 
