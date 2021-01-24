@@ -262,10 +262,14 @@ export class UserController {
 
     const voucher = request.body.voucher;
 
-    const voucherItem = await this.voucherRepository.findOne({ where: { code: voucher } });
+    let voucherItem: Voucher;
 
-    if (!voucherItem) {
-      return responseGenerator(response, 400, "invalid-voucher");
+    if (config.useVoucher) {
+      voucherItem = await this.voucherRepository.findOne({ where: { code: voucher } });
+
+      if (!voucherItem) {
+        return responseGenerator(response, 400, "invalid-voucher");
+      }
     }
 
     let token = "";
@@ -305,7 +309,10 @@ export class UserController {
           point,
           filled,
         });
-        await transactionManager.delete(Voucher, voucherItem);
+
+        if (config.useVoucher) {
+          await transactionManager.delete(Voucher, voucherItem);
+        }
 
         token = jwt.sign({
           id: savedUser.id,
