@@ -29,9 +29,16 @@ export default (): Router => {
     .matches(config.password.checkRegex, "i")
     .withMessage(config.password.checkMessage)
     .isLength({ min: config.password.minLength }).withMessage(`must be at least ${config.password.minLength} characters long`);
-  const voucherCheck = () => check("voucher")
-    .isAlphanumeric().withMessage("must be alphanumeric")
-    .isLength({ min: 6, max: 6 }).withMessage("must be 6 characters long");
+  const voucherCheck = () => {
+    const chain = check("voucher")
+      .isAlphanumeric().withMessage("must be alphanumeric")
+      .isLength({ min: 6, max: 6 }).withMessage("must be 6 characters long");
+    if (!config.useVoucher) {
+      return chain.optional();
+    } else {
+      return chain;
+    }
+  };
   const usernameCheck = () => check("username")
     .matches(/^[a-zA-Z0-9_\-.+]+$/i).withMessage("must be alphanumeric or _-+.")
     .isLength({ min: 1 }).withMessage("must be >= 1 character long");
