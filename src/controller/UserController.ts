@@ -291,13 +291,16 @@ export class UserController {
 
         if (request.body.dob &&
           request.body.gender &&
+          request.body.photo &&
+          request.body.institute &&
+          request.body.telp &&
           (request.body.interest && request.body.interest.length > 0) &&
           request.body.name) {
           filled = true;
           point += config.userFillBonus;
         }
 
-        const changes: Partial<Visitor> = partialUpdate({}, request.body, ["dob", "gender", "interest"]);
+        const changes: Partial<Visitor> = partialUpdate({}, request.body, ["dob", "gender", "interest", "photo", "telp", "institute"]);
 
         if (changes.interest && changes.interest.length === 0) {
           delete changes.interest;
@@ -339,6 +342,9 @@ export class UserController {
   checkFilled(visitorObj: Visitor, userObj: User): boolean {
     return (visitorObj.dob &&
       visitorObj.gender &&
+      visitorObj.photo &&
+      visitorObj.telp &&
+      visitorObj.institute &&
       (visitorObj.interest && visitorObj.interest.length > 0) &&
       (userObj.name !== userObj.email) &&
       !visitorObj.filled);
@@ -369,7 +375,7 @@ export class UserController {
           relations: ["userId"]
         });
 
-        const updatedVisitor = partialUpdate(visitor, request.body, ["dob", "gender", "interest"]);
+        const updatedVisitor = partialUpdate(visitor, request.body, ["dob", "gender", "interest", "photo", "telp", "institute"]);
 
         if (updatedVisitor.interest && updatedVisitor.interest.length === 0) {
           delete updatedVisitor.interest;
