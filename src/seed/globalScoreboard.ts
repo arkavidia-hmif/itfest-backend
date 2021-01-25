@@ -1,11 +1,13 @@
+import { UserSeed } from './user'
+
 export const GlobalScoreboardSeed = [
   {
-    userId: 3,
+    userId: UserSeed[2],
     score: 200,
     lastUpdated: new Date()
   },
   {
-    userId: 4,
+    userId: UserSeed[3],
     score: 500,
     lastUpdated: new Date()
   }

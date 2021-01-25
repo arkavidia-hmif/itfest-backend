@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getConnection, getRepository } from "typeorm";
+import { getConnection, getRepository, Repository } from "typeorm";
 
 import config from "../config";
 import { Feedback } from "../entity/Feedback";
@@ -200,11 +200,7 @@ export class GameController {
         const globalBoard: GlobalScoreboard = await tmGlobalScoreboardRepository.findOne(userId);
 
         if (globalBoard) {
-          await transactionManager.increment(GlobalScoreboard, { user: userId }, "score", score);
-          await tmGlobalScoreboardRepository.save({
-            userId: userId,
-            lastUpdated: new Date()
-          });
+          await transactionManager.increment(GlobalScoreboard, { userId: userId }, "score", score);
         } else {
           await tmGlobalScoreboardRepository.save({
             userId: userId,
@@ -213,7 +209,6 @@ export class GameController {
           });
         }
 
-        // TODO: update scoreboard
         await tmScoreboardRepository.save({
           user: userId,
           game: gameId,
@@ -238,15 +233,14 @@ export class GameController {
           throw "not-enough-point";
         }
 
-        tenant.point -= pointDelta;
+        await transactionManager.increment(Visitor, { userId: userId }, "point", pointDelta);
+        await transactionManager.decrement(Tenant, { userId: userId }, "point", pointDelta);
 
-        await tmTenantRepository.save(tenant);
-
-        const visitor = await tmVisitorRepository.findOne(userId, { relations: ["userId"] });
-
-        visitor.point += pointDelta;
-
-        await tmVisitorRepository.save(visitor);
+        // tenant.point -= pointDelta;
+        // await tmTenantRepository.save(tenant);
+        // const visitor = await tmVisitorRepository.findOne(userId, { relations: ["userId"] });
+        // visitor.point += pointDelta;
+        // await tmVisitorRepository.save(visitor);
 
         // const feedback = await tmFeedbackRepository.findOne({
         //   where: {
