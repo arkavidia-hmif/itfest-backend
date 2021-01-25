@@ -26,7 +26,7 @@ export default (): Router => {
   const interestCheck = () => check("interest").isArray().withMessage("must be an array");
   const dobCheck = () => check("dob").isISO8601().withMessage("must be a valid ISO8601 date");
   const photoCheck = () => check("photo").isString().withMessage("must be a string");
-  const telpCheck = () => check("telp").isString().withMessage("must be a string");
+  const telpCheck = () => check("telp").isString().isLength({min: 11, max: 20}).withMessage("must be a string");
   const instituteCheck = () => check("institute").isString().withMessage("must be a string");
   const passwordCheck = () => check("password")
     .matches(config.password.checkRegex, "i")
