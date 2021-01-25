@@ -220,11 +220,6 @@ export class GameController {
         gameState.submitTime = new Date();
         await tmGameStateRepository.save(gameState);
 
-        // const reducer = (acc, current) => {
-        //   acc += config.gamePoint[current];
-        //   return acc;
-        // }
-
         const pointDelta = score * pointMultiplier;
 
         const tenant = await tmTenantRepository.findOne(game.tenant, { relations: ["userId"] });
@@ -235,29 +230,6 @@ export class GameController {
 
         await transactionManager.increment(Visitor, { userId: userId }, "point", pointDelta);
         await transactionManager.decrement(Tenant, { userId: userId }, "point", pointDelta);
-
-        // tenant.point -= pointDelta;
-        // await tmTenantRepository.save(tenant);
-        // const visitor = await tmVisitorRepository.findOne(userId, { relations: ["userId"] });
-        // visitor.point += pointDelta;
-        // await tmVisitorRepository.save(visitor);
-
-        // const feedback = await tmFeedbackRepository.findOne({
-        //   where: {
-        //     from: visitor,
-        //     to: tenant
-        //   }
-        // });
-
-        // if (feedback) {
-        //   throw "already-play-game";
-        // }
-
-        // await tmFeedbackRepository.save({
-        //   from: visitor,
-        //   to: tenant,
-        //   rated: false
-        // });
 
         await tmTransactionRepository.save({
           type: TransactionType.PLAY,
