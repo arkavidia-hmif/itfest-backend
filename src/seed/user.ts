@@ -1,7 +1,6 @@
 import * as bcrypt from "bcrypt";
-import * as crypto from "crypto";
 
-import { UserRole, User } from "../entity/User";
+import { UserRole } from "../entity/User";
 import config from "../config";
 
 const aSalt = bcrypt.genSaltSync(config.password.saltRounds);

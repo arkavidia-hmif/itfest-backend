@@ -45,6 +45,9 @@ export class CheckoutItem {
   @PrimaryColumn({ type: "int", name: "checkout"})
   @ManyToOne((type) => Checkout)
   checkoutId: number;
+  // @OneToMany((type) => Checkout, { primary: true })
+  // @JoinColumn({ name: "checkoutId" })
+  // checkoutId: Checkout;
 
   @ManyToOne((type) => Item, { nullable: false })
   item: Item;

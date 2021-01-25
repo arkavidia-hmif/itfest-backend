@@ -2,16 +2,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  PrimaryColumn,
-  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
-  OneToOne,
 } from "typeorm";
 import { Game } from "./Game";
 import { User } from "./User";
-// import { Scoreboard } from "./Scoreboard";
 
 @Entity()
 export class Scoreboard {
@@ -27,7 +22,8 @@ export class Scoreboard {
     @Column({ default : () => 0 })
     score : number;
 
-    @Column({type: "timestamp", default: () => "CURRENT_TIMESTAMP"})
+    // @Column({type: "timestamp", default: () => "CURRENT_TIMESTAMP"})
+    @CreateDateColumn()
     playedAt: Date;
 }
 
