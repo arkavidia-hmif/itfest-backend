@@ -2,7 +2,6 @@ import { Request, Response, Router } from "express";
 import { check, oneOf } from "express-validator";
 
 import config from "../config";
-import { GameController } from "../controller/GameController";
 import { InventoryController } from "../controller/InventoryController";
 import { TransactionController } from "../controller/TransactionController";
 import { UserController } from "../controller/UserController";
@@ -12,12 +11,11 @@ import { checkParam } from "../middleware/checkParam";
 import { limitAccess } from "../middleware/limitAccess";
 import { paginationCheck } from "../middleware/paginationCheck";
 
-export default () => {
+export default (): Router => {
   const router = Router();
 
   const uc = new UserController();
   const tc = new TransactionController();
-  const gc = new GameController();
   const ic = new InventoryController();
 
   const emailCheck = () => check("email").isEmail().withMessage("must be a valid email address");
@@ -31,15 +29,20 @@ export default () => {
     .matches(config.password.checkRegex, "i")
     .withMessage(config.password.checkMessage)
     .isLength({ min: config.password.minLength }).withMessage(`must be at least ${config.password.minLength} characters long`);
-  const voucherCheck = () => check("voucher")
-    .isAlphanumeric().withMessage("must be alphanumeric")
-    .isLength({ min: 6, max: 6 }).withMessage("must be 6 characters long");
+  const voucherCheck = () => {
+    const chain = check("voucher")
+      .isAlphanumeric().withMessage("must be alphanumeric")
+      .isLength({ min: 6, max: 6 }).withMessage("must be 6 characters long");
+    if (!config.useVoucher) {
+      return chain.optional();
+    } else {
+      return chain;
+    }
+  };
   const usernameCheck = () => check("username")
     .matches(/^[a-zA-Z0-9_\-.+]+$/i).withMessage("must be alphanumeric or _-+.")
     .isLength({ min: 1 }).withMessage("must be >= 1 character long");
   const pointCheck = () => check("point").isInt({ min: 0 }).withMessage("must be a positive integer");
-  const itemCheck = () => check("item").isInt().withMessage("must be an integer");
-  const amountCheck = () => check("amount").isInt({ min: 1 }).withMessage("must be an integer >= 1");
 
   // Public user endpoint
   router.post("/login", [

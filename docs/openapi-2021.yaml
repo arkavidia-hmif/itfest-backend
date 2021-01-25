@@ -762,7 +762,6 @@ paths:
               required:
                 - email
                 - password
-                - voucher
               properties:
                 email:
                   type: string
@@ -969,7 +968,6 @@ paths:
           description: "Bad Request"
         "500":
           description: "unknown-error"
-
 
   # /game:
   #   get:
@@ -1683,7 +1681,7 @@ paths:
           description: "Bad Request"
         "500":
           description: "unknown-error"
-          
+
   /game/{id}:
     delete:
       tags:
@@ -2116,7 +2114,7 @@ components:
           format: date
         game:
           $ref: "#/components/schemas/GameData"
-        user: 
+        user:
           $ref: "#/components/schemas/BaseUserData"
     GlobalScoreboardData:
       description: Global Scoreboard Object

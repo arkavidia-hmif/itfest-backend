@@ -6,6 +6,7 @@ export default {
     minLength: 8,
     saltRounds: 10,
   },
+  useVoucher: false,
   secret: process.env.SECRET || "secret-key",
   qrKey: process.env.QRKEY || "ini_secret_untuk_enkripsi_qrcode",
   scoreboardSecret: process.env.SCOREBOARD_SECRET || "secret-key",

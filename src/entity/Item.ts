@@ -1,5 +1,5 @@
-import { IsPositive } from "class-validator";
 import {
+  Check,
   Column,
   CreateDateColumn,
   Entity,
@@ -12,6 +12,7 @@ import {
 import { User } from "./User";
 
 @Entity()
+@Check(`(price >= 0)`)
 export class Item {
 
   @PrimaryGeneratedColumn()
@@ -28,7 +29,6 @@ export class Item {
   // ownerId: number;
 
   @Column()
-  @IsPositive()
   price: number;
 
   @Column({ default: "-" })

@@ -2,19 +2,15 @@ import * as bcrypt from "bcrypt";
 import * as crypto from "crypto";
 import { Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
-import * as Mustache from "mustache";
 import { getConnection, getRepository } from "typeorm";
 
 import config from "../config";
 import { Tenant, User, UserRole, Visitor } from "../entity/User";
 import { Voucher } from "../entity/Voucher";
-import { transporter } from "../utils/mail";
 import { partialUpdate } from "../utils/partialUpdateEntity";
 import { decodeQr, generateQr } from "../utils/qr";
 import { responseGenerator } from "../utils/responseGenerator";
 import { TransactionController } from "./TransactionController";
-import { readFileSync } from "fs";
-import { join } from "path";
 
 export class UserController {
 
@@ -24,7 +20,7 @@ export class UserController {
   private voucherRepository = getRepository(Voucher);
   private tc = new TransactionController();
 
-  async createUser(name: string, username: string, email: string, role: UserRole, password: string) {
+  async createUser(name: string, username: string, email: string, role: UserRole, password: string): Promise<void> {
     const salt = bcrypt.genSaltSync(config.password.saltRounds);
 
     const encryptedHash = bcrypt.hashSync(password, salt);
@@ -39,10 +35,10 @@ export class UserController {
     });
   }
 
-  async generateVoucher(qty: number) {
+  async generateVoucher(qty: number): Promise<Array<string>> {
 
-    const promiseArr = [];
-    const codeList = [];
+    const promiseArr: Array<Promise<Voucher>> = [];
+    const codeList: Array<string> = [];
 
     for (let i = 0; i < qty; i++) {
       const code = crypto.randomBytes(3).toString("hex");
@@ -57,7 +53,7 @@ export class UserController {
     return codeList;
   }
 
-  async listUser(request: Request, response: Response) {
+  async listUser(request: Request, response: Response): Promise<void> {
     const page = parseInt(request.query.page, 10) || 1;
     const itemPerPage = parseInt(request.query.itemPerPage, 10) || 100;
 
@@ -106,7 +102,7 @@ export class UserController {
     });
   }
 
-  async getUser(request: Request, response: Response) {
+  async getUser(request: Request, response: Response): Promise<void> {
     const user = await this.userRepository.findOne(request.params.id);
 
     if (user) {
@@ -123,12 +119,12 @@ export class UserController {
     }
   }
 
-  async getMe(request: Request, response: Response) {
+  async getMe(request: Request, response: Response): Promise<void> {
     request.params.id = response.locals.auth.id;
     return this.getUser(request, response);
   }
 
-  async getTransaction(request: Request, response: Response) {
+  async getTransaction(request: Request, response: Response): Promise<void> {
     const userId = request.params.id;
     const page = parseInt(request.query.page, 10) || 1;
     const itemPerPage = parseInt(request.query.itemPerPage, 10) || 10;
@@ -143,13 +139,13 @@ export class UserController {
     });
   }
 
-  async getMeTransaction(request: Request, response: Response) {
+  async getMeTransaction(request: Request, response: Response): Promise<void> {
     request.params.id = response.locals.auth.id;
     return this.getTransaction(request, response);
   }
 
 
-  async login(request: Request, response: Response) {
+  async login(request: Request, response: Response): Promise<void> {
     const { username, email, password } = request.body;
 
     const userByUsername = await this.userRepository.findOne({
@@ -236,6 +232,7 @@ export class UserController {
       } else if (err.code === "ESOCKET") {
         return responseGenerator(response, 500, "email-error");
       } else {
+        // eslint-disable-next-line no-console
         console.error(err);
         return responseGenerator(response, 500, "unknown-error");
       }
@@ -247,7 +244,7 @@ export class UserController {
     });
   }
 
-  async registerVisitor(request: Request, response: Response) {
+  async registerVisitor(request: Request, response: Response): Promise<void> {
     const password: string = request.body.password;
     const email: string = request.body.email;
     const emailFrontPart: string = email.substring(0, email.indexOf("@"));
@@ -263,10 +260,14 @@ export class UserController {
 
     const voucher = request.body.voucher;
 
-    const voucherItem = await this.voucherRepository.findOne({ where: { code: voucher } });
+    let voucherItem: Voucher;
 
-    if (!voucherItem) {
-      return responseGenerator(response, 400, "invalid-voucher");
+    if (config.useVoucher) {
+      voucherItem = await this.voucherRepository.findOne({ where: { code: voucher } });
+
+      if (!voucherItem) {
+        return responseGenerator(response, 400, "invalid-voucher");
+      }
     }
 
     let token = "";
@@ -294,7 +295,7 @@ export class UserController {
           point += config.userFillBonus;
         }
 
-        const changes: any = partialUpdate({}, request.body, ["dob", "gender", "interest"]);
+        const changes: Partial<Visitor> = partialUpdate({}, request.body, ["dob", "gender", "interest"]);
 
         if (changes.interest && changes.interest.length === 0) {
           delete changes.interest;
@@ -306,7 +307,10 @@ export class UserController {
           point,
           filled,
         });
-        await transactionManager.delete(Voucher, voucherItem);
+
+        if (config.useVoucher) {
+          await transactionManager.delete(Voucher, voucherItem);
+        }
 
         token = jwt.sign({
           id: savedUser.id,
@@ -319,6 +323,7 @@ export class UserController {
       if (err.code === "ER_DUP_ENTRY") {
         return responseGenerator(response, 400, "user-exists");
       } else {
+        // eslint-disable-next-line no-console
         console.error(err);
         return responseGenerator(response, 500, "unknown-error");
       }
@@ -329,7 +334,7 @@ export class UserController {
     });
   }
 
-  checkFilled(visitorObj: any, userObj: any): boolean {
+  checkFilled(visitorObj: Visitor, userObj: User): boolean {
     return (visitorObj.dob &&
       visitorObj.gender &&
       (visitorObj.interest && visitorObj.interest.length > 0) &&
@@ -337,12 +342,12 @@ export class UserController {
       !visitorObj.filled);
   }
 
-  async editUserMe(request: Request, response: Response) {
+  async editUserMe(request: Request, response: Response): Promise<void> {
     request.params.id = response.locals.auth.id;
     return this.editUser(request, response);
   }
 
-  async editUser(request: Request, response: Response) {
+  async editUser(request: Request, response: Response): Promise<void> {
     const id = request.params.id;
     try {
 
@@ -378,6 +383,7 @@ export class UserController {
 
       await this.userRepository.save(updatedUser);
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error(err);
       return responseGenerator(response, 500, "unknown-error");
     }
@@ -385,7 +391,7 @@ export class UserController {
     return responseGenerator(response, 200, "ok");
   }
 
-  async getQrMe(request: Request, response: Response) {
+  async getQrMe(request: Request, response: Response): Promise<void> {
     const id = response.locals.auth.id;
 
     const user = await this.userRepository.findOne(id);
@@ -397,16 +403,21 @@ export class UserController {
     });
   }
 
-  async getQrData(request: Request, response: Response) {
+  async getQrData(request: Request, response: Response): Promise<void> {
     const userString = decodeQr(request.params.qrid);
 
-    let userData: any = {};
+    let userData: Partial<User>;
 
     try {
       userData = JSON.parse(userString);
 
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error(error);
+      return responseGenerator(response, 400, "invalid-qrid");
+    }
+
+    if (!userData.id) {
       return responseGenerator(response, 400, "invalid-qrid");
     }
 

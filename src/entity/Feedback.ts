@@ -1,9 +1,10 @@
 import { IsPositive } from "class-validator";
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Check, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 import { Tenant, Visitor } from "./User";
 
 @Entity()
+@Check(`(rating >= 0)`)
 export class Feedback {
 
   @PrimaryGeneratedColumn()

@@ -1,5 +1,5 @@
 import { IsPositive } from "class-validator";
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Check, Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 import { Item } from "./Item";
 import { User } from "./User";
@@ -11,6 +11,7 @@ export enum TransactionType {
 }
 
 @Entity()
+@Check(`(amount >= 0)`)
 export class Transaction {
 
   @PrimaryGeneratedColumn()
