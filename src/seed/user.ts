@@ -16,7 +16,7 @@ export const UserSeed = [
     username: "tenant2",
     name: "tenant2",
     email: "t2@g.com",
-    id: 1
+    // id: 1
   },
   {
     role: UserRole.TENANT,
@@ -25,7 +25,7 @@ export const UserSeed = [
     username: "tenant",
     name: "tenant",
     email: "t@g.com",
-    id: 2
+    // id: 2
   },
   {
     role: UserRole.VISITOR,
@@ -34,7 +34,7 @@ export const UserSeed = [
     username: "visitor",
     name: "visitor",
     email: "v@g.com",
-    id: 3
+    // id: 3
   },
   {
     role: UserRole.VISITOR,
@@ -43,7 +43,7 @@ export const UserSeed = [
     username: "visitor2",
     name: "visitor2",
     email: "v2@g.com",
-    id: 4
+    // id: 4
   },
   {
     role: UserRole.VISITOR,
@@ -52,7 +52,7 @@ export const UserSeed = [
     username: "visitor3",
     name: "visitor3",
     email: "v3@g.com",
-    id: 5
+    // id: 5
   },
   {
     role: UserRole.ADMIN,
@@ -61,6 +61,6 @@ export const UserSeed = [
     username: "admin",
     name: "admin",
     email: "a@g.com",
-    id: 6
+    // id: 6
   }
 ];

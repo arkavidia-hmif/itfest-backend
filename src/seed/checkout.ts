@@ -28,32 +28,32 @@ export const CheckoutSeed = [
 export const CheckoutItemSeed = [
   {
     checkoutId: 1,
-    itemId: 1, 
+    item: ItemSeed[0], 
     quantity: 100
   },
   {
     checkoutId: 1,
-    itemId: 2, 
+    item: ItemSeed[1], 
     quantity: 20
   },
   {
     checkoutId: 1,
-    itemId: 3, 
+    item: ItemSeed[2], 
     quantity: 300
   },
   {
     checkoutId: 4,
-    itemId: 2, 
+    item: ItemSeed[1], 
     quantity: 20
   },
   {
     checkoutId: 4,
-    itemId: 4, 
+    item: ItemSeed[3], 
     quantity: 100
   },
   {
     checkoutId: 3,
-    itemId: 2, 
+    item: ItemSeed[1], 
     quantity: 20
   },
 ];

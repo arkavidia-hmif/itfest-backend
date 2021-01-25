@@ -42,7 +42,7 @@ export class CheckoutItem {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @PrimaryColumn({ type: "int", name: "checkoutId"})
+  @PrimaryColumn({ type: "int", name: "checkout"})
   @ManyToOne((type) => Checkout)
   checkoutId: number;
 
