@@ -123,6 +123,9 @@ export default (): Router => {
     dobCheck().optional(),
     genderCheck().optional(),
     interestCheck().optional(),
+    photoCheck().optional(),
+    telpCheck().optional(),
+    instituteCheck().optional(),
     checkParam,
   ], uc.editUser.bind(uc));
   router.get("/user/:id([0-9]+)/transaction", [
