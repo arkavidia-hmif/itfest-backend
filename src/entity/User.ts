@@ -83,9 +83,6 @@ export class Visitor {
   filled: boolean;
 
   @Column({ nullable: true })
-  photo: string;
-
-  @Column({ nullable: true })
   telp: string;
 
   @Column({ nullable: true })

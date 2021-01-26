@@ -25,7 +25,6 @@ export default (): Router => {
     .withMessage("must be a valid gender (1=male, 2=female)");
   const interestCheck = () => check("interest").isArray().withMessage("must be an array");
   const dobCheck = () => check("dob").isISO8601().withMessage("must be a valid ISO8601 date");
-  const photoCheck = () => check("photo").isString().withMessage("must be a string");
   const telpCheck = () => check("telp").isString().isLength({min: 11, max: 20}).withMessage("must be a string");
   const instituteCheck = () => check("institute").isString().withMessage("must be a string");
   const passwordCheck = () => check("password")
@@ -67,7 +66,6 @@ export default (): Router => {
     genderCheck().optional(),
     interestCheck().optional(),
     dobCheck().optional(),
-    photoCheck().optional(),
     telpCheck().optional(),
     instituteCheck().optional(),
     checkParam,
@@ -123,7 +121,6 @@ export default (): Router => {
     dobCheck().optional(),
     genderCheck().optional(),
     interestCheck().optional(),
-    photoCheck().optional(),
     telpCheck().optional(),
     instituteCheck().optional(),
     checkParam,

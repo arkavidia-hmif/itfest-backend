@@ -272,7 +272,6 @@ paths:
                   username: "admin"
                   name: "Joshua"
                   telp: "87888888"
-                  photo: "https:/img.com/aaaa"
                   institute: "ITB"
                   dob: "1998-10-12"
                   gender: 1
@@ -776,8 +775,6 @@ paths:
                   type: string
                 name:
                   type: string
-                photo:
-                  type: string
                 telp:
                   type: string
                 institute:
@@ -803,7 +800,6 @@ paths:
               dob: "1999-10-10"
               telp: "8788888",
               institute: "ITB",
-              photo: "http://img.com/aaaa",
               gender: 1
               interest:
                 - "Gaming"
