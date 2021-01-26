@@ -41,10 +41,10 @@ export class Game {
   })
   type: GameType;
 
-  @Column()
+  @Column("text")
   problem: string;
 
-  @Column()
+  @Column("text")
   answer: string;
 }
 

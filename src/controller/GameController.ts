@@ -287,6 +287,43 @@ export class GameController {
     return gs.evaluateScore();
   }
 
+
+  async updateGame(request: Request, response: Response): Promise<void> {
+    const id = request.params.id;
+    const role = response.locals.auth.role;
+
+    try {
+
+      const game = await this.gameRepository.findOne(id);
+
+      if (!game) {
+        return responseGenerator(response, 404, "game-not-found");
+      }
+
+      if (request.body.problem) {
+        request.body.problem = JSON.stringify(request.body.problem);
+      }
+
+      if (request.body.answer) {
+        request.body.answer = JSON.stringify(request.body.answer);
+      }
+
+      let updatedGame = partialUpdate(game, request.body, ["name", "difficulty", "type", "problem", "answer"]);
+
+      if (role === UserRole.ADMIN) {
+        updatedGame = partialUpdate(game, request.body, ["tenantUserId"]);
+      }
+
+      await this.gameRepository.save(updatedGame);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error(err);
+      return responseGenerator(response, 500, "unknown-error");
+    }
+
+    return responseGenerator(response, 200, "ok");
+  }
+
   async listGame(request: Request, response: Response) {
     const page = parseInt(request.query.page, 10) || 1;
     const itemPerPage = parseInt(request.query.itemPerPage, 10) || 10;

@@ -81,6 +81,12 @@ export class Visitor {
 
   @Column({ nullable: false, default: false })
   filled: boolean;
+
+  @Column({ nullable: true })
+  telp: string;
+
+  @Column({ nullable: true })
+  institute: string;
 }
 
 @Entity()
