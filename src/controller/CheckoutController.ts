@@ -85,7 +85,7 @@ export class CheckoutController {
               throw "insufficient-quantity";
             }
 
-            transactionManager.decrement(Inventory, { item: item }, "qty", items[i].quantity);
+            await transactionManager.decrement(Inventory, { item: item }, "qty", items[i].quantity);
 
             price += item.price * items[i].quantity;
 
@@ -98,7 +98,7 @@ export class CheckoutController {
             throw "insufficient-point";
           }
 
-          transactionManager.decrement(Visitor, { id: id }, "point", price);
+          await transactionManager.decrement(Visitor, { userId: id }, "point", price);
 
           const checkout = await tmCheckoutRepository.save({
             waContact,
@@ -123,6 +123,7 @@ export class CheckoutController {
           }
         });
       } catch (error) {
+        console.log(error)
         if (typeof error === "string") {
           return responseGenerator(response, 400, error);
         } else {
