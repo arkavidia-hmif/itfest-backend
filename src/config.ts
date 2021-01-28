@@ -16,5 +16,6 @@ export default {
     2: 50,
     3: 75,
   },
+  maxScore: 20,
   userFillBonus: 20
 };
