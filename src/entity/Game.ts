@@ -106,4 +106,4 @@ const getScore = (userAnswer: Record<string, string>, answer: Record<string, str
     }
   });
   return Math.ceil(point * lengthQuestion / maxPoinCrossword);
-}
+};
