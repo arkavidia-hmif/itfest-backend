@@ -227,7 +227,7 @@ export class UserController {
         }, config.secret);
       });
     } catch (err) {
-      if (err === "user-exists" || err.code === "ER_DUP_ENTRY") {
+      if (err === "user-exists" || err.code === "23505") {
         return responseGenerator(response, 400, "user-exists");
       } else if (err.code === "ESOCKET") {
         return responseGenerator(response, 500, "email-error");
@@ -317,7 +317,7 @@ export class UserController {
         }, config.secret);
       });
     } catch (err) {
-      if (err.code === "ER_DUP_ENTRY") {
+      if (err.code === "23505") {
         return responseGenerator(response, 400, "user-exists");
       } else {
         // eslint-disable-next-line no-console
