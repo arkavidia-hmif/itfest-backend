@@ -798,8 +798,8 @@ paths:
               password: "password1234"
               voucher: "abc123"
               dob: "1999-10-10"
-              telp: "8788888",
-              institute: "ITB",
+              telp: "8788888"
+              institute: "ITB"
               gender: 1
               interest:
                 - "Gaming"
