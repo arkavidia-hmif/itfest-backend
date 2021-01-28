@@ -280,7 +280,7 @@ export class GameController {
     return responseGenerator(response, 200, "ok");
   }
 
-  evaluateScore(game: Game, userAnswer: Record<string, unknown>): number {
+  evaluateScore(game: Game, userAnswer: Record<string, string>): number {
     const gs = GameFactory.createGame(game, userAnswer);
     return gs.evaluateScore();
   }
