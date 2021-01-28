@@ -158,8 +158,8 @@ export class GameController {
     const pointMultiplier = 0.5; // Score to point Multiplier
 
     const userId = response.locals.auth.id;
-    const gameId: any = request.params.id;
-    const { data = {} } = request.body;
+    const gameId = request.params.id;
+    const answer = request.body.answer;
 
     const game = await this.gameRepository.findOne(gameId, { relations: ["tenant", "tenant.userId"] });
 
@@ -178,8 +178,6 @@ export class GameController {
       return responseGenerator(response, 400, "user-not-play");
     }
 
-    const timeElapsed = new Date().getTime() - gameState.startTime.getTime();
-
     if (gameState.isSubmit) {
       return responseGenerator(response, 400, "user-already-submitted");
     }
@@ -194,25 +192,25 @@ export class GameController {
         const tmScoreboardRepository = transactionManager.getRepository(Scoreboard);
         const tmGlobalScoreboardRepository = transactionManager.getRepository(GlobalScoreboard);
 
-        const score: number = this.evaluateScore(game, data);
+        const score: number = this.evaluateScore(game, answer);
 
         const globalBoard: GlobalScoreboard = await tmGlobalScoreboardRepository.findOne(userId);
 
-        if (globalBoard) {
-          await transactionManager.increment(GlobalScoreboard, { user: userId }, "score", score);
-          await tmGlobalScoreboardRepository.save({
-            userId: userId,
-            lastUpdated: new Date()
-          });
-        } else {
-          await tmGlobalScoreboardRepository.save({
-            userId: userId,
-            score: score,
-            lastUpdated: new Date()
-          });
-        }
+        // TODO: Fix entity global scoreboard
+        // if (globalBoard) {
+        //   await transactionManager.increment(GlobalScoreboard, { user: userId }, "score", score);
+        //   await tmGlobalScoreboardRepository.save({
+        //     userId: userId,
+        //     lastUpdated: new Date()
+        //   });
+        // } else {
+        //   await tmGlobalScoreboardRepository.save({
+        //     userId: userId,
+        //     score: score,
+        //     lastUpdated: new Date()
+        //   });
+        // }
 
-        // TODO: update scoreboard
         await tmScoreboardRepository.save({
           user: userId,
           game: gameId,
