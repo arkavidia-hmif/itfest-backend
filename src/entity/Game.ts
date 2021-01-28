@@ -1,5 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
+import config from "../config";
 import { Tenant } from "./User";
 
 export enum GameDifficulty {
@@ -54,7 +55,7 @@ export interface GameSystem {
 }
 
 export class GameFactory {
-  static createGame(game: Game, userAnswer: Record<string, unknown>): GameSystem {
+  static createGame(game: Game, userAnswer: Record<string, string>): GameSystem {
     switch (game.type) {
       case GameType.QUIZ:
         return new GameQuiz(game, userAnswer);
@@ -68,37 +69,41 @@ export class GameFactory {
 
 export class GameQuiz implements GameSystem {
   game: Game;
-  userAnswer: Record<string, unknown>;
+  userAnswer: Record<string, string>;
 
-  constructor(game: Game, userAnswer: Record<string, unknown>) {
+  constructor(game: Game, userAnswer: Record<string, string>) {
     this.game = game;
     this.userAnswer = userAnswer;
   }
 
-  // TODO: Fill
   evaluateScore(): number {
-    let point = 0;
-
-    Object.keys(this.userAnswer).forEach((key) => {
-      if (this.userAnswer[key] === this.game.answer[key]) {
-        point += 1;
-      }
-    });
-    return point;
+    return getScore(this.userAnswer, JSON.parse(this.game.answer));
   }
 }
 
 export class GameCrossword implements GameSystem {
   game: Game;
-  userAnswer: Record<string, unknown>;
+  userAnswer: Record<string, string>;
 
-  constructor(game: Game, userAnswer: Record<string, unknown>) {
+  constructor(game: Game, userAnswer: Record<string, string>) {
     this.game = game;
     this.userAnswer = userAnswer;
   }
 
-  // TODO: Fill
   evaluateScore(): number {
-    return 0;
+    return getScore(this.userAnswer, JSON.parse(this.game.answer));
   }
+}
+
+const getScore = (userAnswer: Record<string, string>, answer: Record<string, string>) => {
+  const maxPoinCrossword = config.maxScore;
+  const lengthQuestion = Object.keys(answer).length;
+  let point = 0;
+
+  Object.keys(userAnswer).forEach((key) => {
+    if (userAnswer[key] === answer[key]) {
+      point += 1;
+    }
+  });
+  return Math.ceil(point * lengthQuestion / maxPoinCrossword);
 }
