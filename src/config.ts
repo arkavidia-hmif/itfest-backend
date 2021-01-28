@@ -17,5 +17,6 @@ export default {
     3: 75,
   },
   maxScore: 20,
-  userFillBonus: 20
+  userFillBonusField: ["dob", "gender", "institute"],
+  userFillBonus: 15
 };

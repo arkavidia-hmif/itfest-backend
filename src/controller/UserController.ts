@@ -178,7 +178,7 @@ export class UserController {
     }
   }
 
-  async registerTenant(request: Request, response: Response) {
+  async registerTenant(request: Request, response: Response): Promise<void> {
     const { email, username, password, point } = request.body;
     // const username: string = request.body.uemail.substring(0, email.indexOf("@"));
 
@@ -227,7 +227,7 @@ export class UserController {
         }, config.secret);
       });
     } catch (err) {
-      if (err === "user-exists" || err.code === "ER_DUP_ENTRY") {
+      if (err === "user-exists" || err.code === "23505") {
         return responseGenerator(response, 400, "user-exists");
       } else if (err.code === "ESOCKET") {
         return responseGenerator(response, 500, "email-error");
@@ -287,12 +287,7 @@ export class UserController {
         let filled = false;
         let point = 0;
 
-        if (request.body.dob &&
-          request.body.gender &&
-          request.body.institute &&
-          request.body.telp &&
-          (request.body.interest && request.body.interest.length > 0) &&
-          request.body.name) {
+        if (this.checkFilled(request.body as Visitor) && request.body.name) {
           filled = true;
           point += config.userFillBonus;
         }
@@ -322,7 +317,7 @@ export class UserController {
         }, config.secret);
       });
     } catch (err) {
-      if (err.code === "ER_DUP_ENTRY") {
+      if (err.code === "23505") {
         return responseGenerator(response, 400, "user-exists");
       } else {
         // eslint-disable-next-line no-console
@@ -336,14 +331,16 @@ export class UserController {
     });
   }
 
-  checkFilled(visitorObj: Visitor, userObj: User): boolean {
-    return (visitorObj.dob &&
-      visitorObj.gender &&
-      visitorObj.telp &&
-      visitorObj.institute &&
-      (visitorObj.interest && visitorObj.interest.length > 0) &&
-      (userObj.name !== userObj.email) &&
-      !visitorObj.filled);
+  checkFilled(visitorObj: Visitor, userObj?: User): boolean {
+    return !visitorObj.filled &&
+      (!userObj || userObj.name !== userObj.email) &&
+      config.userFillBonusField.every((field) => {
+        if (field === "interest") {
+          return visitorObj.interest && visitorObj.interest.length > 0;
+        } else {
+          return visitorObj[field];
+        }
+      });
   }
 
   async editUserMe(request: Request, response: Response): Promise<void> {
