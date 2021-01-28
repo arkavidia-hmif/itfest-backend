@@ -53,6 +53,27 @@ export class UserController {
     return codeList;
   }
 
+  async resetPassword(request: Request, response: Response){
+    const salt = bcrypt.genSaltSync(config.password.saltRounds);
+    const id = response.locals.auth.id;
+    const { password } = request.body;
+
+    try {
+      const encryptedHash = bcrypt.hashSync(password, salt);
+      const user = await this.userRepository.findOne(id);
+
+      user.password = encryptedHash;
+
+      await this.userRepository.save(user);
+
+      return responseGenerator(response, 200, "pass-changed");
+
+    } catch (err) {
+      return responseGenerator(response, 500, "server-error");
+      
+    }
+  }
+
   async listUser(request: Request, response: Response): Promise<void> {
     const page = parseInt(request.query.page, 10) || 1;
     const itemPerPage = parseInt(request.query.itemPerPage, 10) || 100;
