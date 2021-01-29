@@ -59,7 +59,11 @@ export class User {
   @Column()
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @Column({ default: false })
+  isVerified: boolean;
 }
+
 @Entity()
 @Check(`(point >= 0)`)
 export class Visitor {
