@@ -144,7 +144,6 @@ export class UserController {
     return this.getTransaction(request, response);
   }
 
-
   async login(request: Request, response: Response): Promise<void> {
     const { username, email, password } = request.body;
 

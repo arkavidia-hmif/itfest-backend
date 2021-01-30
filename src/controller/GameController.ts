@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { getConnection, getRepository, Repository } from "typeorm";
 
-import config from "../config";
 import { Feedback } from "../entity/Feedback";
 import { Game, GameFactory } from "../entity/Game";
 import { GameState } from "../entity/GameState";
@@ -11,9 +10,6 @@ import { Tenant, User, UserRole, Visitor } from "../entity/User";
 import { Transaction, TransactionType } from "../entity/Transaction";
 import { responseGenerator } from "../utils/responseGenerator";
 
-import { partialUpdate } from "../utils/partialUpdateEntity";
-import { globalSocket } from "../routes/socket";
-
 export class GameController {
   private userRepository = getRepository(User);
   private feedbackRepository = getRepository(Feedback);
@@ -22,7 +18,6 @@ export class GameController {
   private gameRepository = getRepository(Game);
   private gameStateRepository = getRepository(GameState);
   private scoreboardRepository = getRepository(Scoreboard);
-  private transactionRepository = getRepository(Transaction);
 
   // get data game
   async getGame(request: Request, response: Response) {
