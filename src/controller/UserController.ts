@@ -3,6 +3,7 @@ import * as crypto from "crypto";
 import { Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
 import { getConnection, getRepository } from "typeorm";
+import { getTestMessageUrl } from 'nodemailer';
 
 import config from "../config";
 import { Tenant, User, UserRole, Visitor } from "../entity/User";
@@ -11,6 +12,7 @@ import { partialUpdate } from "../utils/partialUpdateEntity";
 import { decodeQr, generateQr } from "../utils/qr";
 import { responseGenerator } from "../utils/responseGenerator";
 import { TransactionController } from "./TransactionController";
+import { transporter } from "../utils/mail"
 
 export class UserController {
 
@@ -53,6 +55,63 @@ export class UserController {
     return codeList;
   }
 
+  async sendEmail(target: String, subject: String, body: String){
+    const html = `
+    <html>
+    <head>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+        </style>
+    </head>
+    <body style="font-family: Roboto,sans-serif; line-height: 2; background-color: #eee; width: 100%; padding: 20px; margin: 0;">
+        
+    </body>
+    `;
+
+    let mailOptions = {
+      from: '"Nodemailer Contact" <your@email.com>', // sender address
+      to: 'RECEIVEREMAILS', // list of receivers
+      subject: 'Node Contact Request', // Subject line
+      text: 'Hello world?', // plain text body
+      html: html // html body
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+          throw error;
+      }
+        console.log('Message sent: %s', info.messageId);   
+        console.log('Preview URL: %s', getTestMessageUrl(info));
+    });
+  }
+
+  async initResetPassword(request: Request, response: Response){
+    try {
+      // const 
+
+      let htmlBody = `
+        <table style="margin: auto; width: 100%; background-color: #FFF; padding: 20px; max-width: 500px;">
+          <tr><td style="text-align: center"><img src="https://arkavidia.nyc3.digitaloceanspaces.com/logo-arkavidia.png" height="100"></td></tr>
+          <tr><td style="text-align: center">Halo, {{ user.full_name }}! </td></tr>
+          <tr><td style="text-align: center">Untuk mereset password Anda, <a href="https://www.arkavidia.id/email/recover/{{ token }}">klik disini</a>.</td></tr>
+
+          <tr><td style="text-align: center">Jika Anda tidak ingin mengganti password, tidak ada yang perlu Anda lakukan.</td></tr>
+          <tr><td style="text-align: center">Password Anda tidak akan berubah sampai Anda mengakses link di atas dan memasukkan password yang baru.</td></tr>
+        </table>
+      `;
+
+      this.sendEmail("", "", htmlBody);
+
+    } catch (err) {
+      return responseGenerator(response, 500, "server-error");
+      
+    }
+  }
+
   async resetPassword(request: Request, response: Response){
     const salt = bcrypt.genSaltSync(config.password.saltRounds);
     const id = response.locals.auth.id;
@@ -65,6 +124,25 @@ export class UserController {
       user.password = encryptedHash;
 
       await this.userRepository.save(user);
+
+      return responseGenerator(response, 200, "pass-changed");
+
+    } catch (err) {
+      return responseGenerator(response, 500, "server-error");
+      
+    }
+  }
+
+  async confirmAccount(request: Request, response: Response){
+    const { token } = request.body;
+
+    try {
+      // const encryptedHash = bcrypt.hashSync(password, salt);
+      // const user = await this.userRepository.findOne(id);
+
+      // user.password = encryptedHash;
+
+      // await this.userRepository.save(user);
 
       return responseGenerator(response, 200, "pass-changed");
 
@@ -190,6 +268,10 @@ export class UserController {
         email: user.email,
         role: user.role,
       }, config.secret);
+
+      if(!user.isVerified){
+        return responseGenerator(response, 403, "not-verified");
+      }
 
       return responseGenerator(response, 200, "ok", {
         jwt: token
