@@ -30,7 +30,7 @@ export class User {
   @IsAlphanumeric()
   username: string;
 
-  @Column()
+  @Column({ default: "anonymous" })
   name: string;
 
   @Column({

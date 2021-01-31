@@ -3,8 +3,9 @@ import * as crypto from "crypto";
 import { Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
 import { AdvancedConsoleLogger, getConnection, getRepository, Repository } from "typeorm";
-import { getTestMessageUrl, createTestAccount, createTransport } from 'nodemailer';
 import * as TokenGenerator from 'uuid-token-generator';
+import { getTestMessageUrl, createTestAccount, createTransport } from 'nodemailer';
+
 import config from "../config";
 import { Tenant, User, UserRole, Visitor } from "../entity/User";
 import { Verification, VerificationType } from "../entity/Verification";
@@ -134,7 +135,7 @@ export class UserController {
         let htmlBody = `
           <table style="margin: auto; width: 100%; background-color: #FFF; padding: 20px; max-width: 500px;">
             <tr><td style="text-align: center"><img src="https://arkavidia.nyc3.digitaloceanspaces.com/logo-arkavidia.png" height="100"></td></tr>
-            <tr><td style="text-align: center">Halo, ${user.username}! </td></tr>
+            <tr><td style="text-align: center">Halo, ${user.name}! </td></tr>
             <tr><td style="text-align: center">Untuk mereset password Anda, masukkan token [ <strong> ${token} </strong> ] ke halaman yang memintanya.</td></tr>
 
             <tr><td style="text-align: center">Jika Anda tidak ingin mengganti password, tidak ada yang perlu Anda lakukan.</td></tr>
@@ -362,7 +363,7 @@ export class UserController {
       let htmlBody = `
         <table style="margin: auto; width: 100%; background-color: #FFF; padding: 20px; max-width: 500px;">
           <tr><td style="text-align: center"><img src="https://arkavidia.nyc3.digitaloceanspaces.com/logo-arkavidia.png" height="100"></td></tr>
-          <tr><td style="text-align: center">Halo, ${user.username}! </td></tr>
+          <tr><td style="text-align: center">Halo, ${user.name}! </td></tr>
           <tr><td style="text-align: center">Untuk menkonfirmasi akun anda, masukkan token [ <strong> ${token} </strong> ] ke halaman yang memintanya.</td></tr>
 
           <tr><td style="text-align: center">Jika Anda tidak meminta email ini, tidak ada yang perlu Anda lakukan.</td></tr>
