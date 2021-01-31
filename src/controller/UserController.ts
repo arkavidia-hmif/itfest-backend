@@ -111,7 +111,7 @@ export class UserController {
     });
   }
 
-  async initResetPassword(request: Request, response: Response){
+  async resetPassword(request: Request, response: Response){
     try {
       const { username, email } = request.body;
       const token = this.tokenGenerator.generate();
@@ -158,27 +158,6 @@ export class UserController {
     }
   }
 
-  async resetPassword(request: Request, response: Response){
-    const salt = bcrypt.genSaltSync(config.password.saltRounds);
-    const id = response.locals.auth.id;
-    const { password } = request.body;
-
-    try {
-      const encryptedHash = bcrypt.hashSync(password, salt);
-      const user = await this.userRepository.findOne(id);
-
-      user.password = encryptedHash;
-
-      await this.userRepository.save(user);
-
-      return responseGenerator(response, 200, "pass-changed");
-
-    } catch (err) {
-      return responseGenerator(response, 500, "server-error");
-      
-    }
-  }
-
   async confirmAccount(request: Request, response: Response){
     const { token } = request.body;
 
@@ -196,6 +175,77 @@ export class UserController {
       return responseGenerator(response, 500, "server-error");
       
     }
+  }
+
+  async verifyToken(request: Request, response: Response){
+    const token = request.body.token;
+
+    const verification = await this.verificationRepository.findOne({
+      where: {
+        token: token
+      }
+    });
+
+    if(verification){
+      const user = verification.userId;
+
+      if(verification.type == VerificationType.RESET_PASS){
+        try {
+          const { password } = request.body;
+          const salt = bcrypt.genSaltSync(config.password.saltRounds);
+
+          const encryptedHash = bcrypt.hashSync(password, salt);
+
+          user.password = encryptedHash;
+
+          await getConnection().transaction(async transactionManager => {
+            const tmUserRepository = transactionManager.getRepository(User);
+            const tmVerificationRepository = transactionManager.getRepository(Verification);
+
+            await tmUserRepository.save(user);
+
+            await tmVerificationRepository.delete(verification);
+
+          })
+
+          return responseGenerator(response, 200, "ok");
+
+        } catch (error) {
+          if (typeof error === "string") {
+            return responseGenerator(response, 400, error);
+          } else {
+            console.error(error);
+            return responseGenerator(response, 500, "unknown-error");
+          }
+        }
+      } else {
+        try {
+          user.isVerified = true;
+
+          await getConnection().transaction(async transactionManager => {
+            const tmUserRepository = transactionManager.getRepository(User);
+            const tmVerificationRepository = transactionManager.getRepository(Verification);
+
+            await tmUserRepository.save(user);
+
+            await tmVerificationRepository.delete(verification);
+
+          })
+
+          return responseGenerator(response, 200, "ok");
+
+        } catch (error) {
+          if (typeof error === "string") {
+            return responseGenerator(response, 400, error);
+          } else {
+            console.error(error);
+            return responseGenerator(response, 500, "unknown-error");
+          }
+        }
+      }
+    }
+
+    return responseGenerator(response, 200, "ok");
   }
 
   async listUser(request: Request, response: Response): Promise<void> {

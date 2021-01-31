@@ -84,11 +84,11 @@ export default (): Router => {
 
   router.post("/resetpass", [
     checkParam,
-  ], uc.initResetPassword.bind(uc));
+  ], uc.resetPassword.bind(uc));
 
   router.post("/validation/:token", [
     checkParam,
-  ], uc.resetPassword.bind(uc));
+  ], uc.verifyToken.bind(uc));
 
   // User endpoint
   router.use("/user", checkJWT);
