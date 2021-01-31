@@ -86,7 +86,7 @@ export default (): Router => {
     checkParam,
   ], uc.resetPassword.bind(uc));
 
-  router.post("/validation/:token", [
+  router.post("/validation/:token([0-9a-zA-Z]+)", [
     checkParam,
   ], uc.verifyToken.bind(uc));
 

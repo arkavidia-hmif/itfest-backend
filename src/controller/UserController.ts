@@ -156,20 +156,21 @@ export class UserController {
   }
 
   async verifyToken(request: Request, response: Response){
-    const token = request.params.token;
-    const { password } = request.body;
+    try{
+      const token: String = request.params.token;
+      const password: String = request.body.password;
 
-    const verification = await this.verificationRepository.findOne({
-      where: {
-        token: token
-      }
-    });
+      const verification = await this.verificationRepository.findOne({
+        where: {
+          token: token
+        }, 
+        relations: [ "userId" ]
+      });
 
-    if(verification){
-      const user = verification.userId;
-
-      if(verification.type == VerificationType.CONFIRM_EMAIL){
-        try {
+      if(verification){
+        const user: User = verification.userId;
+        
+        if(verification.type == VerificationType.CONFIRM_EMAIL){
           user.isVerified = true;
 
           await getConnection().transaction(async transactionManager => {
@@ -184,17 +185,7 @@ export class UserController {
 
           return responseGenerator(response, 200, "ok");
 
-        } catch (error) {
-          if (typeof error === "string") {
-            return responseGenerator(response, 400, error);
-          } else {
-            console.error(error);
-            return responseGenerator(response, 500, "unknown-error");
-          }
-        }
-
-      } else if (password instanceof String && password !== "") {
-        try {
+        } else if (password !== "") {
           const salt = bcrypt.genSaltSync(config.password.saltRounds);
 
           const encryptedHash = bcrypt.hashSync(password, salt);
@@ -213,20 +204,20 @@ export class UserController {
 
           return responseGenerator(response, 200, "ok");
 
-        } catch (error) {
-          if (typeof error === "string") {
-            return responseGenerator(response, 400, error);
-          } else {
-            console.error(error);
-            return responseGenerator(response, 500, "unknown-error");
-          }
         }
+
+        return responseGenerator(response, 400, "password-cant-be-empty");
       }
 
-      return responseGenerator(response, 400, "password-has-bad-value-or-empty");
+      return responseGenerator(response, 404, "token-not-found");
+    } catch (error) {
+      if (typeof error === "string") {
+        return responseGenerator(response, 400, error);
+      } else {
+        console.error(error);
+        return responseGenerator(response, 500, "unknown-error");
+      }
     }
-
-    return responseGenerator(response, 404, "token-not-found");
   }
 
   async listUser(request: Request, response: Response): Promise<void> {
