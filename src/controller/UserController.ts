@@ -7,6 +7,7 @@ import { getTestMessageUrl, createTestAccount, createTransport } from 'nodemaile
 import * as TokenGenerator from 'uuid-token-generator';
 import config from "../config";
 import { Tenant, User, UserRole, Visitor } from "../entity/User";
+import { Verification, VerificationType } from "../entity/Verification";
 import { Voucher } from "../entity/Voucher";
 import { partialUpdate } from "../utils/partialUpdateEntity";
 import { decodeQr, generateQr } from "../utils/qr";
@@ -15,13 +16,15 @@ import { TransactionController } from "./TransactionController";
 import { transporter } from "../utils/mail"
 
 export class UserController {
-
+  private tokenGenerator = new TokenGenerator(128, TokenGenerator.BASE62);
+  
   private userRepository = getRepository(User);
   private visitorRepository = getRepository(Visitor);
   private tenantRepository = getRepository(Tenant);
   private voucherRepository = getRepository(Voucher);
+  private verificationRepository = getRepository(Verification);
+
   private tc = new TransactionController();
-  private tokenGenerator = new TokenGenerator(128, TokenGenerator.BASE62);
 
   async createUser(name: string, username: string, email: string, role: UserRole, password: string): Promise<void> {
     const salt = bcrypt.genSaltSync(config.password.saltRounds);
@@ -112,38 +115,44 @@ export class UserController {
     try {
       const { username, email } = request.body;
       const token = this.tokenGenerator.generate();
-      console.log(token);
 
       const userByUsername = await this.userRepository.findOne({
         username
-      }, { select: ["id", "username", "email", "role", "password", "isVerified"] });
+      });
   
       const userByEmail = await this.userRepository.findOne({
         email
-      }, { select: ["id", "username", "email", "role", "password", "isVerified"] });
+      });
   
       let user = userByEmail || userByUsername;
       
       if(user){
+        await this.verificationRepository.save({
+          userId: user,
+          token,
+          type: VerificationType.RESET_PASS
+        })
+
         let htmlBody = `
           <table style="margin: auto; width: 100%; background-color: #FFF; padding: 20px; max-width: 500px;">
             <tr><td style="text-align: center"><img src="https://arkavidia.nyc3.digitaloceanspaces.com/logo-arkavidia.png" height="100"></td></tr>
-            <tr><td style="text-align: center">Halo, {{ user.full_name }}! </td></tr>
-            <tr><td style="text-align: center">Untuk mereset password Anda, <a href="https://www.arkavidia.id/email/recover/{{ token }}">klik disini</a>.</td></tr>
+            <tr><td style="text-align: center">Halo, ${user.username}! </td></tr>
+            <tr><td style="text-align: center">Untuk mereset password Anda, masukkan token [ <strong> ${token} </strong> ] ke halaman yang memintanya.</td></tr>
 
             <tr><td style="text-align: center">Jika Anda tidak ingin mengganti password, tidak ada yang perlu Anda lakukan.</td></tr>
-            <tr><td style="text-align: center">Password Anda tidak akan berubah sampai Anda mengakses link di atas dan memasukkan password yang baru.</td></tr>
+            <tr><td style="text-align: center">Password Anda tidak akan berubah sampai Anda menggunakan token di atas dan mengganti dengan password yang baru.</td></tr>
           </table>
         `;
         
-        const textBody = ``;
+        const textBody = `TOKEN: ${token}`;
 
-        // this.sendEmail(user.email, "Reset Password - Arkavidia", htmlBody, textBody);
+        this.sendEmail(user.email, "Reset Password - Arkavidia", htmlBody, textBody);
       }
       
       return responseGenerator(response, 200, "ok");
 
     } catch (err) {
+      console.log(err);
       return responseGenerator(response, 500, "server-error");
       
     }

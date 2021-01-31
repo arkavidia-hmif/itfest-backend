@@ -1,13 +1,25 @@
 import { IsAlphanumeric, IsEmail } from "class-validator";
-import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn, Check } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn, Check } from "typeorm";
 
-class Verification {
+import { User } from './User';
+
+export enum VerificationType {
+    CONFIRM_EMAIL = 1,
+    RESET_PASS = 2
+}
+
+@Entity()
+export class Verification {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ nullable: false })
-    userId: number;
+    @ManyToOne((type) => User, { nullable: false, cascade: true })
+    @JoinColumn({ name: "userId" })
+    userId: User;
 
     @Column({ nullable: false })
     token: String;
+
+    @Column({ nullable: false })
+    type: VerificationType;
 }
