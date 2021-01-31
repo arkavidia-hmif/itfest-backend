@@ -83,10 +83,11 @@ export default (): Router => {
   ], uc.registerTenant.bind(uc));
 
   router.post("/resetpass", [
-    check("password")
-      .not().isEmpty().withMessage("must be provided"),
     checkParam,
-    checkJWT
+  ], uc.initResetPassword.bind(uc));
+
+  router.post("/validation/:token", [
+    checkParam,
   ], uc.resetPassword.bind(uc));
 
   // User endpoint

@@ -2,9 +2,9 @@ import * as bcrypt from "bcrypt";
 import * as crypto from "crypto";
 import { Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
-import { getConnection, getRepository } from "typeorm";
-import { getTestMessageUrl } from 'nodemailer';
-
+import { AdvancedConsoleLogger, getConnection, getRepository } from "typeorm";
+import { getTestMessageUrl, createTestAccount, createTransport } from 'nodemailer';
+import * as TokenGenerator from 'uuid-token-generator';
 import config from "../config";
 import { Tenant, User, UserRole, Visitor } from "../entity/User";
 import { Voucher } from "../entity/Voucher";
@@ -21,6 +21,7 @@ export class UserController {
   private tenantRepository = getRepository(Tenant);
   private voucherRepository = getRepository(Voucher);
   private tc = new TransactionController();
+  private tokenGenerator = new TokenGenerator(128, TokenGenerator.BASE62);
 
   async createUser(name: string, username: string, email: string, role: UserRole, password: string): Promise<void> {
     const salt = bcrypt.genSaltSync(config.password.saltRounds);
@@ -55,30 +56,48 @@ export class UserController {
     return codeList;
   }
 
-  async sendEmail(target: String, subject: String, body: String){
+  async sendEmail(target: string, subject: string, body: string, text: string){
     const html = `
-    <html>
-    <head>
-        <style>
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
-        </style>
-    </head>
-    <body style="font-family: Roboto,sans-serif; line-height: 2; background-color: #eee; width: 100%; padding: 20px; margin: 0;">
-        
-    </body>
+      <html>
+      <head>
+          <style>
+              * {
+                  margin: 0;
+                  padding: 0;
+                  box-sizing: border-box;
+              }
+          </style>
+      </head>
+      <body style="font-family: Roboto,sans-serif; line-height: 2; background-color: #eee; width: 100%; padding: 20px; margin: 0;">
+          ${body}
+      </body>
     `;
+    
+    /********************************************/
+    /* FOR TESTING */
+    let testAccount = await createTestAccount();
+
+    // create reusable transporter object using the default SMTP transport
+    let transporter = createTransport({
+      host: "smtp.ethereal.email",
+      port: 587,
+      secure: false, // true for 465, false for other ports
+      auth: {
+        user: testAccount.user, // generated ethereal user
+        pass: testAccount.pass, // generated ethereal password
+      },
+    });
+    /********************************************/
 
     let mailOptions = {
-      from: '"Nodemailer Contact" <your@email.com>', // sender address
-      to: 'RECEIVEREMAILS', // list of receivers
-      subject: 'Node Contact Request', // Subject line
-      text: 'Hello world?', // plain text body
+      from: '"Arkavidia" <no-reply@arkavidia.com>', // sender address
+      to: target, // list of receivers
+      subject: subject, // Subject line
+      text: text, // plain text body
       html: html // html body
     };
+
+    // console.log(html);   
 
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
@@ -91,20 +110,38 @@ export class UserController {
 
   async initResetPassword(request: Request, response: Response){
     try {
-      // const 
+      const { username, email } = request.body;
+      const token = this.tokenGenerator.generate();
+      console.log(token);
 
-      let htmlBody = `
-        <table style="margin: auto; width: 100%; background-color: #FFF; padding: 20px; max-width: 500px;">
-          <tr><td style="text-align: center"><img src="https://arkavidia.nyc3.digitaloceanspaces.com/logo-arkavidia.png" height="100"></td></tr>
-          <tr><td style="text-align: center">Halo, {{ user.full_name }}! </td></tr>
-          <tr><td style="text-align: center">Untuk mereset password Anda, <a href="https://www.arkavidia.id/email/recover/{{ token }}">klik disini</a>.</td></tr>
+      const userByUsername = await this.userRepository.findOne({
+        username
+      }, { select: ["id", "username", "email", "role", "password", "isVerified"] });
+  
+      const userByEmail = await this.userRepository.findOne({
+        email
+      }, { select: ["id", "username", "email", "role", "password", "isVerified"] });
+  
+      let user = userByEmail || userByUsername;
+      
+      if(user){
+        let htmlBody = `
+          <table style="margin: auto; width: 100%; background-color: #FFF; padding: 20px; max-width: 500px;">
+            <tr><td style="text-align: center"><img src="https://arkavidia.nyc3.digitaloceanspaces.com/logo-arkavidia.png" height="100"></td></tr>
+            <tr><td style="text-align: center">Halo, {{ user.full_name }}! </td></tr>
+            <tr><td style="text-align: center">Untuk mereset password Anda, <a href="https://www.arkavidia.id/email/recover/{{ token }}">klik disini</a>.</td></tr>
 
-          <tr><td style="text-align: center">Jika Anda tidak ingin mengganti password, tidak ada yang perlu Anda lakukan.</td></tr>
-          <tr><td style="text-align: center">Password Anda tidak akan berubah sampai Anda mengakses link di atas dan memasukkan password yang baru.</td></tr>
-        </table>
-      `;
+            <tr><td style="text-align: center">Jika Anda tidak ingin mengganti password, tidak ada yang perlu Anda lakukan.</td></tr>
+            <tr><td style="text-align: center">Password Anda tidak akan berubah sampai Anda mengakses link di atas dan memasukkan password yang baru.</td></tr>
+          </table>
+        `;
+        
+        const textBody = ``;
 
-      this.sendEmail("", "", htmlBody);
+        // this.sendEmail(user.email, "Reset Password - Arkavidia", htmlBody, textBody);
+      }
+      
+      return responseGenerator(response, 200, "ok");
 
     } catch (err) {
       return responseGenerator(response, 500, "server-error");
@@ -249,11 +286,11 @@ export class UserController {
 
     const userByUsername = await this.userRepository.findOne({
       username
-    }, { select: ["id", "username", "email", "role", "password"] });
+    }, { select: ["id", "username", "email", "role", "password", "isVerified"] });
 
     const userByEmail = await this.userRepository.findOne({
       email
-    }, { select: ["id", "username", "email", "role", "password"] });
+    }, { select: ["id", "username", "email", "role", "password", "isVerified"] });
 
     const user = userByEmail || userByUsername;
 
