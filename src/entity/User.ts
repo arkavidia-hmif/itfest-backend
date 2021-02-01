@@ -61,9 +61,9 @@ export class User {
   updatedAt: Date;
 }
 @Entity()
-@Check(`(point >= 0)`)
+@Check("(point >= 0)")
 export class Visitor {
-  @OneToOne((type) => User, { primary: true })
+  @OneToOne(() => User, { primary: true })
   @JoinColumn({ name: "userId" })
   userId: User;
 
@@ -81,21 +81,21 @@ export class Visitor {
 
   @Column({ nullable: false, default: false })
   filled: boolean;
+
+  @Column({ nullable: true })
+  telp: string;
+
+  @Column({ nullable: true })
+  institute: string;
 }
 
 @Entity()
-@Check(`(point >= 0)`)
+@Check("(point >= 0)")
 export class Tenant {
-  @OneToOne((type) => User, { primary: true })
+  @OneToOne(() => User, { primary: true })
   @JoinColumn({ name: "userId" })
   userId: User;
 
   @Column({ nullable: false })
   point: number;
-
-  @Column({ nullable: false })
-  x: number;
-
-  @Column({ nullable: false })
-  y: number;
 }

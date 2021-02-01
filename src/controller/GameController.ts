@@ -154,8 +154,8 @@ export class GameController {
     const pointMultiplier = 0.5; // Score to point Multiplier
 
     const userId = response.locals.auth.id;
-    const gameId: any = request.params.id;
-    const { data = {} } = request.body;
+    const gameId = request.params.id;
+    const answer = request.body.answer;
 
     const game = await this.gameRepository.findOne(gameId, { relations: ["tenant", "tenant.userId"] });
 
@@ -174,8 +174,6 @@ export class GameController {
       return responseGenerator(response, 400, "user-not-play");
     }
 
-    const timeElapsed = new Date().getTime() - gameState.startTime.getTime();
-
     if (gameState.isSubmit) {
       return responseGenerator(response, 400, "user-already-submitted");
     }
@@ -190,7 +188,7 @@ export class GameController {
         const tmScoreboardRepository = transactionManager.getRepository(Scoreboard);
         const tmGlobalScoreboardRepository = transactionManager.getRepository(GlobalScoreboard);
 
-        const score: number = this.evaluateScore(game, data);
+        const score: number = this.evaluateScore(game, answer);
 
         const globalBoard: GlobalScoreboard = await tmGlobalScoreboardRepository.findOne(userId);
 
@@ -244,9 +242,46 @@ export class GameController {
     return responseGenerator(response, 200, "ok");
   }
 
-  evaluateScore(game: Game, userAnswer: Record<string, unknown>): number {
+  evaluateScore(game: Game, userAnswer: Record<string, string>): number {
     const gs = GameFactory.createGame(game, userAnswer);
     return gs.evaluateScore();
+  }
+
+
+  async updateGame(request: Request, response: Response): Promise<void> {
+    const id = request.params.id;
+    const role = response.locals.auth.role;
+
+    try {
+
+      const game = await this.gameRepository.findOne(id);
+
+      if (!game) {
+        return responseGenerator(response, 404, "game-not-found");
+      }
+
+      if (request.body.problem) {
+        request.body.problem = JSON.stringify(request.body.problem);
+      }
+
+      if (request.body.answer) {
+        request.body.answer = JSON.stringify(request.body.answer);
+      }
+
+      let updatedGame = partialUpdate(game, request.body, ["name", "difficulty", "type", "problem", "answer"]);
+
+      if (role === UserRole.ADMIN) {
+        updatedGame = partialUpdate(game, request.body, ["tenantUserId"]);
+      }
+
+      await this.gameRepository.save(updatedGame);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error(err);
+      return responseGenerator(response, 500, "unknown-error");
+    }
+
+    return responseGenerator(response, 200, "ok");
   }
 
   async listGame(request: Request, response: Response) {

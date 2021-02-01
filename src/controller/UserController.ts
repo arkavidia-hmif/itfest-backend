@@ -178,7 +178,7 @@ export class UserController {
   }
 
   async registerTenant(request: Request, response: Response): Promise<void> {
-    const { email, username, password, point, x, y } = request.body;
+    const { email, username, password, point } = request.body;
     // const username: string = request.body.uemail.substring(0, email.indexOf("@"));
 
     const name = request.body.name || username;
@@ -215,9 +215,7 @@ export class UserController {
 
         await tmTenantRepository.save({
           userId: savedUser,
-          point: point || config.tenantInitial,
-          x,
-          y
+          point: point || config.tenantInitial
         });
 
         token = jwt.sign({
@@ -228,7 +226,7 @@ export class UserController {
         }, config.secret);
       });
     } catch (err) {
-      if (err === "user-exists" || err.code === "ER_DUP_ENTRY") {
+      if (err === "user-exists" || err.code === "23505") {
         return responseGenerator(response, 400, "user-exists");
       } else if (err.code === "ESOCKET") {
         return responseGenerator(response, 500, "email-error");
@@ -288,15 +286,12 @@ export class UserController {
         let filled = false;
         let point = 0;
 
-        if (request.body.dob &&
-          request.body.gender &&
-          (request.body.interest && request.body.interest.length > 0) &&
-          request.body.name) {
+        if (this.checkFilled(request.body as Visitor) && request.body.name) {
           filled = true;
           point += config.userFillBonus;
         }
 
-        const changes: Partial<Visitor> = partialUpdate({}, request.body, ["dob", "gender", "interest"]);
+        const changes: Partial<Visitor> = partialUpdate({}, request.body, ["dob", "gender", "interest", "telp", "institute"]);
 
         if (changes.interest && changes.interest.length === 0) {
           delete changes.interest;
@@ -321,7 +316,7 @@ export class UserController {
         }, config.secret);
       });
     } catch (err) {
-      if (err.code === "ER_DUP_ENTRY") {
+      if (err.code === "23505") {
         return responseGenerator(response, 400, "user-exists");
       } else {
         // eslint-disable-next-line no-console
@@ -335,12 +330,16 @@ export class UserController {
     });
   }
 
-  checkFilled(visitorObj: Visitor, userObj: User): boolean {
-    return (visitorObj.dob &&
-      visitorObj.gender &&
-      (visitorObj.interest && visitorObj.interest.length > 0) &&
-      (userObj.name !== userObj.email) &&
-      !visitorObj.filled);
+  checkFilled(visitorObj: Visitor, userObj?: User): boolean {
+    return !visitorObj.filled &&
+      (!userObj || userObj.name !== userObj.email) &&
+      config.userFillBonusField.every((field) => {
+        if (field === "interest") {
+          return visitorObj.interest && visitorObj.interest.length > 0;
+        } else {
+          return visitorObj[field];
+        }
+      });
   }
 
   async editUserMe(request: Request, response: Response): Promise<void> {
@@ -368,7 +367,7 @@ export class UserController {
           relations: ["userId"]
         });
 
-        const updatedVisitor = partialUpdate(visitor, request.body, ["dob", "gender", "interest"]);
+        const updatedVisitor = partialUpdate(visitor, request.body, ["dob", "gender", "interest", "telp", "institute"]);
 
         if (updatedVisitor.interest && updatedVisitor.interest.length === 0) {
           delete updatedVisitor.interest;
