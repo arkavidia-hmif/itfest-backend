@@ -24,7 +24,7 @@ export const transporterTest = async () => {
   });
 };
 
-export const sendEmail = (target: string, subject: string, body: string, text: string) => {
+export const sendEmail = async (target: string, subject: string, body: string, text: string) => {
   const html = `
     <html>
     <head>
@@ -49,7 +49,8 @@ export const sendEmail = (target: string, subject: string, body: string, text: s
     html: html // html body
   };
 
-  transporter.sendMail(mailOptions, (error, info) => {
+  // transporter.sendMail(mailOptions, (error, info) => {
+  (await transporterTest()).sendMail(mailOptions, (error, info) => {
     if (error) {
       throw error;
     }
@@ -85,7 +86,7 @@ export const verifyAccountBodyGenerator = (name: string, token: string) => {
   `;
 };
 
-export const sendResetPasswordEmail = (name: string, email: string, token: string) => {
+export const sendResetPasswordEmail = async (name: string, email: string, token: string) => {
   const htmlBody = resetPasswordBodyGenerator(name, token);
         
   const textBody = `TOKEN: ${token}`;

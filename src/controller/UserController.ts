@@ -82,10 +82,11 @@ export class UserController {
         });
 
         sendResetPasswordEmail(user.name, user.email, token);
+        return responseGenerator(response, 200, "ok");
 
       }
       
-      return responseGenerator(response, 200, "ok");
+      return responseGenerator(response, 404, "not-found");
 
     } catch (err) {
       return responseGenerator(response, 500, "server-error");

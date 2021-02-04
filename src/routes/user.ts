@@ -1,5 +1,5 @@
 import { Request, Response, Router } from "express";
-import { check, oneOf } from "express-validator";
+import { check, oneOf, body } from "express-validator";
 
 import config from "../config";
 import { InventoryController } from "../controller/InventoryController";
@@ -83,6 +83,12 @@ export default (): Router => {
   ], uc.registerTenant.bind(uc));
 
   router.post("/resetpass", [
+    oneOf([
+      check("email").not().isEmpty()
+        .withMessage("email can't be empty")
+        .isEmail().withMessage("must be a valid email address"),
+      usernameCheck(),
+    ]),
     checkParam,
   ], uc.resetPassword.bind(uc));
 
