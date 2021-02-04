@@ -30,7 +30,7 @@ export class User {
   @IsAlphanumeric()
   username: string;
 
-  @Column()
+  @Column({ default: "anonymous" })
   name: string;
 
   @Column({
@@ -59,7 +59,13 @@ export class User {
   @Column()
   @UpdateDateColumn()
   updatedAt: Date;
+
+  // set this to true in the prod
+  // @Column({ default: false })
+  @Column({ default: true })
+  isVerified: boolean;
 }
+
 @Entity()
 @Check("(point >= 0)")
 export class Visitor {

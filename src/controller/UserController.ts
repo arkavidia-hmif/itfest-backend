@@ -2,22 +2,29 @@ import * as bcrypt from "bcrypt";
 import * as crypto from "crypto";
 import { Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
-import { getConnection, getRepository } from "typeorm";
+import { AdvancedConsoleLogger, getConnection, getRepository, Repository } from "typeorm";
+import * as TokenGenerator from 'uuid-token-generator';
+import { getTestMessageUrl, createTestAccount, createTransport } from 'nodemailer';
 
 import config from "../config";
 import { Tenant, User, UserRole, Visitor } from "../entity/User";
+import { Verification, VerificationType } from "../entity/Verification";
 import { Voucher } from "../entity/Voucher";
 import { partialUpdate } from "../utils/partialUpdateEntity";
 import { decodeQr, generateQr } from "../utils/qr";
 import { responseGenerator } from "../utils/responseGenerator";
 import { TransactionController } from "./TransactionController";
+import { transporter } from "../utils/mail";
 
 export class UserController {
-
+  private tokenGenerator = new TokenGenerator(128, TokenGenerator.BASE62);
+  
   private userRepository = getRepository(User);
   private visitorRepository = getRepository(Visitor);
   private tenantRepository = getRepository(Tenant);
   private voucherRepository = getRepository(Voucher);
+  private verificationRepository = getRepository(Verification);
+
   private tc = new TransactionController();
 
   async createUser(name: string, username: string, email: string, role: UserRole, password: string): Promise<void> {
@@ -51,6 +58,168 @@ export class UserController {
     await Promise.all(promiseArr);
 
     return codeList;
+  }
+
+  async sendEmail(target: string, subject: string, body: string, text: string){
+    const html = `
+      <html>
+      <head>
+          <style>
+              * {
+                  margin: 0;
+                  padding: 0;
+                  box-sizing: border-box;
+              }
+          </style>
+      </head>
+      <body style="font-family: Roboto,sans-serif; line-height: 2; background-color: #eee; width: 100%; padding: 20px; margin: 0;">
+          ${body}
+      </body>
+    `;
+    
+    /********************************************/
+    /* FOR TESTING UNCOMMENT THIS PART */
+    // let testAccount = await createTestAccount();
+
+    // create reusable transporter object using the default SMTP transport
+    // let transporter = createTransport({
+    //   host: "smtp.ethereal.email",
+    //   port: 587,
+    //   secure: false, // true for 465, false for other ports
+    //   auth: {
+    //     user: testAccount.user, // generated ethereal user
+    //     pass: testAccount.pass, // generated ethereal password
+    //   },
+    // });
+    /********************************************/
+
+    const mailOptions = {
+      from: '"Arkavidia" <no-reply@arkavidia.com>', // sender address
+      to: target, // list of receivers
+      subject: subject, // Subject line
+      text: text, // plain text body
+      html: html // html body
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        throw error;
+      }
+
+      // Uncomment too for testing puropose
+      // console.log('Message sent: %s', info.messageId);   
+      // console.log('Preview URL: %s', getTestMessageUrl(info));
+    });
+  }
+
+  async resetPassword(request: Request, response: Response){
+    try {
+      const { username, email } = request.body;
+      const token = this.tokenGenerator.generate();
+
+      const userByUsername = await this.userRepository.findOne({
+        username
+      });
+  
+      const userByEmail = await this.userRepository.findOne({
+        email
+      });
+  
+      const user = userByEmail || userByUsername;
+      
+      if(user){
+        await this.verificationRepository.save({
+          userId: user,
+          token,
+          type: VerificationType.RESET_PASS
+        });
+
+        const htmlBody = `
+          <table style="margin: auto; width: 100%; background-color: #FFF; padding: 20px; max-width: 500px;">
+            <tr><td style="text-align: center"><img src="https://arkavidia.nyc3.digitaloceanspaces.com/logo-arkavidia.png" height="100"></td></tr>
+            <tr><td style="text-align: center">Halo, ${user.name}! </td></tr>
+            <tr><td style="text-align: center">Untuk mereset password Anda, masukkan token [ <strong> ${token} </strong> ] ke halaman yang memintanya.</td></tr>
+
+            <tr><td style="text-align: center">Jika Anda tidak ingin mengganti password, tidak ada yang perlu Anda lakukan.</td></tr>
+            <tr><td style="text-align: center">Password Anda tidak akan berubah sampai Anda menggunakan token di atas dan mengganti dengan password yang baru.</td></tr>
+          </table>
+        `;
+        
+        const textBody = `TOKEN: ${token}`;
+
+        this.sendEmail(user.email, "Reset Password - ITFest Arkavidia", htmlBody, textBody);
+      }
+      
+      return responseGenerator(response, 200, "ok");
+
+    } catch (err) {
+      return responseGenerator(response, 500, "server-error");
+      
+    }
+  }
+
+  async verifyToken(request: Request, response: Response){
+    try{
+      const token: string = request.params.token;
+      const password: string = request.body.password;
+
+      const verification = await this.verificationRepository.findOne({
+        where: {
+          token: token
+        }, 
+        relations: [ "userId" ]
+      });
+
+      if(verification){
+        const user: User = verification.userId;
+        
+        if(verification.type === VerificationType.CONFIRM_EMAIL){
+          user.isVerified = true;
+
+          await getConnection().transaction(async transactionManager => {
+            const tmUserRepository = transactionManager.getRepository(User);
+            const tmVerificationRepository = transactionManager.getRepository(Verification);
+
+            await tmUserRepository.save(user);
+
+            await tmVerificationRepository.delete(verification);
+          });
+
+          return responseGenerator(response, 200, "ok");
+
+        } else if (password !== "") {
+          const salt = bcrypt.genSaltSync(config.password.saltRounds);
+
+          const encryptedHash = bcrypt.hashSync(password, salt);
+
+          user.password = encryptedHash;
+
+          await getConnection().transaction(async transactionManager => {
+            const tmUserRepository = transactionManager.getRepository(User);
+            const tmVerificationRepository = transactionManager.getRepository(Verification);
+
+            await tmUserRepository.save(user);
+
+            await tmVerificationRepository.delete(verification);
+
+          });
+
+          return responseGenerator(response, 200, "ok");
+
+        }
+
+        return responseGenerator(response, 400, "password-cant-be-empty");
+      }
+
+      return responseGenerator(response, 404, "token-not-found");
+    } catch (error) {
+      if (typeof error === "string") {
+        return responseGenerator(response, 400, error);
+      } else {
+        console.error(error);
+        return responseGenerator(response, 500, "unknown-error");
+      }
+    }
   }
 
   async listUser(request: Request, response: Response): Promise<void> {
@@ -149,11 +318,11 @@ export class UserController {
 
     const userByUsername = await this.userRepository.findOne({
       username
-    }, { select: ["id", "username", "email", "role", "password"] });
+    }, { select: ["id", "username", "email", "role", "password", "isVerified"] });
 
     const userByEmail = await this.userRepository.findOne({
       email
-    }, { select: ["id", "username", "email", "role", "password"] });
+    }, { select: ["id", "username", "email", "role", "password", "isVerified"] });
 
     const user = userByEmail || userByUsername;
 
@@ -169,6 +338,10 @@ export class UserController {
         role: user.role,
       }, config.secret);
 
+      if(!user.isVerified){
+        return responseGenerator(response, 403, "not-verified");
+      }
+
       return responseGenerator(response, 200, "ok", {
         jwt: token
       });
@@ -177,7 +350,33 @@ export class UserController {
     }
   }
 
-  async registerTenant(request: Request, response: Response): Promise<void> {
+  async sendVerificationEmail(verificationRepository: Repository<Verification>, user: User): Promise<void>{
+    const token = this.tokenGenerator.generate();
+    
+    await verificationRepository.save({
+      userId: user,
+      token,
+      type: VerificationType.CONFIRM_EMAIL
+    });
+
+    const htmlBody = `
+      <table style="margin: auto; width: 100%; background-color: #FFF; padding: 20px; max-width: 500px;">
+        <tr><td style="text-align: center"><img src="https://arkavidia.nyc3.digitaloceanspaces.com/logo-arkavidia.png" height="100"></td></tr>
+        <tr><td style="text-align: center">Halo, ${user.name}! </td></tr>
+        <tr><td style="text-align: center">Untuk menkonfirmasi akun anda, masukkan token [ <strong> ${token} </strong> ] ke halaman yang memintanya.</td></tr>
+
+        <tr><td style="text-align: center">Jika Anda tidak meminta email ini, tidak ada yang perlu Anda lakukan.</td></tr>
+        <tr><td style="text-align: center">Terimakasih sudah mendaftarkan diri ke event ITFest dari Arkavidia!</td></tr>
+      </table>
+    `;
+    
+    const textBody = `TOKEN: ${token}`;
+
+    this.sendEmail(user.email, "Confirm Email - ITFest Arkavidia", htmlBody, textBody);
+
+  }
+
+  async registerTenant(request: Request, response: Response) {
     const { email, username, password, point } = request.body;
     // const username: string = request.body.uemail.substring(0, email.indexOf("@"));
 
@@ -195,6 +394,7 @@ export class UserController {
       await getConnection().transaction(async transactionManager => {
         const tmUserRepository = transactionManager.getRepository(User);
         const tmTenantRepository = transactionManager.getRepository(Tenant);
+        const tmVerificationRepository = transactionManager.getRepository(Verification);
 
         if (await tmUserRepository.findOne({
           where: {
@@ -212,11 +412,13 @@ export class UserController {
           name,
           email,
         });
-
+        
         await tmTenantRepository.save({
           userId: savedUser,
           point: point || config.tenantInitial
         });
+
+        await this.sendVerificationEmail(tmVerificationRepository, savedUser);
 
         token = jwt.sign({
           id: savedUser.id,
@@ -274,6 +476,8 @@ export class UserController {
     try {
       await getConnection().transaction(async transactionManager => {
         const tmUserRepository = transactionManager.getRepository(User);
+        const tmVerificationRepository = transactionManager.getRepository(Verification);
+        
         const savedUser = await tmUserRepository.save({
           role: UserRole.VISITOR,
           salt,
@@ -282,6 +486,8 @@ export class UserController {
           name,
           email,
         });
+
+        await this.sendVerificationEmail(tmVerificationRepository, savedUser);
 
         let filled = false;
         let point = 0;

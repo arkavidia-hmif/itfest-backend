@@ -9,6 +9,7 @@ import { GlobalScoreboard } from "../entity/GlobalScoreboard";
 import { Tenant, User, UserRole, Visitor } from "../entity/User";
 import { Transaction, TransactionType } from "../entity/Transaction";
 import { responseGenerator } from "../utils/responseGenerator";
+import { partialUpdate } from "../utils/partialUpdateEntity";
 
 export class GameController {
   private userRepository = getRepository(User);
@@ -157,6 +158,10 @@ export class GameController {
     const gameId = request.params.id;
     const answer = request.body.answer;
 
+    if (!answer) {
+      return responseGenerator(response, 404, "answer not found");
+    }
+
     const game = await this.gameRepository.findOne(gameId, { relations: ["tenant", "tenant.userId"] });
 
     if (!game) {
@@ -190,13 +195,13 @@ export class GameController {
 
         const score: number = this.evaluateScore(game, answer);
 
-        const globalBoard: GlobalScoreboard = await tmGlobalScoreboardRepository.findOne(userId);
+        const globalBoard: GlobalScoreboard = await tmGlobalScoreboardRepository.findOne({ user: { id: userId } }, { relations: ["user"] });
 
         if (globalBoard) {
-          await transactionManager.increment(GlobalScoreboard, { userId: userId }, "score", score);
+          await transactionManager.increment(GlobalScoreboard, { user: { id: userId } }, "score", score);
         } else {
           await tmGlobalScoreboardRepository.save({
-            userId: userId,
+            user: userId,
             score: score,
             lastUpdated: new Date()
           });

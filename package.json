@@ -32,7 +32,8 @@
     "readline-sync": "^1.4.10",
     "reflect-metadata": "^0.1.13",
     "socket.io": "^3.1.0",
-    "typeorm": "^0.2.30"
+    "typeorm": "^0.2.30",
+    "uuid-token-generator": "^1.0.0"
   },
   "scripts": {
     "build": "tsc",
@@ -42,6 +43,7 @@
     "lint": "eslint 'src/**/*.ts'",
     "manage": "ts-node src/manage.ts",
     "typeorm": "ts-node ./node_modules/typeorm/cli.js",
+    "migration:generate": "ts-node ./node_modules/typeorm/cli.js migration:generate",
     "migration:run": "ts-node ./node_modules/typeorm/cli.js migration:run",
     "seed": "ts-node ./src/seed/index.ts",
     "reset": "npm run schema:drop && npm run schema:sync && npm run seed",
