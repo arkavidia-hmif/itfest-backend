@@ -18,7 +18,7 @@ export class Verification {
     userId: User;
 
     @Column({ nullable: false })
-    token: String;
+    token: string;
 
     @Column({ nullable: false })
     type: VerificationType;

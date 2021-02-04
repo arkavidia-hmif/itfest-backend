@@ -14,7 +14,7 @@ import { partialUpdate } from "../utils/partialUpdateEntity";
 import { decodeQr, generateQr } from "../utils/qr";
 import { responseGenerator } from "../utils/responseGenerator";
 import { TransactionController } from "./TransactionController";
-import { transporter } from "../utils/mail"
+import { transporter } from "../utils/mail";
 
 export class UserController {
   private tokenGenerator = new TokenGenerator(128, TokenGenerator.BASE62);
@@ -78,22 +78,22 @@ export class UserController {
     `;
     
     /********************************************/
-    /* FOR TESTING */
-    let testAccount = await createTestAccount();
+    /* FOR TESTING UNCOMMENT THIS PART */
+    // let testAccount = await createTestAccount();
 
     // create reusable transporter object using the default SMTP transport
-    let transporter = createTransport({
-      host: "smtp.ethereal.email",
-      port: 587,
-      secure: false, // true for 465, false for other ports
-      auth: {
-        user: testAccount.user, // generated ethereal user
-        pass: testAccount.pass, // generated ethereal password
-      },
-    });
+    // let transporter = createTransport({
+    //   host: "smtp.ethereal.email",
+    //   port: 587,
+    //   secure: false, // true for 465, false for other ports
+    //   auth: {
+    //     user: testAccount.user, // generated ethereal user
+    //     pass: testAccount.pass, // generated ethereal password
+    //   },
+    // });
     /********************************************/
 
-    let mailOptions = {
+    const mailOptions = {
       from: '"Arkavidia" <no-reply@arkavidia.com>', // sender address
       to: target, // list of receivers
       subject: subject, // Subject line
@@ -103,10 +103,12 @@ export class UserController {
 
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
-          throw error;
+        throw error;
       }
-        console.log('Message sent: %s', info.messageId);   
-        console.log('Preview URL: %s', getTestMessageUrl(info));
+
+      // Uncomment too for testing puropose
+      // console.log('Message sent: %s', info.messageId);   
+      // console.log('Preview URL: %s', getTestMessageUrl(info));
     });
   }
 
@@ -123,16 +125,16 @@ export class UserController {
         email
       });
   
-      let user = userByEmail || userByUsername;
+      const user = userByEmail || userByUsername;
       
       if(user){
         await this.verificationRepository.save({
           userId: user,
           token,
           type: VerificationType.RESET_PASS
-        })
+        });
 
-        let htmlBody = `
+        const htmlBody = `
           <table style="margin: auto; width: 100%; background-color: #FFF; padding: 20px; max-width: 500px;">
             <tr><td style="text-align: center"><img src="https://arkavidia.nyc3.digitaloceanspaces.com/logo-arkavidia.png" height="100"></td></tr>
             <tr><td style="text-align: center">Halo, ${user.name}! </td></tr>
@@ -158,8 +160,8 @@ export class UserController {
 
   async verifyToken(request: Request, response: Response){
     try{
-      const token: String = request.params.token;
-      const password: String = request.body.password;
+      const token: string = request.params.token;
+      const password: string = request.body.password;
 
       const verification = await this.verificationRepository.findOne({
         where: {
@@ -171,7 +173,7 @@ export class UserController {
       if(verification){
         const user: User = verification.userId;
         
-        if(verification.type == VerificationType.CONFIRM_EMAIL){
+        if(verification.type === VerificationType.CONFIRM_EMAIL){
           user.isVerified = true;
 
           await getConnection().transaction(async transactionManager => {
@@ -181,8 +183,7 @@ export class UserController {
             await tmUserRepository.save(user);
 
             await tmVerificationRepository.delete(verification);
-
-          })
+          });
 
           return responseGenerator(response, 200, "ok");
 
@@ -201,7 +202,7 @@ export class UserController {
 
             await tmVerificationRepository.delete(verification);
 
-          })
+          });
 
           return responseGenerator(response, 200, "ok");
 
@@ -351,34 +352,29 @@ export class UserController {
   }
 
   async sendVerificationEmail(verificationRepository: Repository<Verification>, user: User){
-    try {
-      const token = this.tokenGenerator.generate();
-      
-      await verificationRepository.save({
-        userId: user,
-        token,
-        type: VerificationType.CONFIRM_EMAIL
-      })
+    const token = this.tokenGenerator.generate();
+    
+    await verificationRepository.save({
+      userId: user,
+      token,
+      type: VerificationType.CONFIRM_EMAIL
+    });
 
-      let htmlBody = `
-        <table style="margin: auto; width: 100%; background-color: #FFF; padding: 20px; max-width: 500px;">
-          <tr><td style="text-align: center"><img src="https://arkavidia.nyc3.digitaloceanspaces.com/logo-arkavidia.png" height="100"></td></tr>
-          <tr><td style="text-align: center">Halo, ${user.name}! </td></tr>
-          <tr><td style="text-align: center">Untuk menkonfirmasi akun anda, masukkan token [ <strong> ${token} </strong> ] ke halaman yang memintanya.</td></tr>
+    const htmlBody = `
+      <table style="margin: auto; width: 100%; background-color: #FFF; padding: 20px; max-width: 500px;">
+        <tr><td style="text-align: center"><img src="https://arkavidia.nyc3.digitaloceanspaces.com/logo-arkavidia.png" height="100"></td></tr>
+        <tr><td style="text-align: center">Halo, ${user.name}! </td></tr>
+        <tr><td style="text-align: center">Untuk menkonfirmasi akun anda, masukkan token [ <strong> ${token} </strong> ] ke halaman yang memintanya.</td></tr>
 
-          <tr><td style="text-align: center">Jika Anda tidak meminta email ini, tidak ada yang perlu Anda lakukan.</td></tr>
-          <tr><td style="text-align: center">Terimakasih sudah mendaftarkan diri ke event ITFest dari Arkavidia!</td></tr>
-        </table>
-      `;
-      
-      const textBody = `TOKEN: ${token}`;
+        <tr><td style="text-align: center">Jika Anda tidak meminta email ini, tidak ada yang perlu Anda lakukan.</td></tr>
+        <tr><td style="text-align: center">Terimakasih sudah mendaftarkan diri ke event ITFest dari Arkavidia!</td></tr>
+      </table>
+    `;
+    
+    const textBody = `TOKEN: ${token}`;
 
-      this.sendEmail(user.email, "Confirm Email - ITFest Arkavidia", htmlBody, textBody);
+    this.sendEmail(user.email, "Confirm Email - ITFest Arkavidia", htmlBody, textBody);
 
-    } catch (err) {
-      throw err;
-      
-    }
   }
 
   async registerTenant(request: Request, response: Response) {
