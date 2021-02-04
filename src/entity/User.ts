@@ -67,9 +67,9 @@ export class User {
 }
 
 @Entity()
-@Check(`(point >= 0)`)
+@Check("(point >= 0)")
 export class Visitor {
-  @OneToOne((type) => User, { primary: true })
+  @OneToOne(() => User, { primary: true })
   @JoinColumn({ name: "userId" })
   userId: User;
 
@@ -96,9 +96,9 @@ export class Visitor {
 }
 
 @Entity()
-@Check(`(point >= 0)`)
+@Check("(point >= 0)")
 export class Tenant {
-  @OneToOne((type) => User, { primary: true })
+  @OneToOne(() => User, { primary: true })
   @JoinColumn({ name: "userId" })
   userId: User;
 

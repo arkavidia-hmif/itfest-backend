@@ -25,7 +25,7 @@ export default (): Router => {
     .withMessage("must be a valid gender (1=male, 2=female)");
   const interestCheck = () => check("interest").isArray().withMessage("must be an array");
   const dobCheck = () => check("dob").isISO8601().withMessage("must be a valid ISO8601 date");
-  const telpCheck = () => check("telp").isString().isLength({min: 11, max: 20}).withMessage("must be >=11 and <=20 characters long");
+  const telpCheck = () => check("telp").isString().isLength({ min: 10, max: 20 }).withMessage("must be >=10 and <=20 characters long");
   const instituteCheck = () => check("institute").isString().withMessage("must be a string");
   const passwordCheck = () => check("password")
     .matches(config.password.checkRegex, "i")
@@ -60,14 +60,14 @@ export default (): Router => {
   router.post("/register/visitor", [
     emailCheck(),
     passwordCheck(),
-    voucherCheck(),
+    telpCheck(),
+    nameCheck(),
     usernameCheck().optional(),
-    nameCheck().optional(),
     genderCheck().optional(),
     interestCheck().optional(),
     dobCheck().optional(),
-    telpCheck().optional(),
     instituteCheck().optional(),
+    voucherCheck(),
     checkParam,
   ], uc.registerVisitor.bind(uc));
 
