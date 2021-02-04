@@ -1,10 +1,14 @@
-import { Column, Entity, JoinColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+
+import { User } from "./User";
 
 @Entity()
 export class GlobalScoreboard {
   @PrimaryGeneratedColumn()
-  @JoinColumn({ name: "userId" })
-  userId: number;
+  id: number;
+
+  @ManyToOne((type) => User, (user) => user.id, { nullable: false, onDelete: "CASCADE" })
+  user: User;
 
   @Column({ default: () => 0 })
   score: number;

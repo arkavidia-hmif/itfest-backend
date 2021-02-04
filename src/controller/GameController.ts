@@ -100,6 +100,7 @@ export class GameController {
     let tenantId = response.locals.auth.id;
     const role = response.locals.auth.role;
     const difficulty = request.body.difficulty;
+    const type = request.body.type;
 
     if (role === UserRole.ADMIN) {
       tenantId = request.body.tenantId;
@@ -111,6 +112,7 @@ export class GameController {
         tenant: tenantId,
         problem: JSON.stringify(request.body.problem),
         answer: JSON.stringify(request.body.answer),
+        type: type,
         difficulty: difficulty
       });
       return responseGenerator(response, 201, "created", { id: game.id });
@@ -161,6 +163,10 @@ export class GameController {
     const gameId = request.params.id;
     const answer = request.body.answer;
 
+    if (!answer) {
+      return responseGenerator(response, 404, "answer not found");
+    }
+
     const game = await this.gameRepository.findOne(gameId, { relations: ["tenant", "tenant.userId"] });
 
     if (!game) {
@@ -194,22 +200,17 @@ export class GameController {
 
         const score: number = this.evaluateScore(game, answer);
 
-        const globalBoard: GlobalScoreboard = await tmGlobalScoreboardRepository.findOne(userId);
+        const globalBoard: GlobalScoreboard = await tmGlobalScoreboardRepository.findOne({ user: { id: userId } }, { relations: ["user"] });
 
-        // TODO: Fix entity global scoreboard
-        // if (globalBoard) {
-        //   await transactionManager.increment(GlobalScoreboard, { user: userId }, "score", score);
-        //   await tmGlobalScoreboardRepository.save({
-        //     userId: userId,
-        //     lastUpdated: new Date()
-        //   });
-        // } else {
-        //   await tmGlobalScoreboardRepository.save({
-        //     userId: userId,
-        //     score: score,
-        //     lastUpdated: new Date()
-        //   });
-        // }
+        if (globalBoard) {
+          await transactionManager.increment(GlobalScoreboard, { user: { id: userId } }, "score", score);
+        } else {
+          await tmGlobalScoreboardRepository.save({
+            user: userId,
+            score: score,
+            lastUpdated: new Date()
+          });
+        }
 
         await tmScoreboardRepository.save({
           user: userId,
@@ -221,11 +222,6 @@ export class GameController {
         gameState.isSubmit = true;
         gameState.submitTime = new Date();
         await tmGameStateRepository.save(gameState);
-
-        // const reducer = (acc, current) => {
-        //   acc += config.gamePoint[current];
-        //   return acc;
-        // }
 
         const pointDelta = score * pointMultiplier;
 

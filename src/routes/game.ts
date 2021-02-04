@@ -26,6 +26,7 @@ export default () => {
   const tenantCheck = () => check("tenant").isInt({ min: 1 }).withMessage("must be valid id");
   const problemCheck = () => check("owner").exists().withMessage("must be valid object");
   const answerCheck = () => check("answer").exists().withMessage("must be valid object");
+  const typeCheck = () => check("type").isInt({ min: 1, max: 2 }).withMessage("must be valid type, 1 for quiz, 2 for crossword");
   const diffCheck = () => check("difficulty").isInt({ min: 1 }).withMessage("must be valid difficulty");
 
   router.get("/game",
@@ -36,6 +37,7 @@ export default () => {
     limitAccess([UserRole.ADMIN, UserRole.TENANT]),
     nameCheck(),
     tenantCheck().optional(),
+    typeCheck(),
     diffCheck(),
     problemCheck(),
     answerCheck()
