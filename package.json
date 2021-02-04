@@ -43,6 +43,7 @@
     "lint": "eslint 'src/**/*.ts'",
     "manage": "ts-node src/manage.ts",
     "typeorm": "ts-node ./node_modules/typeorm/cli.js",
+    "migration:create": "ts-node ./node_modules/typeorm/cli.js migration:create",
     "migration:run": "ts-node ./node_modules/typeorm/cli.js migration:run",
     "seed": "ts-node ./src/seed/index.ts",
     "reset": "npm run schema:drop && npm run schema:sync && npm run seed",
