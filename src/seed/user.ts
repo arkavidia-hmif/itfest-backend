@@ -35,7 +35,7 @@ export const UserSeed = [
     password: aEncryptedHash,
     username: "visitor",
     name: "visitor",
-    email: "v@g.com",
+    email: "primayoriko@gmail.com",//"v@g.com",
     id: 3
   },
   {
