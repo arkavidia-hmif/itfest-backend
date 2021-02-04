@@ -123,7 +123,6 @@ export class CheckoutController {
           }
         });
       } catch (error) {
-        console.log(error)
         if (typeof error === "string") {
           return responseGenerator(response, 400, error);
         } else {
