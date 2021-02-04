@@ -82,8 +82,17 @@ export default (): Router => {
     checkParam,
   ], uc.registerTenant.bind(uc));
 
+  router.post("/resetpass", [
+    checkParam,
+  ], uc.resetPassword.bind(uc));
+
+  router.post("/validation/:token([0-9a-zA-Z]+)", [
+    checkParam,
+  ], uc.verifyToken.bind(uc));
+
   // User endpoint
   router.use("/user", checkJWT);
+
   router.get("/user", [
     limitAccess([UserRole.ADMIN]),
     ...paginationCheck,
