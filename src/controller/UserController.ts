@@ -4,7 +4,6 @@ import { Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
 import { AdvancedConsoleLogger, getConnection, getRepository, Repository } from "typeorm";
 import * as TokenGenerator from 'uuid-token-generator';
-import { getTestMessageUrl, createTestAccount, createTransport } from 'nodemailer';
 
 import config from "../config";
 import { Tenant, User, UserRole, Visitor } from "../entity/User";
@@ -14,7 +13,7 @@ import { partialUpdate } from "../utils/partialUpdateEntity";
 import { decodeQr, generateQr } from "../utils/qr";
 import { responseGenerator } from "../utils/responseGenerator";
 import { TransactionController } from "./TransactionController";
-import { transporter } from "../utils/mail";
+import { sendResetPasswordEmail, sendVerifyAccountEmail } from "../utils/mail";
 
 export class UserController {
   private tokenGenerator = new TokenGenerator(128, TokenGenerator.BASE62);
@@ -60,58 +59,6 @@ export class UserController {
     return codeList;
   }
 
-  async sendEmail(target: string, subject: string, body: string, text: string){
-    const html = `
-      <html>
-      <head>
-          <style>
-              * {
-                  margin: 0;
-                  padding: 0;
-                  box-sizing: border-box;
-              }
-          </style>
-      </head>
-      <body style="font-family: Roboto,sans-serif; line-height: 2; background-color: #eee; width: 100%; padding: 20px; margin: 0;">
-          ${body}
-      </body>
-    `;
-    
-    /********************************************/
-    /* FOR TESTING UNCOMMENT THIS PART */
-    // let testAccount = await createTestAccount();
-
-    // create reusable transporter object using the default SMTP transport
-    // let transporter = createTransport({
-    //   host: "smtp.ethereal.email",
-    //   port: 587,
-    //   secure: false, // true for 465, false for other ports
-    //   auth: {
-    //     user: testAccount.user, // generated ethereal user
-    //     pass: testAccount.pass, // generated ethereal password
-    //   },
-    // });
-    /********************************************/
-
-    const mailOptions = {
-      from: '"Arkavidia" <no-reply@arkavidia.com>', // sender address
-      to: target, // list of receivers
-      subject: subject, // Subject line
-      text: text, // plain text body
-      html: html // html body
-    };
-
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        throw error;
-      }
-
-      // Uncomment too for testing puropose
-      // console.log('Message sent: %s', info.messageId);   
-      // console.log('Preview URL: %s', getTestMessageUrl(info));
-    });
-  }
-
   async resetPassword(request: Request, response: Response){
     try {
       const { username, email } = request.body;
@@ -134,20 +81,8 @@ export class UserController {
           type: VerificationType.RESET_PASS
         });
 
-        const htmlBody = `
-          <table style="margin: auto; width: 100%; background-color: #FFF; padding: 20px; max-width: 500px;">
-            <tr><td style="text-align: center"><img src="https://arkavidia.nyc3.digitaloceanspaces.com/logo-arkavidia.png" height="100"></td></tr>
-            <tr><td style="text-align: center">Halo, ${user.name}! </td></tr>
-            <tr><td style="text-align: center">Untuk mereset password Anda, masukkan token [ <strong> ${token} </strong> ] ke halaman yang memintanya.</td></tr>
+        sendResetPasswordEmail(user.name, user.email, token);
 
-            <tr><td style="text-align: center">Jika Anda tidak ingin mengganti password, tidak ada yang perlu Anda lakukan.</td></tr>
-            <tr><td style="text-align: center">Password Anda tidak akan berubah sampai Anda menggunakan token di atas dan mengganti dengan password yang baru.</td></tr>
-          </table>
-        `;
-        
-        const textBody = `TOKEN: ${token}`;
-
-        this.sendEmail(user.email, "Reset Password - ITFest Arkavidia", htmlBody, textBody);
       }
       
       return responseGenerator(response, 200, "ok");
@@ -351,32 +286,6 @@ export class UserController {
     }
   }
 
-  async sendVerificationEmail(verificationRepository: Repository<Verification>, user: User): Promise<void>{
-    const token = this.tokenGenerator.generate();
-    
-    await verificationRepository.save({
-      userId: user,
-      token,
-      type: VerificationType.CONFIRM_EMAIL
-    });
-
-    const htmlBody = `
-      <table style="margin: auto; width: 100%; background-color: #FFF; padding: 20px; max-width: 500px;">
-        <tr><td style="text-align: center"><img src="https://arkavidia.nyc3.digitaloceanspaces.com/logo-arkavidia.png" height="100"></td></tr>
-        <tr><td style="text-align: center">Halo, ${user.name}! </td></tr>
-        <tr><td style="text-align: center">Untuk menkonfirmasi akun anda, masukkan token [ <strong> ${token} </strong> ] ke halaman yang memintanya.</td></tr>
-
-        <tr><td style="text-align: center">Jika Anda tidak meminta email ini, tidak ada yang perlu Anda lakukan.</td></tr>
-        <tr><td style="text-align: center">Terimakasih sudah mendaftarkan diri ke event ITFest dari Arkavidia!</td></tr>
-      </table>
-    `;
-    
-    const textBody = `TOKEN: ${token}`;
-
-    this.sendEmail(user.email, "Confirm Email - ITFest Arkavidia", htmlBody, textBody);
-
-  }
-
   async registerTenant(request: Request, response: Response) {
     const { email, username, password, point } = request.body;
     // const username: string = request.body.uemail.substring(0, email.indexOf("@"));
@@ -419,7 +328,15 @@ export class UserController {
           point: point || config.tenantInitial
         });
 
-        await this.sendVerificationEmail(tmVerificationRepository, savedUser);
+        const verificationToken = this.tokenGenerator.generate();
+
+        await tmVerificationRepository.save({
+          userId: savedUser,
+          token,
+          type: VerificationType.CONFIRM_EMAIL
+        });
+
+        sendVerifyAccountEmail(savedUser.name, savedUser.email, verificationToken);
 
         token = jwt.sign({
           id: savedUser.id,
@@ -488,7 +405,15 @@ export class UserController {
           email,
         });
 
-        await this.sendVerificationEmail(tmVerificationRepository, savedUser);
+        const verificationToken = this.tokenGenerator.generate();
+
+        await tmVerificationRepository.save({
+          userId: savedUser,
+          token,
+          type: VerificationType.CONFIRM_EMAIL
+        });
+
+        sendVerifyAccountEmail(savedUser.name, savedUser.email, verificationToken);
 
         let filled = false;
         let point = 0;
