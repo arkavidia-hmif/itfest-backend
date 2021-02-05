@@ -18,7 +18,7 @@ import { transporter } from "../utils/mail";
 
 export class UserController {
   private tokenGenerator = new TokenGenerator(128, TokenGenerator.BASE62);
-  
+
   private userRepository = getRepository(User);
   private visitorRepository = getRepository(Visitor);
   private tenantRepository = getRepository(Tenant);
@@ -60,7 +60,7 @@ export class UserController {
     return codeList;
   }
 
-  async sendEmail(target: string, subject: string, body: string, text: string){
+  async sendEmail(target: string, subject: string, body: string, text: string) {
     const html = `
       <html>
       <head>
@@ -76,43 +76,20 @@ export class UserController {
           ${body}
       </body>
     `;
-    
-    /********************************************/
-    /* FOR TESTING UNCOMMENT THIS PART */
-    // let testAccount = await createTestAccount();
 
-    // create reusable transporter object using the default SMTP transport
-    // let transporter = createTransport({
-    //   host: "smtp.ethereal.email",
-    //   port: 587,
-    //   secure: false, // true for 465, false for other ports
-    //   auth: {
-    //     user: testAccount.user, // generated ethereal user
-    //     pass: testAccount.pass, // generated ethereal password
-    //   },
-    // });
-    /********************************************/
 
     const mailOptions = {
-      from: '"Arkavidia" <no-reply@arkavidia.com>', // sender address
+      from: "\"Arkavidia\" <no-reply@arkavidia.id>", // sender address
       to: target, // list of receivers
       subject: subject, // Subject line
       text: text, // plain text body
       html: html // html body
     };
 
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        throw error;
-      }
-
-      // Uncomment too for testing puropose
-      // console.log('Message sent: %s', info.messageId);   
-      // console.log('Preview URL: %s', getTestMessageUrl(info));
-    });
+    await transporter.sendMail(mailOptions);
   }
 
-  async resetPassword(request: Request, response: Response){
+  async resetPassword(request: Request, response: Response) {
     try {
       const { username, email } = request.body;
       const token = this.tokenGenerator.generate();
@@ -120,14 +97,14 @@ export class UserController {
       const userByUsername = await this.userRepository.findOne({
         username
       });
-  
+
       const userByEmail = await this.userRepository.findOne({
         email
       });
-  
+
       const user = userByEmail || userByUsername;
-      
-      if(user){
+
+      if (user) {
         await this.verificationRepository.save({
           userId: user,
           token,
@@ -144,36 +121,36 @@ export class UserController {
             <tr><td style="text-align: center">Password Anda tidak akan berubah sampai Anda menggunakan token di atas dan mengganti dengan password yang baru.</td></tr>
           </table>
         `;
-        
+
         const textBody = `TOKEN: ${token}`;
 
         this.sendEmail(user.email, "Reset Password - ITFest Arkavidia", htmlBody, textBody);
       }
-      
+
       return responseGenerator(response, 200, "ok");
 
     } catch (err) {
       return responseGenerator(response, 500, "server-error");
-      
+
     }
   }
 
-  async verifyToken(request: Request, response: Response){
-    try{
+  async verifyToken(request: Request, response: Response) {
+    try {
       const token: string = request.params.token;
       const password: string = request.body.password;
 
       const verification = await this.verificationRepository.findOne({
         where: {
           token: token
-        }, 
-        relations: [ "userId" ]
+        },
+        relations: ["userId"]
       });
 
-      if(verification){
+      if (verification) {
         const user: User = verification.userId;
-        
-        if(verification.type === VerificationType.CONFIRM_EMAIL){
+
+        if (verification.type === VerificationType.CONFIRM_EMAIL) {
           user.isVerified = true;
 
           await getConnection().transaction(async transactionManager => {
@@ -338,7 +315,7 @@ export class UserController {
         role: user.role,
       }, config.secret);
 
-      if(!user.isVerified){
+      if (!user.isVerified) {
         return responseGenerator(response, 403, "not-verified");
       }
 
@@ -350,9 +327,9 @@ export class UserController {
     }
   }
 
-  async sendVerificationEmail(verificationRepository: Repository<Verification>, user: User): Promise<void>{
+  async sendVerificationEmail(verificationRepository: Repository<Verification>, user: User): Promise<void> {
     const token = this.tokenGenerator.generate();
-    
+
     await verificationRepository.save({
       userId: user,
       token,
@@ -369,7 +346,7 @@ export class UserController {
         <tr><td style="text-align: center">Terimakasih sudah mendaftarkan diri ke event ITFest dari Arkavidia!</td></tr>
       </table>
     `;
-    
+
     const textBody = `TOKEN: ${token}`;
 
     this.sendEmail(user.email, "Confirm Email - ITFest Arkavidia", htmlBody, textBody);
@@ -412,7 +389,7 @@ export class UserController {
           name,
           email,
         });
-        
+
         await tmTenantRepository.save({
           userId: savedUser,
           point: point || config.tenantInitial
@@ -470,14 +447,13 @@ export class UserController {
         return responseGenerator(response, 400, "invalid-voucher");
       }
     }
-
     let token = "";
 
     try {
       await getConnection().transaction(async transactionManager => {
         const tmUserRepository = transactionManager.getRepository(User);
         const tmVerificationRepository = transactionManager.getRepository(Verification);
-        
+
         const savedUser = await tmUserRepository.save({
           role: UserRole.VISITOR,
           salt,
