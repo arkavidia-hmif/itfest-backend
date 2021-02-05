@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getRepository, getConnection } from "typeorm";
+import { getRepository, getConnection, createQueryBuilder } from "typeorm";
 
 import { Inventory } from "../entity/Inventory";
 import { Item } from "../entity/Item";
@@ -40,7 +40,7 @@ export class InventoryController {
   }
 
 
-  async listTenatWithItem(request: Request, response: Response) {
+  async listTenantWithItem(request: Request, response: Response) {
     const page = parseInt(request.query.page, 10) || 1;
     const itemPerPage = parseInt(request.query.itemPerPage, 10) || 100;
 
@@ -168,6 +168,28 @@ export class InventoryController {
     } else {
       return responseGenerator(response, 404, "item-not-found");
     }
+  }
+
+  async getInventoryGroupedByTenantID(request: Request, response: Response) {
+    const limit: number = +request.query.limit || 100; //dafault
+    const offset: number = +request.query.offset || 0;// default
+
+    try{
+      const items = await createQueryBuilder("item").groupBy("ownerId")
+        .orderBy("ownerId")
+        .leftJoinAndSelect(Inventory, "inventory", "Item.id = inventory.itemId")
+        .offset(offset)
+        .limit(limit)
+        .getMany();
+
+      return responseGenerator(response, 200, "ok", items);
+
+    } catch (err){
+      console.log(err);
+      return responseGenerator(response, 500, "internal-server-error");
+
+    }
+
   }
 
   async editItem(request: Request, response: Response) {

@@ -107,7 +107,7 @@ export default (): Router => {
     limitAccess([UserRole.ADMIN]),
     ...paginationCheck,
     checkParam,
-  ], ic.listTenatWithItem.bind(ic));
+  ], ic.listTenantWithItem.bind(ic));
   router.get("/user/me", uc.getMe.bind(uc));
   router.put("/user/me", [
     emailCheck().optional(),
