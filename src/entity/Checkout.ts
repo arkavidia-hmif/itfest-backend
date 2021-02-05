@@ -42,9 +42,12 @@ export class CheckoutItem {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @PrimaryColumn({ type: "int", name: "checkoutId"})
+  @PrimaryColumn({ type: "int", name: "checkout"})
   @ManyToOne((type) => Checkout)
   checkoutId: number;
+  // @OneToMany((type) => Checkout, { primary: true })
+  // @JoinColumn({ name: "checkoutId" })
+  // checkoutId: Checkout;
 
   @ManyToOne((type) => Item, { nullable: false })
   item: Item;

@@ -1,10 +1,8 @@
 import { Request, response, Response } from "express";
-import { getConnection, getRepository } from "typeorm";
-import { Tenant, User, UserRole, Visitor } from "../entity/User";
+import { getRepository } from "typeorm";
 import { GlobalScoreboard } from "../entity/GlobalScoreboard";
 import { responseGenerator } from "../utils/responseGenerator";
-import { readFileSync } from "fs";
-import { join } from "path";
+
 
 export class GlobalScoreboardController {
     private scoreboardRepository = getRepository(GlobalScoreboard);
