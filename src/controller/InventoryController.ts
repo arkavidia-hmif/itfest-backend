@@ -8,6 +8,7 @@ import { responseGenerator } from "../utils/responseGenerator";
 import { Transaction, TransactionType } from "../entity/Transaction";
 import { globalSocket } from "../routes/socket";
 import { decodeQr } from "../utils/qr";
+import user from "../routes/user";
 
 export class InventoryController {
 
@@ -44,68 +45,73 @@ export class InventoryController {
     const page = parseInt(request.query.page, 10) || 1;
     const itemPerPage = parseInt(request.query.itemPerPage, 10) || 100;
 
-    const [userArray, userTotal] = await this.userRepository.findAndCount({
-      where: [
-        {
-          role: UserRole.ADMIN
-        },
-        {
-          role: UserRole.TENANT
-        }
-      ],
-      take: itemPerPage,
-      skip: (page - 1) * itemPerPage,
-      select: ["id", "name"]
-    });
+    try {
+      const [userArray, userTotal] = await this.userRepository.findAndCount({
+        where: [
+          {
+            role: UserRole.ADMIN
+          },
+          {
+            role: UserRole.TENANT
+          }
+        ],
+        take: itemPerPage,
+        skip: (page - 1) * itemPerPage,
+        select: ["id", "name"]
+      });
 
-    const tenantIdArray = userArray.map((entry) => {
-      return {
-        ownerId: entry.id
-      };
-    });
-
-    const [itemArray, itemTotal] = await this.itemRepository.findAndCount({
-      where: tenantIdArray,
-      select: ["id"]
-    });
-
-    const itemIdArray = itemArray.map((entry) => {
-      return {
-        item: entry.id
-      };
-    });
-
-    const [inventoryArray, inventoryTotal] = await this.inventoryRepository.findAndCount({
-      where: itemIdArray,
-      relations: ["item"]
-    });
-
-    const finalArray = userArray.map((entry) => {
-      const filteredInventory = inventoryArray.filter((inventory) => (+inventory.item.owner) === entry.id);
-      const userInventory = filteredInventory.map((inventory) => {
+      const tenantIdArray = userArray.map((entry) => {
         return {
-          id: inventory.item.id,
-          name: inventory.item.name,
-          price: inventory.item.price,
-          qty: inventory.qty,
-          hasPhysical: inventory.item.hasPhysical,
-          imageUrl: inventory.item.imageUrl
+          owner: entry.id
         };
       });
 
-      return {
-        id: entry.id,
-        name: entry.name,
-        items: userInventory
-      };
-    });
+      const [itemArray, itemTotal] = await this.itemRepository.findAndCount({
+        where: tenantIdArray,
+        select: ["id"],
+      });
 
-    return responseGenerator(response, 200, "ok", {
-      array: finalArray,
-      page,
-      itemPerPage,
-      total: userTotal
-    });
+      const itemIdArray = itemArray.map((entry) => {
+        return {
+          item: entry.id
+        };
+      });
+
+      const [inventoryArray, inventoryTotal] = await this.inventoryRepository.findAndCount({
+        where: itemIdArray,
+        relations: ["item", "item.owner"]
+      });
+
+      const finalArray = userArray.map((entry) => {
+        const filteredInventory = inventoryArray.filter((inventory) => (+inventory.item.owner.id) === entry.id);
+        const userInventory = filteredInventory.map((inventory) => {
+          return {
+            id: inventory.item.id,
+            name: inventory.item.name,
+            price: inventory.item.price,
+            qty: inventory.qty,
+            hasPhysical: inventory.item.hasPhysical,
+            imageUrl: inventory.item.imageUrl
+          };
+        });
+        
+        return {
+          id: entry.id,
+          name: entry.name,
+          items: userInventory
+        };
+      });
+  
+      return responseGenerator(response, 200, "ok", {
+        array: finalArray,
+        page,
+        itemPerPage,
+        total: userTotal
+      });
+    } catch (err) {
+      return responseGenerator(response, 500, "err");
+
+    }
   }
 
   async createItem(request: Request, response: Response) {
@@ -168,28 +174,6 @@ export class InventoryController {
     } else {
       return responseGenerator(response, 404, "item-not-found");
     }
-  }
-
-  async getInventoryGroupedByTenantID(request: Request, response: Response) {
-    const limit: number = +request.query.limit || 100; //dafault
-    const offset: number = +request.query.offset || 0;// default
-
-    try{
-      const items = await createQueryBuilder("item").groupBy("ownerId")
-        .orderBy("ownerId")
-        .leftJoinAndSelect(Inventory, "inventory", "Item.id = inventory.itemId")
-        .offset(offset)
-        .limit(limit)
-        .getMany();
-
-      return responseGenerator(response, 200, "ok", items);
-
-    } catch (err){
-      console.log(err);
-      return responseGenerator(response, 500, "internal-server-error");
-
-    }
-
   }
 
   async editItem(request: Request, response: Response) {
@@ -326,7 +310,6 @@ export class InventoryController {
         return responseGenerator(response, 500, "unknown-error", error);
       }
     }
-
 
     return responseGenerator(response, 200, "ok");
   }

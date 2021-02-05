@@ -18,8 +18,6 @@ export default () => {
   const ownerCheck = () => check("owner").isInt({ min: 0 }).withMessage("must be valid id");
   const qtyCheck = () => check("qty").isInt({ min: 0 }).withMessage("must be >= 0");
 
-  router.get("/item/bytenant", [], ic.getInventoryGroupedByTenantID.bind(ic));
-  
   router.use(checkJWT);
   router.get("/item", [...paginationCheck, checkParam], ic.listItem.bind(ic));
   router.post("/item", [
