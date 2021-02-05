@@ -95,6 +95,7 @@ export class GameController {
   async addGame(request: Request, response: Response) {
     let tenantId = response.locals.auth.id;
     const role = response.locals.auth.role;
+
     const { difficulty, type } = request.body;
 
     if (role === UserRole.ADMIN) {
@@ -107,8 +108,8 @@ export class GameController {
         tenant: tenantId,
         problem: JSON.stringify(request.body.problem),
         answer: JSON.stringify(request.body.answer),
-        difficulty: difficulty,
-        type: type
+        type: type,
+        difficulty: difficulty
       });
       return responseGenerator(response, 201, "created", { id: game.id });
     } catch (error) {
