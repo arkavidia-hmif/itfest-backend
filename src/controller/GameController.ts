@@ -25,7 +25,7 @@ export class GameController {
     const userId = response.locals.auth.id;
     const gameId = request.params.id;
 
-    let game = await this.gameRepository.findOne(gameId);
+    const game = await this.gameRepository.findOne(gameId);
 
     if (!game) {
       return responseGenerator(response, 404, "game-not-found");
