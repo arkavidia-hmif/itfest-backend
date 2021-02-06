@@ -49,8 +49,9 @@ export class GameController {
     delete game.tenant;
     delete game.answer;
 
-    return responseGenerator(response, 200, "ok", JSON.parse(game.problem));
-    // return responseGenerator(response, 200, 'ok', { "questions": game.problem });
+    game.problem = JSON.parse(game.problem);
+
+    return responseGenerator(response, 200, "ok", game);
   }
 
   async playGame(request: Request, response: Response) {
