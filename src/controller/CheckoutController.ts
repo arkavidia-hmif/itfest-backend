@@ -110,7 +110,7 @@ export class CheckoutController {
 
           items.forEach(async item => {
             await tmCheckoutItemRepository.save({
-              checkoutId: checkout.id,
+              checkout: checkout,
               item: item,
               quantity: +item.quantity
             });
