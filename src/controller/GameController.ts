@@ -25,7 +25,7 @@ export class GameController {
     const userId = response.locals.auth.id;
     const gameId = request.params.id;
 
-    const game = await this.gameRepository.findOne(gameId);
+    let game = await this.gameRepository.findOne(gameId);
 
     if (!game) {
       return responseGenerator(response, 404, "game-not-found");
@@ -49,8 +49,9 @@ export class GameController {
     delete game.tenant;
     delete game.answer;
 
-    return responseGenerator(response, 200, "ok", JSON.parse(game.problem));
-    // return responseGenerator(response, 200, 'ok', { "questions": game.problem });
+    game.problem = JSON.parse(game.problem);
+
+    return responseGenerator(response, 200, "ok", game);
   }
 
   async playGame(request: Request, response: Response) {
