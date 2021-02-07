@@ -1,4 +1,4 @@
-import { IsAlphanumeric, IsEmail } from "class-validator";
+import { IsEmail } from "class-validator";
 import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn, Check } from "typeorm";
 
 export enum UserRole {
@@ -27,7 +27,6 @@ export class User {
   @Column({
     unique: true,
   })
-  @IsAlphanumeric()
   username: string;
 
   @Column({ default: "anonymous" })

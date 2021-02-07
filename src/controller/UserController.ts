@@ -428,8 +428,7 @@ export class UserController {
   async registerVisitor(request: Request, response: Response): Promise<void> {
     const password: string = request.body.password;
     const email: string = request.body.email;
-    const emailFrontPart: string = email.substring(0, email.indexOf("@"));
-    const username: string = request.body.username || emailFrontPart;
+    const username: string = request.body.username || request.body.email;
 
     delete request.body.password;
 
