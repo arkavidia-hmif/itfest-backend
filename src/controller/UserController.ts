@@ -368,8 +368,6 @@ export class UserController {
 
     const encryptedHash = bcrypt.hashSync(password, salt);
 
-    let token = "";
-
     try {
       await getConnection().transaction(async transactionManager => {
         const tmUserRepository = transactionManager.getRepository(User);
@@ -399,13 +397,6 @@ export class UserController {
         });
 
         await this.sendVerificationEmail(tmVerificationRepository, savedUser);
-
-        token = jwt.sign({
-          id: savedUser.id,
-          username: savedUser.username,
-          email: savedUser.email,
-          role: savedUser.role,
-        }, config.secret);
       });
     } catch (err) {
       if (err === "user-exists" || err.code === "23505") {
@@ -419,10 +410,7 @@ export class UserController {
       }
     }
 
-
-    return responseGenerator(response, 200, "ok", {
-      jwt: token
-    });
+    return responseGenerator(response, 200, "ok");
   }
 
   async registerVisitor(request: Request, response: Response): Promise<void> {
@@ -449,7 +437,6 @@ export class UserController {
         return responseGenerator(response, 400, "invalid-voucher");
       }
     }
-    let token = "";
 
     try {
       await getConnection().transaction(async transactionManager => {
@@ -491,13 +478,6 @@ export class UserController {
         if (config.useVoucher) {
           await transactionManager.delete(Voucher, voucherItem);
         }
-
-        token = jwt.sign({
-          id: savedUser.id,
-          username: savedUser.username,
-          email: savedUser.email,
-          role: savedUser.role,
-        }, config.secret);
       });
     } catch (err) {
       if (err.code === "23505") {
@@ -509,9 +489,7 @@ export class UserController {
       }
     }
 
-    return responseGenerator(response, 200, "ok", {
-      jwt: token
-    });
+    return responseGenerator(response, 200, "ok");
   }
 
   checkFilled(visitorObj: Visitor, userObj?: User): boolean {
