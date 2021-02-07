@@ -154,8 +154,6 @@ export class GameController {
   }
 
   async submitGame(request: Request, response: Response) {
-    const pointMultiplier = 0.5; // Score to point Multiplier
-
     const userId = response.locals.auth.id;
     const gameId = request.params.id;
     const answer = request.body.answer;
@@ -220,7 +218,7 @@ export class GameController {
         gameState.submitTime = new Date();
         await tmGameStateRepository.save(gameState);
 
-        const pointDelta = score * pointMultiplier;
+        const pointDelta = score;
 
         const tenant = await tmTenantRepository.findOne(game.tenant, { relations: ["userId"] });
 
