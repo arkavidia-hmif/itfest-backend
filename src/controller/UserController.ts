@@ -319,8 +319,11 @@ export class UserController {
         return responseGenerator(response, 403, "not-verified");
       }
 
+      delete user.password;
+
       return responseGenerator(response, 200, "ok", {
-        jwt: token
+        jwt: token,
+        user
       });
     } else {
       return responseGenerator(response, 401, "invalid-auth");
