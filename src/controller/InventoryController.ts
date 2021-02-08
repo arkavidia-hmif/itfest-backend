@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getRepository, getConnection, createQueryBuilder } from "typeorm";
+import { getRepository, getConnection } from "typeorm";
 
 import { Inventory } from "../entity/Inventory";
 import { Item } from "../entity/Item";
@@ -7,8 +7,6 @@ import { User, UserRole, Visitor } from "../entity/User";
 import { responseGenerator } from "../utils/responseGenerator";
 import { Transaction, TransactionType } from "../entity/Transaction";
 import { globalSocket } from "../routes/socket";
-import { decodeQr } from "../utils/qr";
-import user from "../routes/user";
 
 export class InventoryController {
 

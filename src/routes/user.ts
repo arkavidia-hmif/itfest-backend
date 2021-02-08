@@ -104,10 +104,11 @@ export default (): Router => {
     checkParam,
   ], uc.listUser.bind(uc));
   router.get("/user/item", [
-    // limitAccess([UserRole.ADMIN]),
+    limitAccess([UserRole.ADMIN]),
     ...paginationCheck,
     checkParam,
   ], ic.listTenantWithItem.bind(ic));
+
   router.get("/user/me", uc.getMe.bind(uc));
   router.put("/user/me", [
     emailCheck().optional(),
