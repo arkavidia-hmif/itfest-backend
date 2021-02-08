@@ -31,7 +31,7 @@ export class Checkout{
     @Column({ default: 0 })
     totalPrice: number;
 
-    @OneToMany(() => CheckoutItem, checkoutItem => checkoutItem.checkoutId)
+    @OneToMany(() => CheckoutItem, checkoutItem => checkoutItem.checkout)
     @JoinColumn({ name: "items" })
     items: CheckoutItem[];
 }
@@ -42,9 +42,8 @@ export class CheckoutItem {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @PrimaryColumn({ type: "int", name: "checkoutId"})
-  @ManyToOne((type) => Checkout)
-  checkoutId: number;
+  @ManyToOne((type) => Checkout, (checkout) => checkout.id, { nullable: false, onDelete: "CASCADE" })
+  checkout: Checkout;
 
   @ManyToOne((type) => Item, { nullable: false })
   item: Item;

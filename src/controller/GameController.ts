@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
-import { getConnection, getRepository } from "typeorm";
+import { getConnection, getRepository, Repository } from "typeorm";
 
-import config from "../config";
 import { Feedback } from "../entity/Feedback";
 import { Game, GameFactory } from "../entity/Game";
 import { GameState } from "../entity/GameState";
@@ -10,9 +9,7 @@ import { GlobalScoreboard } from "../entity/GlobalScoreboard";
 import { Tenant, User, UserRole, Visitor } from "../entity/User";
 import { Transaction, TransactionType } from "../entity/Transaction";
 import { responseGenerator } from "../utils/responseGenerator";
-
 import { partialUpdate } from "../utils/partialUpdateEntity";
-import { globalSocket } from "../routes/socket";
 
 export class GameController {
   private userRepository = getRepository(User);
@@ -22,7 +19,6 @@ export class GameController {
   private gameRepository = getRepository(Game);
   private gameStateRepository = getRepository(GameState);
   private scoreboardRepository = getRepository(Scoreboard);
-  private transactionRepository = getRepository(Transaction);
 
   // get data game
   async getGame(request: Request, response: Response) {
@@ -53,8 +49,9 @@ export class GameController {
     delete game.tenant;
     delete game.answer;
 
-    return responseGenerator(response, 200, "ok", JSON.parse(game.problem));
-    // return responseGenerator(response, 200, 'ok', { "questions": game.problem });
+    game.problem = JSON.parse(game.problem);
+
+    return responseGenerator(response, 200, "ok", game);
   }
 
   async playGame(request: Request, response: Response) {
@@ -99,8 +96,8 @@ export class GameController {
   async addGame(request: Request, response: Response) {
     let tenantId = response.locals.auth.id;
     const role = response.locals.auth.role;
-    const difficulty = request.body.difficulty;
-    const type = request.body.type;
+
+    const { difficulty, type } = request.body;
 
     if (role === UserRole.ADMIN) {
       tenantId = request.body.tenantId;
@@ -157,8 +154,6 @@ export class GameController {
   }
 
   async submitGame(request: Request, response: Response) {
-    const pointMultiplier = 0.5; // Score to point Multiplier
-
     const userId = response.locals.auth.id;
     const gameId = request.params.id;
     const answer = request.body.answer;
@@ -223,7 +218,7 @@ export class GameController {
         gameState.submitTime = new Date();
         await tmGameStateRepository.save(gameState);
 
-        const pointDelta = score * pointMultiplier;
+        const pointDelta = score;
 
         const tenant = await tmTenantRepository.findOne(game.tenant, { relations: ["userId"] });
 
@@ -231,32 +226,8 @@ export class GameController {
           throw "not-enough-point";
         }
 
-        tenant.point -= pointDelta;
-
-        await tmTenantRepository.save(tenant);
-
-        const visitor = await tmVisitorRepository.findOne(userId, { relations: ["userId"] });
-
-        visitor.point += pointDelta;
-
-        await tmVisitorRepository.save(visitor);
-
-        // const feedback = await tmFeedbackRepository.findOne({
-        //   where: {
-        //     from: visitor,
-        //     to: tenant
-        //   }
-        // });
-
-        // if (feedback) {
-        //   throw "already-play-game";
-        // }
-
-        // await tmFeedbackRepository.save({
-        //   from: visitor,
-        //   to: tenant,
-        //   rated: false
-        // });
+        await transactionManager.increment(Visitor, { userId: userId }, "point", pointDelta);
+        await transactionManager.decrement(Tenant, { userId: userId }, "point", pointDelta);
 
         await tmTransactionRepository.save({
           type: TransactionType.PLAY,

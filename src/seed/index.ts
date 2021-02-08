@@ -46,7 +46,7 @@ async function seedData(){
   const checkoutItemRepository = getRepository(CheckoutItem);
 
   await userRepository.save(UserSeed)
-    .then(user => {
+    .then(() => {
       console.log("user data successfully added");
     })
     .catch(err => {
@@ -54,7 +54,7 @@ async function seedData(){
     });
 
   await tenantRepository.save(TenantSeed)
-    .then(user => {
+    .then(() => {
       console.log("tenant data successfully added");
     })
     .catch(err => {
@@ -62,7 +62,7 @@ async function seedData(){
     });
 
   await visitorRepository.save(VisitorSeed)
-    .then(visitor => {
+    .then(() => {
       console.log("visitor data successfully added");
     })
     .catch(err => {
@@ -70,7 +70,7 @@ async function seedData(){
     });
 
   await gameRepository.save(GameSeed)
-    .then(game => {
+    .then(() => {
       console.log("game data successfully added");
     })
     .catch(err => {
@@ -78,7 +78,7 @@ async function seedData(){
     });
 
   await globalScoreboardRepository.save(GlobalScoreboardSeed)
-    .then(gsc => {
+    .then(() => {
       console.log("global scoreboard data successfully added");
     })
     .catch(err => {
@@ -86,7 +86,7 @@ async function seedData(){
     });
 
   await scoreboardRepository.save(ScoreboardSeed)
-    .then(sc => {
+    .then(() => {
       console.log("scoreboard data successfully added");
     })
     .catch(err => {
@@ -94,7 +94,7 @@ async function seedData(){
     });
 
   await itemRepository.save(ItemSeed)
-    .then(sc => {
+    .then(() => {
       console.log("item data successfully added");
     })
     .catch(err => {
@@ -102,7 +102,7 @@ async function seedData(){
     });
 
   await inventoryRepository.save(InventorySeed)
-    .then(sc => {
+    .then(() => {
       console.log("inventory data successfully added");
     })
     .catch(err => {
@@ -110,7 +110,7 @@ async function seedData(){
     });
 
   await checkoutRepository.save(CheckoutSeed)
-    .then(sc => {
+    .then(() => {
       console.log("checkout data successfully added");
     })
     .catch(err => {
@@ -118,7 +118,7 @@ async function seedData(){
     });
 
   await checkoutItemRepository.save(CheckoutItemSeed)
-    .then(sc => {
+    .then(() => {
       console.log("checkout-item data successfully added");
     })
     .catch(err => {

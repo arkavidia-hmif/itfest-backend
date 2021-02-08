@@ -1,7 +1,6 @@
 import * as bcrypt from "bcrypt";
-import * as crypto from "crypto";
 
-import { UserRole, User } from "../entity/User";
+import { UserRole } from "../entity/User";
 import config from "../config";
 
 const aSalt = bcrypt.genSaltSync(config.password.saltRounds);
@@ -17,7 +16,7 @@ export const UserSeed = [
     username: "tenant2",
     name: "tenant2",
     email: "t2@g.com",
-    id: 1
+    // id: 1
   },
   {
     role: UserRole.TENANT,
@@ -27,7 +26,7 @@ export const UserSeed = [
     username: "tenant",
     name: "tenant",
     email: "t@g.com",
-    id: 2
+    // id: 2
   },
   {
     role: UserRole.VISITOR,
@@ -35,8 +34,8 @@ export const UserSeed = [
     password: aEncryptedHash,
     username: "visitor",
     name: "visitor",
-    email: "primayoriko@gmail.com",//"v@g.com",
-    id: 3
+    email: "v@g.com",
+    // id: 3W
   },
   {
     role: UserRole.VISITOR,
@@ -45,7 +44,7 @@ export const UserSeed = [
     username: "visitor2",
     name: "visitor2",
     email: "v2@g.com",
-    id: 4
+    // id: 4
   },
   {
     role: UserRole.VISITOR,
@@ -54,7 +53,7 @@ export const UserSeed = [
     username: "visitor3",
     name: "visitor3",
     email: "v3@g.com",
-    id: 5
+    // id: 5
   },
   {
     role: UserRole.ADMIN,
@@ -63,6 +62,6 @@ export const UserSeed = [
     username: "admin",
     name: "admin",
     email: "a@g.com",
-    id: 6
+    // id: 6
   }
 ];
