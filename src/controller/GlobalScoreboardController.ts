@@ -9,12 +9,19 @@ export class GlobalScoreboardController {
 
     getScoreboard = async (req: Request, res: Response) => {
       try {
-        const limit: number = +req.query.limit || 1000; //default
+        const limit = (+req.query.limit && +req.query.limit < 20 && +req.query.limit) || 20;
         const offset: number = +req.query.offset || 0; //default
 
         const scoreboard = await this.scoreboardRepository
           .createQueryBuilder("global_scoreboard")
           .orderBy("global_scoreboard.score", "DESC")
+          .leftJoinAndSelect("global_scoreboard.user", "user")
+          .select(
+            [
+              "global_scoreboard.id",
+              "global_scoreboard.score",
+              "user.name",
+            ])
           .offset(offset)
           .take(limit)
           .getMany();
