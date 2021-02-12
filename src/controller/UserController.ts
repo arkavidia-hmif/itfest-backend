@@ -15,6 +15,7 @@ import { decodeQr, generateQr } from "../utils/qr";
 import { responseGenerator } from "../utils/responseGenerator";
 import { TransactionController } from "./TransactionController";
 import { transporter } from "../utils/mail";
+import { Request } from "express-validator/src/base";
 
 export class UserController {
   private tokenGenerator = new TokenGenerator(128, TokenGenerator.BASE62);
@@ -492,6 +493,18 @@ export class UserController {
     return responseGenerator(response, 200, "ok");
   }
 
+  async countVisitor(req: Request, res: Response){
+    try {
+      const visCount = await this.visitorRepository.count();
+
+      return responseGenerator(res, 200, "ok", visCount);
+    } catch (err) {
+      
+      console.error(err);
+      return responseGenerator(res, 500, "unknown-error");
+    }
+  }
+
   checkFilled(visitorObj: Visitor, userObj?: User): boolean {
     return !visitorObj.filled &&
       (!userObj || userObj.name !== userObj.email) &&
@@ -596,4 +609,3 @@ export class UserController {
     });
   }
 }
-

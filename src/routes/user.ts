@@ -90,6 +90,9 @@ export default (): Router => {
     checkParam,
   ], uc.verifyToken.bind(uc));
 
+  router.get("/user/visitor/count", [
+  ], uc.countVisitor.bind(uc));
+
   // User endpoint
   router.use("/user", checkJWT);
 
