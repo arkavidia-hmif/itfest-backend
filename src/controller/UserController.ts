@@ -511,16 +511,16 @@ export class UserController {
       const id = response.locals.auth.id;
 
       const visitorData = await this.visitorRepository
-        .createQueryBuilder("visitor")
-        .select("visitor.point")
+        .createQueryBuilder()
+        .select("visitor.point", "point")
         .where("visitor.userId = :id", { id: id })
+        .from(Visitor, "visitor")
         .getRawOne();
 
       const scoreboardData = await this.globalScoreboardRepository
         .createQueryBuilder()
-        .select('global_scoreboard')
+        .select('ROW_NUMBER () OVER (ORDER BY global_scoreboard.score DESC)', 'rank')
         .where("global_scoreboard.userId = :id", { id: id })
-        .addSelect('ROW_NUMBER () OVER (ORDER BY "score" DESC)')
         .from(GlobalScoreboard, 'global_scoreboard')
         .getRawOne();
 
@@ -528,19 +528,16 @@ export class UserController {
       if (visitorData === null){
         point = 0;
       } else {
-        point = visitorData.score;
+        point = visitorData.point;
       }
 
       if (scoreboardData === null){
-        rank = "-";
+        rank = -1;
       } else {
-        rank = scoreboardData.rank;
+        rank = +scoreboardData.rank;
       }
 
-      console.log(visitorData);
-      console.log(scoreboardData);
-
-      return responseGenerator(response, 200, "ok", {point: point, rank: rank});
+      return responseGenerator(response, 200, "ok", {point: point, rank: rank} as any);
 
     } catch (err) {
 
