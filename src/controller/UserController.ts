@@ -15,7 +15,7 @@ import { decodeQr, generateQr } from "../utils/qr";
 import { responseGenerator } from "../utils/responseGenerator";
 import { TransactionController } from "./TransactionController";
 import { transporter } from "../utils/mail";
-import { Request } from "express-validator/src/base";
+import { GlobalScoreboard } from "../entity/GlobalScoreboard";
 
 export class UserController {
   private tokenGenerator = new TokenGenerator(128, TokenGenerator.BASE62);
@@ -25,6 +25,7 @@ export class UserController {
   private tenantRepository = getRepository(Tenant);
   private voucherRepository = getRepository(Voucher);
   private verificationRepository = getRepository(Verification);
+  private globalScoreboardRepository = getRepository(GlobalScoreboard);
 
   private tc = new TransactionController();
 
@@ -499,9 +500,52 @@ export class UserController {
 
       return responseGenerator(res, 200, "ok", visCount);
     } catch (err) {
-      
+
       console.error(err);
       return responseGenerator(res, 500, "unknown-error");
+    }
+  }
+
+  async getRankAndPoint(request: Request, response: Response){
+    try {
+      const id = response.locals.auth.id;
+
+      const visitorData = await this.visitorRepository
+        .createQueryBuilder("visitor")
+        .select("visitor.point")
+        .where("visitor.userId = :id", { id: id })
+        .getRawOne();
+
+      const scoreboardData = await this.globalScoreboardRepository
+        .createQueryBuilder()
+        .select('global_scoreboard')
+        .where("global_scoreboard.userId = :id", { id: id })
+        .addSelect('ROW_NUMBER () OVER (ORDER BY "score" DESC)')
+        .from(GlobalScoreboard, 'global_scoreboard')
+        .getRawOne();
+
+      let point, rank;
+      if (visitorData === null){
+        point = 0;
+      } else {
+        point = visitorData.score;
+      }
+
+      if (scoreboardData === null){
+        rank = "-";
+      } else {
+        rank = scoreboardData.rank;
+      }
+
+      console.log(visitorData);
+      console.log(scoreboardData);
+
+      return responseGenerator(response, 200, "ok", {point: point, rank: rank});
+
+    } catch (err) {
+
+      console.error(err);
+      return responseGenerator(response, 500, "unknown-error");
     }
   }
 
