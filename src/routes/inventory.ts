@@ -20,6 +20,11 @@ export default () => {
 
   router.use(checkJWT);
   router.get("/item", [...paginationCheck, checkParam], ic.listItem.bind(ic));
+  router.get("/store", [
+    ...paginationCheck,
+    checkParam,
+  ], ic.listTenantWithItem.bind(ic));
+
   router.post("/item", [
     limitAccess([UserRole.ADMIN, UserRole.TENANT]),
     nameCheck(),
