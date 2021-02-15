@@ -16,6 +16,7 @@ import { responseGenerator } from "../utils/responseGenerator";
 import { TransactionController } from "./TransactionController";
 import { transporter } from "../utils/mail";
 import { GlobalScoreboard } from "../entity/GlobalScoreboard";
+import scoreboard from "../routes/scoreboard";
 
 export class UserController {
   private tokenGenerator = new TokenGenerator(128, TokenGenerator.BASE62);
@@ -498,7 +499,7 @@ export class UserController {
     try {
       const visCount = await this.visitorRepository.count();
 
-      return responseGenerator(res, 200, "ok", visCount);
+      return responseGenerator(res, 200, "ok", { count: visCount} as any);
     } catch (err) {
 
       console.error(err);
@@ -510,34 +511,27 @@ export class UserController {
     try {
       const id = response.locals.auth.id;
 
-      const visitorData = await this.visitorRepository
-        .createQueryBuilder()
-        .select("visitor.point", "point")
-        .where("visitor.userId = :id", { id: id })
-        .from(Visitor, "visitor")
-        .getRawOne();
-
       const scoreboardData = await this.globalScoreboardRepository
-        .createQueryBuilder()
-        .select('ROW_NUMBER () OVER (ORDER BY global_scoreboard.score DESC)', 'rank')
-        .where("global_scoreboard.userId = :id", { id: id })
-        .from(GlobalScoreboard, 'global_scoreboard')
-        .getRawOne();
+        .createQueryBuilder("global_scoreboard")
+        .addSelect("ROW_NUMBER () OVER (ORDER BY global_scoreboard.score DESC)", "rank")
+        .getRawMany();
 
-      let point, rank;
-      if (visitorData === null){
-        point = 0;
-      } else {
-        point = visitorData.point;
-      }
+      let score, rank;
 
-      if (scoreboardData === null){
+      if (scoreboardData === null || scoreboardData.length < 1){
         rank = -1;
+        score = 0;
       } else {
-        rank = +scoreboardData.rank;
+        for(let i = 0; i < scoreboardData.length; i++) {
+          if(scoreboardData[i].global_scoreboard_userId == id){
+            rank = +scoreboardData[i].rank;
+            score = +scoreboardData[i].global_scoreboard_score;
+            break;
+          }
+        }
       }
 
-      return responseGenerator(response, 200, "ok", {point: point, rank: rank} as any);
+      return responseGenerator(response, 200, "ok", {score, rank} as any);
 
     } catch (err) {
 
