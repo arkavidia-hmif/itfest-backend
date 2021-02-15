@@ -516,12 +516,9 @@ export class UserController {
         .addSelect("ROW_NUMBER () OVER (ORDER BY global_scoreboard.score DESC)", "rank")
         .getRawMany();
 
-      let score, rank;
+      let score = -1, rank = 0;
 
-      if (scoreboardData === null || scoreboardData.length < 1){
-        rank = -1;
-        score = 0;
-      } else {
+      if (scoreboardData !== null) {
         for(let i = 0; i < scoreboardData.length; i++) {
           if(scoreboardData[i].global_scoreboard_userId == id){
             rank = +scoreboardData[i].rank;
