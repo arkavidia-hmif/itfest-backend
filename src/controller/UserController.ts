@@ -509,7 +509,7 @@ export class UserController {
 
   async getRankAndPoint(request: Request, response: Response){
     try {
-      const id = response.locals.auth.id;
+      const id = +response.locals.auth.id;
 
       const scoreboardData = await this.globalScoreboardRepository
         .createQueryBuilder("global_scoreboard")
@@ -520,7 +520,7 @@ export class UserController {
 
       if (scoreboardData !== null) {
         for(let i = 0; i < scoreboardData.length; i++) {
-          if(scoreboardData[i].global_scoreboard_userId == id){
+          if(scoreboardData[i].global_scoreboard_userId === id){
             rank = +scoreboardData[i].rank;
             score = +scoreboardData[i].global_scoreboard_score;
             break;
