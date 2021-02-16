@@ -90,6 +90,9 @@ export default (): Router => {
     checkParam,
   ], uc.verifyToken.bind(uc));
 
+  router.get("/visitor/count", [
+  ], uc.countVisitor.bind(uc));
+
   // User endpoint
   router.use("/user", checkJWT);
 
@@ -144,6 +147,11 @@ export default (): Router => {
     check("amount").isInt({ min: 0 }),
     checkParam,
   ], tc.give.bind(tc));
+
+  router.get("/visitor/rankpoint", [
+    checkJWT,
+    limitAccess([UserRole.VISITOR]),
+  ], uc.getRankAndPoint.bind(uc));
 
   // router.get("/user/:qrid([a-z0-9]+)", uc.getQrData.bind(uc));
 

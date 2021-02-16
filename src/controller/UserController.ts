@@ -2,7 +2,7 @@ import * as bcrypt from "bcrypt";
 import * as crypto from "crypto";
 import { Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
-import { AdvancedConsoleLogger, getConnection, getRepository, Repository } from "typeorm";
+import { AdvancedConsoleLogger, getConnection, getRepository, MoreThan, Repository } from "typeorm";
 import * as TokenGenerator from 'uuid-token-generator';
 import { getTestMessageUrl, createTestAccount, createTransport } from 'nodemailer';
 
@@ -15,6 +15,8 @@ import { decodeQr, generateQr } from "../utils/qr";
 import { responseGenerator } from "../utils/responseGenerator";
 import { TransactionController } from "./TransactionController";
 import { transporter } from "../utils/mail";
+import { GlobalScoreboard } from "../entity/GlobalScoreboard";
+import scoreboard from "../routes/scoreboard";
 
 export class UserController {
   private tokenGenerator = new TokenGenerator(128, TokenGenerator.BASE62);
@@ -24,6 +26,7 @@ export class UserController {
   private tenantRepository = getRepository(Tenant);
   private voucherRepository = getRepository(Voucher);
   private verificationRepository = getRepository(Verification);
+  private globalScoreboardRepository = getRepository(GlobalScoreboard);
 
   private tc = new TransactionController();
 
@@ -492,6 +495,53 @@ export class UserController {
     return responseGenerator(response, 200, "ok");
   }
 
+  async countVisitor(req: Request, res: Response){
+    try {
+      const visCount = await this.visitorRepository.count();
+
+      return responseGenerator(res, 200, "ok", { count: visCount} as any);
+    } catch (err) {
+
+      console.error(err);
+      return responseGenerator(res, 500, "unknown-error");
+    }
+  }
+
+  async getRankAndPoint(request: Request, response: Response){
+    try {
+      const id = +response.locals.auth.id;
+
+      const userScoreBoard = await this.globalScoreboardRepository.findOne({
+        where: {
+          user: { id } as User
+        }
+      });
+
+      let score = 0, rank = -1;
+      if(userScoreBoard){
+        rank = 1;
+        score = userScoreBoard.score;
+
+        const scoreboardData = await this.globalScoreboardRepository.find({
+          where: {
+            score: MoreThan(score)
+          }
+        });
+
+        if(scoreboardData){
+          rank = scoreboardData.length + 1;
+        }
+      }
+
+      return responseGenerator(response, 200, "ok", {score, rank} as any);
+
+    } catch (err) {
+
+      console.error(err);
+      return responseGenerator(response, 500, "unknown-error");
+    }
+  }
+
   checkFilled(visitorObj: Visitor, userObj?: User): boolean {
     return !visitorObj.filled &&
       (!userObj || userObj.name !== userObj.email) &&
@@ -596,4 +646,3 @@ export class UserController {
     });
   }
 }
-
