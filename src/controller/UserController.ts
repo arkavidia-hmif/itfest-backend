@@ -2,7 +2,7 @@ import * as bcrypt from "bcrypt";
 import * as crypto from "crypto";
 import { Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
-import { AdvancedConsoleLogger, getConnection, getRepository, Repository } from "typeorm";
+import { AdvancedConsoleLogger, getConnection, getRepository, MoreThan, Repository } from "typeorm";
 import * as TokenGenerator from 'uuid-token-generator';
 import { getTestMessageUrl, createTestAccount, createTransport } from 'nodemailer';
 
@@ -511,20 +511,25 @@ export class UserController {
     try {
       const id = +response.locals.auth.id;
 
-      const scoreboardData = await this.globalScoreboardRepository
-        .createQueryBuilder("global_scoreboard")
-        .addSelect("ROW_NUMBER () OVER (ORDER BY global_scoreboard.score DESC)", "rank")
-        .getRawMany();
+      const userScoreBoard = await this.globalScoreboardRepository.findOne({
+        where: {
+          user: { id } as User
+        }
+      });
 
-      let score = -1, rank = 0;
+      let score = 0, rank = -1;
+      if(userScoreBoard){
+        rank = 1;
+        score = userScoreBoard.score;
 
-      if (scoreboardData !== null) {
-        for(let i = 0; i < scoreboardData.length; i++) {
-          if(scoreboardData[i].global_scoreboard_userId === id){
-            rank = +scoreboardData[i].rank;
-            score = +scoreboardData[i].global_scoreboard_score;
-            break;
+        const scoreboardData = await this.globalScoreboardRepository.find({
+          where: {
+            score: MoreThan(score)
           }
+        });
+
+        if(scoreboardData){
+          rank = scoreboardData.length + 1;
         }
       }
 
