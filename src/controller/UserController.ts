@@ -17,8 +17,6 @@ import { sendEmail } from "../utils/mail";
 import { GlobalScoreboard } from "../entity/GlobalScoreboard";
 
 export class UserController {
-  private tokenGenerator = new TokenGenerator(128, TokenGenerator.BASE62);
-
   private userRepository = getRepository(User);
   private visitorRepository = getRepository(Visitor);
   private tenantRepository = getRepository(Tenant);
@@ -27,6 +25,10 @@ export class UserController {
   private globalScoreboardRepository = getRepository(GlobalScoreboard);
 
   private tc = new TransactionController();
+
+  generateToken(): string {
+    return (Math.random() + 1).toString(36).substr(2, 6);
+  }
 
   async createUser(name: string, username: string, email: string, role: UserRole, password: string): Promise<void> {
     const salt = bcrypt.genSaltSync(config.password.saltRounds);
@@ -64,7 +66,7 @@ export class UserController {
   async resetPassword(request: Request, response: Response) {
     try {
       const { username, email } = request.body;
-      const token = this.tokenGenerator.generate();
+      const token = this.generateToken();
 
       const userByUsername = await this.userRepository.findOne({
         username
@@ -107,60 +109,63 @@ export class UserController {
     }
   }
 
-  async verifyToken(request: Request, response: Response) {
+  async verifyToken(request: Request, response: Response): Promise<void> {
     try {
-      const token: string = request.params.token;
-      const password: string = request.body.password;
+      const { email, password = "", token } = request.body;
+
+      const user = await this.userRepository.findOne({ where: { email } });
+
+      if (!user) {
+        return responseGenerator(response, 400, "invalid-token");
+      }
 
       const verification = await this.verificationRepository.findOne({
         where: {
-          token: token
-        },
-        relations: ["userId"]
+          userId: user.id
+        }
       });
 
-      if (verification) {
-        const user: User = verification.userId;
-
-        if (verification.type === VerificationType.CONFIRM_EMAIL) {
-          user.isVerified = true;
-
-          await getConnection().transaction(async transactionManager => {
-            const tmUserRepository = transactionManager.getRepository(User);
-            const tmVerificationRepository = transactionManager.getRepository(Verification);
-
-            await tmUserRepository.save(user);
-
-            await tmVerificationRepository.delete(verification);
-          });
-
-          return responseGenerator(response, 200, "ok");
-
-        } else if (password !== "") {
-          const salt = bcrypt.genSaltSync(config.password.saltRounds);
-
-          const encryptedHash = bcrypt.hashSync(password, salt);
-
-          user.password = encryptedHash;
-
-          await getConnection().transaction(async transactionManager => {
-            const tmUserRepository = transactionManager.getRepository(User);
-            const tmVerificationRepository = transactionManager.getRepository(Verification);
-
-            await tmUserRepository.save(user);
-
-            await tmVerificationRepository.delete(verification);
-
-          });
-
-          return responseGenerator(response, 200, "ok");
-
-        }
-
-        return responseGenerator(response, 400, "password-cant-be-empty");
+      if (!verification || verification.token !== token) {
+        return responseGenerator(response, 400, "invalid-token");
       }
 
-      return responseGenerator(response, 404, "token-not-found");
+      if (verification.type === VerificationType.CONFIRM_EMAIL) {
+        user.isVerified = true;
+
+        await getConnection().transaction(async transactionManager => {
+          const tmUserRepository = transactionManager.getRepository(User);
+          const tmVerificationRepository = transactionManager.getRepository(Verification);
+
+          await tmUserRepository.save(user);
+
+          await tmVerificationRepository.delete(verification);
+        });
+
+        return responseGenerator(response, 200, "ok");
+
+      } else if (password !== "") {
+        const salt = bcrypt.genSaltSync(config.password.saltRounds);
+
+        const encryptedHash = bcrypt.hashSync(password, salt);
+
+        user.password = encryptedHash;
+
+        await getConnection().transaction(async transactionManager => {
+          const tmUserRepository = transactionManager.getRepository(User);
+          const tmVerificationRepository = transactionManager.getRepository(Verification);
+
+          await tmUserRepository.save(user);
+
+          await tmVerificationRepository.delete(verification);
+
+        });
+
+        return responseGenerator(response, 200, "ok");
+
+      }
+
+      return responseGenerator(response, 400, "password-cant-be-empty");
+
     } catch (error) {
       if (typeof error === "string") {
         return responseGenerator(response, 400, error);
@@ -303,7 +308,7 @@ export class UserController {
   }
 
   async sendVerificationEmail(verificationRepository: Repository<Verification>, user: User): Promise<void> {
-    const token = this.tokenGenerator.generate();
+    const token = this.generateToken();
 
     await verificationRepository.save({
       userId: user,

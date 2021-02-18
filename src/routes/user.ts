@@ -45,6 +45,7 @@ export default (): Router => {
     .matches(/^[a-zA-Z0-9_\-.+]+$/i).withMessage("must be alphanumeric or _-+.")
     .isLength({ min: 1 }).withMessage("must be >= 1 character long");
   const pointCheck = () => check("point").isInt({ min: 0 }).withMessage("must be a positive integer");
+  const tokenCheck = () => check("token").isAlphanumeric().isLength({ min: 6, max: 6 }).withMessage("muse be 6 alpanumeric character");
 
   // Public user endpoint
   router.post("/login", [
@@ -81,14 +82,6 @@ export default (): Router => {
     pointCheck().optional(),
     checkParam,
   ], uc.registerTenant.bind(uc));
-
-  router.post("/resetpass", [
-    checkParam,
-  ], uc.resetPassword.bind(uc));
-
-  router.post("/validation/:token([0-9a-zA-Z]+)", [
-    checkParam,
-  ], uc.verifyToken.bind(uc));
 
   router.get("/visitor/count", [
   ], uc.countVisitor.bind(uc));
@@ -152,6 +145,18 @@ export default (): Router => {
     checkJWT,
     limitAccess([UserRole.VISITOR]),
   ], uc.getRankAndPoint.bind(uc));
+
+  // Verification and resetpass
+  router.post("/resetpass", [
+    checkParam,
+  ], uc.resetPassword.bind(uc));
+  router.post("/validation", [
+    emailCheck(),
+    tokenCheck(),
+    passwordCheck().optional(),
+    checkParam,
+  ], uc.verifyToken.bind(uc));
+
 
   // router.get("/user/:qrid([a-z0-9]+)", uc.getQrData.bind(uc));
 
