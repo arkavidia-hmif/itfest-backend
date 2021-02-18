@@ -54,15 +54,33 @@ export class GameController {
     return responseGenerator(response, 200, "ok", game);
   }
 
-  // get data game
   async getGameIdByTenant(request: Request, response: Response): Promise<void> {
+    const userId = response.locals.auth.id;
     const tenantId = request.params.id;
 
-    const game = await this.gameRepository.find({ tenant: tenantId });
+    const game = await this.gameRepository.findOne({ tenant: tenantId });
 
-    return responseGenerator(response, 200, "ok", game.map(g => {
-      return g.id;
-    }));
+    if (!game) {
+      return responseGenerator(response, 400, "no game");
+    }
+
+    const gameState = await this.gameStateRepository.findOne({
+      where: {
+        game: game.id,
+        user: userId
+      }
+    });
+
+    let attempt = 0;
+
+    if (gameState) {
+      attempt = 1;
+      if (gameState.isSubmit) {
+        attempt = 2;
+      }
+    }
+
+    return responseGenerator(response, 200, "ok", { gameid: game.id, attempt });
   }
 
   async playGame(request: Request, response: Response) {
