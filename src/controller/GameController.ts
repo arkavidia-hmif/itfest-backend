@@ -54,6 +54,17 @@ export class GameController {
     return responseGenerator(response, 200, "ok", game);
   }
 
+  // get data game
+  async getGameIdByTenant(request: Request, response: Response): Promise<void> {
+    const tenantId = request.params.id;
+
+    const game = await this.gameRepository.find({ tenant: tenantId });
+
+    return responseGenerator(response, 200, "ok", game.map(g => {
+      return g.id;
+    }));
+  }
+
   async playGame(request: Request, response: Response) {
     const userId = response.locals.auth.id;
     const gameId: any = +request.params.id;
