@@ -47,6 +47,10 @@ export default () => {
     limitAccess([UserRole.VISITOR, UserRole.ADMIN])
   ], gc.getGame.bind(gc));
 
+  router.get("/game/tenant/:id([0-9]+)", [
+    limitAccess([UserRole.VISITOR, UserRole.ADMIN, UserRole.TENANT])
+  ], gc.getGameIdByTenant.bind(gc));
+
   router.post("/game/:id([0-9]+)/play", [
     limitAccess([UserRole.VISITOR, UserRole.ADMIN])
   ], gc.playGame.bind(gc));
