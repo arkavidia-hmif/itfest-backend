@@ -14,7 +14,7 @@ import { partialUpdate } from "../utils/partialUpdateEntity";
 import { decodeQr, generateQr } from "../utils/qr";
 import { responseGenerator } from "../utils/responseGenerator";
 import { TransactionController } from "./TransactionController";
-import { transporter } from "../utils/mail";
+import { sendEmail, transporter } from "../utils/mail";
 import { GlobalScoreboard } from "../entity/GlobalScoreboard";
 import scoreboard from "../routes/scoreboard";
 
@@ -63,35 +63,6 @@ export class UserController {
     return codeList;
   }
 
-  async sendEmail(target: string, subject: string, body: string, text: string) {
-    const html = `
-      <html>
-      <head>
-          <style>
-              * {
-                  margin: 0;
-                  padding: 0;
-                  box-sizing: border-box;
-              }
-          </style>
-      </head>
-      <body style="font-family: Roboto,sans-serif; line-height: 2; background-color: #eee; width: 100%; padding: 20px; margin: 0;">
-          ${body}
-      </body>
-    `;
-
-
-    const mailOptions = {
-      from: "\"Arkavidia\" <no-reply@arkavidia.id>", // sender address
-      to: target, // list of receivers
-      subject: subject, // Subject line
-      text: text, // plain text body
-      html: html // html body
-    };
-
-    await transporter.sendMail(mailOptions);
-  }
-
   async resetPassword(request: Request, response: Response) {
     try {
       const { username, email } = request.body;
@@ -127,7 +98,7 @@ export class UserController {
 
         const textBody = `TOKEN: ${token}`;
 
-        this.sendEmail(user.email, "Reset Password - ITFest Arkavidia", htmlBody, textBody);
+        await sendEmail(user.email, "Reset Password - ITFest Arkavidia", htmlBody, textBody);
       }
 
       return responseGenerator(response, 200, "ok");
@@ -495,11 +466,11 @@ export class UserController {
     return responseGenerator(response, 200, "ok");
   }
 
-  async countVisitor(req: Request, res: Response){
+  async countVisitor(req: Request, res: Response) {
     try {
       const visCount = await this.visitorRepository.count();
 
-      return responseGenerator(res, 200, "ok", { count: visCount} as any);
+      return responseGenerator(res, 200, "ok", { count: visCount } as any);
     } catch (err) {
 
       console.error(err);
@@ -507,7 +478,7 @@ export class UserController {
     }
   }
 
-  async getRankAndPoint(request: Request, response: Response){
+  async getRankAndPoint(request: Request, response: Response) {
     try {
       const id = +response.locals.auth.id;
 
@@ -518,7 +489,7 @@ export class UserController {
       });
 
       let score = 0, rank = -1;
-      if(userScoreBoard){
+      if (userScoreBoard) {
         rank = 1;
         score = userScoreBoard.score;
 
@@ -528,12 +499,12 @@ export class UserController {
           }
         });
 
-        if(scoreboardData){
+        if (scoreboardData) {
           rank = scoreboardData.length + 1;
         }
       }
 
-      return responseGenerator(response, 200, "ok", {score, rank} as any);
+      return responseGenerator(response, 200, "ok", { score, rank } as any);
 
     } catch (err) {
 
