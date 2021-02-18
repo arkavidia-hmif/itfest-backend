@@ -61,7 +61,7 @@ export class GameController {
     const game = await this.gameRepository.findOne({ tenant: tenantId });
 
     if (!game) {
-      return responseGenerator(response, 400, "no game");
+      return responseGenerator(response, 400, "no-game");
     }
 
     const gameState = await this.gameStateRepository.findOne({
