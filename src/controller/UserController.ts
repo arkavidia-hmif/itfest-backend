@@ -2,9 +2,8 @@ import * as bcrypt from "bcrypt";
 import * as crypto from "crypto";
 import { Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
-import { AdvancedConsoleLogger, getConnection, getRepository, MoreThan, Repository } from "typeorm";
-import * as TokenGenerator from 'uuid-token-generator';
-import { getTestMessageUrl, createTestAccount, createTransport } from 'nodemailer';
+import { getConnection, getRepository, MoreThan, Repository } from "typeorm";
+import * as TokenGenerator from "uuid-token-generator";
 
 import config from "../config";
 import { Tenant, User, UserRole, Visitor } from "../entity/User";
@@ -14,9 +13,8 @@ import { partialUpdate } from "../utils/partialUpdateEntity";
 import { decodeQr, generateQr } from "../utils/qr";
 import { responseGenerator } from "../utils/responseGenerator";
 import { TransactionController } from "./TransactionController";
-import { sendEmail, transporter } from "../utils/mail";
+import { sendEmail } from "../utils/mail";
 import { GlobalScoreboard } from "../entity/GlobalScoreboard";
-import scoreboard from "../routes/scoreboard";
 
 export class UserController {
   private tokenGenerator = new TokenGenerator(128, TokenGenerator.BASE62);
@@ -326,7 +324,7 @@ export class UserController {
 
     const textBody = `TOKEN: ${token}`;
 
-    this.sendEmail(user.email, "Confirm Email - ITFest Arkavidia", htmlBody, textBody);
+    await sendEmail(user.email, "Confirm Email - ITFest Arkavidia", htmlBody, textBody);
 
   }
 
