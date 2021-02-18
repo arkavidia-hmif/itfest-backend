@@ -328,8 +328,9 @@ export class UserController {
     `;
 
     const textBody = `TOKEN: ${token}`;
+    console.log(textBody);
 
-    await sendEmail(user.email, "Confirm Email - ITFest Arkavidia", htmlBody, textBody);
+    // await sendEmail(user.email, "Confirm Email - ITFest Arkavidia", htmlBody, textBody);
 
   }
 
@@ -427,6 +428,7 @@ export class UserController {
           username,
           name,
           email,
+          isVerified: false
         });
 
         await this.sendVerificationEmail(tmVerificationRepository, savedUser);
