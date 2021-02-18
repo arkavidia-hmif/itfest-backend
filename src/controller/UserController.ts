@@ -328,9 +328,8 @@ export class UserController {
     `;
 
     const textBody = `TOKEN: ${token}`;
-    console.log(textBody);
 
-    // await sendEmail(user.email, "Confirm Email - ITFest Arkavidia", htmlBody, textBody);
+    await sendEmail(user.email, "Confirm Email - ITFest Arkavidia", htmlBody, textBody);
 
   }
 
