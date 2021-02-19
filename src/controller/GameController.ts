@@ -212,6 +212,8 @@ export class GameController {
       return responseGenerator(response, 400, "user-already-submitted");
     }
 
+    let score = 0;
+
     try {
       await getConnection().transaction(async transactionManager => {
         const tmTenantRepository = transactionManager.getRepository(Tenant);
@@ -222,7 +224,7 @@ export class GameController {
         const tmScoreboardRepository = transactionManager.getRepository(Scoreboard);
         const tmGlobalScoreboardRepository = transactionManager.getRepository(GlobalScoreboard);
 
-        const score: number = this.evaluateScore(game, answer);
+        score = this.evaluateScore(game, answer);
 
         const globalBoard: GlobalScoreboard = await tmGlobalScoreboardRepository.findOne({ user: { id: userId } }, { relations: ["user"] });
 
