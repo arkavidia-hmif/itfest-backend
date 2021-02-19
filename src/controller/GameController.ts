@@ -273,7 +273,7 @@ export class GameController {
         return responseGenerator(response, 500, "unknown-error");
       }
     }
-    return responseGenerator(response, 200, "ok");
+    return responseGenerator(response, 200, "ok", { prize: score });
   }
 
   evaluateScore(game: Game, userAnswer: Record<string, string>): number {
