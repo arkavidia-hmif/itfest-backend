@@ -583,6 +583,18 @@ export class UserController {
         }
 
         await this.visitorRepository.save(updatedVisitor);
+      } else if(user.role == UserRole.TENANT){
+        const tenant = await this.tenantRepository.findOne({
+          where: {
+            userId: user
+          },
+          relations: ["userId"]
+        });
+
+        const updatedTenant = partialUpdate(tenant, request.body, ["isLive", "liveURL"]);
+
+        await this.tenantRepository.save(updatedTenant);
+
       }
 
       await this.userRepository.save(updatedUser);
