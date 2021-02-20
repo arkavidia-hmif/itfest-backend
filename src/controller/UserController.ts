@@ -531,7 +531,7 @@ export class UserController {
         result.push({
           name: el.userId.name,
           liveURL: el.liveURL
-        })
+        });
       });
 
       return responseGenerator(response, 200, "ok", result);
@@ -592,7 +592,7 @@ export class UserController {
         }
 
         await this.visitorRepository.save(updatedVisitor);
-      } else if(user.role == UserRole.TENANT){
+      } else if(user.role === UserRole.TENANT){
         const tenant = await this.tenantRepository.findOne({
           where: {
             userId: user
