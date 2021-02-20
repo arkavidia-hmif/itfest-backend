@@ -529,7 +529,7 @@ export class UserController {
       const result = [];
       tenantList.map(el => {
         result.push({
-          name: el.userId.name,
+          name: el.userId.username,
           liveURL: el.liveURL
         });
       });
