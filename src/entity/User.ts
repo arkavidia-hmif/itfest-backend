@@ -103,4 +103,10 @@ export class Tenant {
 
   @Column({ nullable: false })
   point: number;
+
+  @Column({ default: false })
+  isLive: boolean;
+
+  @Column({ default: "-" })
+  liveURL: string;
 }

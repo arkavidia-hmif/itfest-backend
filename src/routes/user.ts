@@ -86,6 +86,9 @@ export default (): Router => {
   router.get("/visitor/count", [
   ], uc.countVisitor.bind(uc));
 
+  router.get("/tenant/live", [
+  ], uc.getLiveTenant.bind(uc));
+
   // User endpoint
   router.use("/user", checkJWT);
 
