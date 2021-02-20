@@ -105,6 +105,11 @@ export default (): Router => {
     checkParam,
   ], ic.listTenantWithItem.bind(ic));
 
+  router.get("/user/:username([a-zA-Z0-9]+)/item", [
+    ...paginationCheck,
+    checkParam,
+  ], ic.getItemByUsername.bind(ic));
+
   router.get("/user/me", uc.getMe.bind(uc));
   router.put("/user/me", [
     emailCheck().optional(),
