@@ -174,6 +174,67 @@ export class InventoryController {
     }
   }
 
+  async getItemByUsername(request: Request, response: Response) {
+    const page = parseInt(request.query.page, 10) || 1;
+    const itemPerPage = parseInt(request.query.itemPerPage, 10) || 100;
+    const username = request.params.username;
+
+    try{
+
+      const user = await this.userRepository.findOne({
+        username
+      });
+
+      if(user === null || user.role !== UserRole.TENANT){
+        return response.status(404).send({
+          message: "not-found"
+        });
+      }
+
+      const [itemArray, itemTotal] = await this.itemRepository.findAndCount({
+        where: {
+          owner: { id: user.id } as User
+        },
+        take: itemPerPage,
+        skip: (page - 1) * itemPerPage,
+      });
+
+      const itemIdArray = itemArray.map((entry) => {
+        return {
+          item: entry.id
+        };
+      });
+
+      const [inventoryArray, inventoryTotal] = await this.inventoryRepository.findAndCount({
+        where: itemIdArray,
+        relations: ["item"]
+      });
+
+      const finalArray = itemArray.map(entry => {
+        const inventory = inventoryArray.filter(inv => inv.item.id === entry.id);
+        
+        if(inventory === null) return;
+
+        return {
+          id: entry.id,
+          name: entry.name,
+          price: entry.price,
+          qty: inventory[0].qty,
+          hasPhysical: entry.hasPhysical,
+          imageUrl: entry.imageUrl
+        };
+      });
+
+      return responseGenerator(response, 200, "ok", finalArray);
+
+    } catch (err){
+
+      console.log(err);
+      return responseGenerator(response, 500, "err");
+    }
+
+  }
+
   async editItem(request: Request, response: Response) {
     const id = request.params.id;
     const { name, price, qty, hasPhysical, imageUrl } = request.body;
