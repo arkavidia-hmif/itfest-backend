@@ -86,6 +86,11 @@ export default (): Router => {
   router.get("/visitor/count", [
   ], uc.countVisitor.bind(uc));
 
+  router.get("/user/:username([a-zA-Z0-9]+)/item", [
+    ...paginationCheck,
+    checkParam,
+  ], ic.getItemByUsername.bind(ic));
+
   // User endpoint
   router.use("/user", checkJWT);
 
@@ -104,11 +109,6 @@ export default (): Router => {
     ...paginationCheck,
     checkParam,
   ], ic.listTenantWithItem.bind(ic));
-
-  router.get("/user/:username([a-zA-Z0-9]+)/item", [
-    ...paginationCheck,
-    checkParam,
-  ], ic.getItemByUsername.bind(ic));
 
   router.get("/user/me", uc.getMe.bind(uc));
   router.put("/user/me", [

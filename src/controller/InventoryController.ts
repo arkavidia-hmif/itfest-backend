@@ -199,8 +199,6 @@ export class InventoryController {
         skip: (page - 1) * itemPerPage,
       });
 
-      console.log(itemArray);
-
       const itemIdArray = itemArray.map((entry) => {
         return {
           item: entry.id
@@ -225,9 +223,7 @@ export class InventoryController {
           hasPhysical: entry.hasPhysical,
           imageUrl: entry.imageUrl
         }
-      })
-
-      console.log(inventoryArray);
+      });
 
       return responseGenerator(response, 200, "ok", finalArray);
 
