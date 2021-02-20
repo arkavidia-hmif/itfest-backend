@@ -517,6 +517,23 @@ export class UserController {
     }
   }
 
+  async getLiveTenant(request: Request, response: Response){
+    try {
+      const tenantList = await this.tenantRepository.find({
+        where: {
+          isLive: true
+        }
+      });
+
+      return responseGenerator(response, 200, "ok", tenantList);
+
+    } catch(err) {
+
+      console.error(err);
+      return responseGenerator(response, 500, "unknown-error");
+    }
+  }
+
   checkFilled(visitorObj: Visitor, userObj?: User): boolean {
     return !visitorObj.filled &&
       (!userObj || userObj.name !== userObj.email) &&
