@@ -90,6 +90,9 @@ export default (): Router => {
     ...paginationCheck,
     checkParam,
   ], ic.getItemByUsername.bind(ic));
+  
+  router.get("/tenant/live", [
+  ], uc.getLiveTenant.bind(uc));
 
   // User endpoint
   router.use("/user", checkJWT);

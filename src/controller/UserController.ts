@@ -517,6 +517,32 @@ export class UserController {
     }
   }
 
+  async getLiveTenant(request: Request, response: Response){
+    try {
+      const tenantList = await this.tenantRepository.find({
+        where: {
+          isLive: true
+        },
+        relations: ["userId"]
+      });
+
+      const result = [];
+      tenantList.map(el => {
+        result.push({
+          name: el.userId.username,
+          liveURL: el.liveURL
+        });
+      });
+
+      return responseGenerator(response, 200, "ok", result);
+
+    } catch(err) {
+
+      console.error(err);
+      return responseGenerator(response, 500, "unknown-error");
+    }
+  }
+
   checkFilled(visitorObj: Visitor, userObj?: User): boolean {
     return !visitorObj.filled &&
       (!userObj || userObj.name !== userObj.email) &&
@@ -566,6 +592,18 @@ export class UserController {
         }
 
         await this.visitorRepository.save(updatedVisitor);
+      } else if(user.role === UserRole.TENANT){
+        const tenant = await this.tenantRepository.findOne({
+          where: {
+            userId: user
+          },
+          relations: ["userId"]
+        });
+
+        const updatedTenant = partialUpdate(tenant, request.body, ["isLive", "liveURL"]);
+
+        await this.tenantRepository.save(updatedTenant);
+
       }
 
       await this.userRepository.save(updatedUser);
