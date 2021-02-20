@@ -522,10 +522,19 @@ export class UserController {
       const tenantList = await this.tenantRepository.find({
         where: {
           isLive: true
-        }
+        },
+        relations: ["userId"]
       });
 
-      return responseGenerator(response, 200, "ok", tenantList);
+      const result = [];
+      tenantList.map(el => {
+        result.push({
+          name: el.userId.name,
+          liveURL: el.liveURL
+        })
+      });
+
+      return responseGenerator(response, 200, "ok", result);
 
     } catch(err) {
 
