@@ -185,7 +185,7 @@ export class InventoryController {
         username
       });
 
-      if(user == null || user.role !== UserRole.TENANT){
+      if(user === null || user.role !== UserRole.TENANT){
         return response.status(404).send({
           message: "not-found"
         });
@@ -222,7 +222,7 @@ export class InventoryController {
           qty: inventory[0].qty,
           hasPhysical: entry.hasPhysical,
           imageUrl: entry.imageUrl
-        }
+        };
       });
 
       return responseGenerator(response, 200, "ok", finalArray);
