@@ -32,10 +32,10 @@ export default () => {
   router.get("/tenant/live", [
   ], uc.getLiveTenant.bind(uc));
 
-  router.get("/tenant/:username([a-zA-Z0-9]+)/item", [
+  router.get("/tenant/:id([0-9]+)/item", [
     ...paginationCheck,
     checkParam,
-  ], ic.getItemByUsername.bind(ic));
+  ], ic.getItemByTenantId.bind(ic));
 
 
   return router;

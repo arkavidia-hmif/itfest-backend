@@ -92,14 +92,14 @@ export class InventoryController {
             imageUrl: inventory.item.imageUrl
           };
         });
-        
+
         return {
           id: entry.id,
           name: entry.name,
           items: userInventory
         };
       });
-  
+
       return responseGenerator(response, 200, "ok", {
         array: finalArray,
         page,
@@ -174,24 +174,24 @@ export class InventoryController {
     }
   }
 
-  async getItemByUsername(request: Request, response: Response) {
+  async getItemByTenantId(request: Request, response: Response): Promise<void> {
     const page = parseInt(request.query.page, 10) || 1;
     const itemPerPage = parseInt(request.query.itemPerPage, 10) || 100;
-    const username = request.params.username;
+    const tenantId = request.params.id;
 
-    try{
+    try {
 
       const user = await this.userRepository.findOne({
-        username
+        id: tenantId
       });
 
-      if(user === null || user.role !== UserRole.TENANT){
+      if (user === null || user.role !== UserRole.TENANT) {
         return response.status(404).send({
           message: "not-found"
         });
       }
 
-      const [itemArray, itemTotal] = await this.itemRepository.findAndCount({
+      const [itemArray] = await this.itemRepository.findAndCount({
         where: {
           owner: { id: user.id } as User
         },
@@ -205,15 +205,15 @@ export class InventoryController {
         };
       });
 
-      const [inventoryArray, inventoryTotal] = await this.inventoryRepository.findAndCount({
+      const [inventoryArray] = await this.inventoryRepository.findAndCount({
         where: itemIdArray,
         relations: ["item"]
       });
 
       const finalArray = itemArray.map(entry => {
         const inventory = inventoryArray.filter(inv => inv.item.id === entry.id);
-        
-        if(inventory === null) return;
+
+        if (inventory === null) return;
 
         return {
           id: entry.id,
@@ -227,9 +227,8 @@ export class InventoryController {
 
       return responseGenerator(response, 200, "ok", finalArray);
 
-    } catch (err){
-
-      console.log(err);
+    } catch (err) {
+      console.error(err);
       return responseGenerator(response, 500, "err");
     }
 
