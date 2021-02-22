@@ -59,9 +59,7 @@ export class User {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  // set this to true in the prod
-  // @Column({ default: false })
-  @Column({ default: true })
+  @Column({ default: false })
   isVerified: boolean;
 }
 
