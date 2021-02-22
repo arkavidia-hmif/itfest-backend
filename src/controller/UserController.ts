@@ -333,23 +333,20 @@ export class UserController {
 
   }
 
-  async registerTenant(request: Request, response: Response) {
+  async registerTenant(request: Request, response: Response): Promise<void> {
     const { email, username, password, point } = request.body;
-    // const username: string = request.body.uemail.substring(0, email.indexOf("@"));
 
     const name = request.body.name || username;
 
     delete request.body.password;
 
     const salt = bcrypt.genSaltSync(config.password.saltRounds);
-
-    const encryptedHash = bcrypt.hashSync(password, salt);
+    const encryptedHash = await bcrypt.hash(password, salt);
 
     try {
       await getConnection().transaction(async transactionManager => {
         const tmUserRepository = transactionManager.getRepository(User);
         const tmTenantRepository = transactionManager.getRepository(Tenant);
-        const tmVerificationRepository = transactionManager.getRepository(Verification);
 
         if (await tmUserRepository.findOne({
           where: {
@@ -366,28 +363,24 @@ export class UserController {
           username,
           name,
           email,
-        });
+          isVerified: true
+        } as User);
 
         await tmTenantRepository.save({
           userId: savedUser,
           point: point || config.tenantInitial
         });
 
-        await this.sendVerificationEmail(tmVerificationRepository, savedUser);
+        return responseGenerator(response, 200, "ok", { id: savedUser.id });
       });
     } catch (err) {
       if (err === "user-exists" || err.code === "23505") {
         return responseGenerator(response, 400, "user-exists");
-      } else if (err.code === "ESOCKET") {
-        return responseGenerator(response, 500, "email-error");
       } else {
-        // eslint-disable-next-line no-console
         console.error(err);
         return responseGenerator(response, 500, "unknown-error");
       }
     }
-
-    return responseGenerator(response, 200, "ok");
   }
 
   async registerVisitor(request: Request, response: Response): Promise<void> {
@@ -517,7 +510,7 @@ export class UserController {
     }
   }
 
-  async getLiveTenant(request: Request, response: Response){
+  async getLiveTenant(request: Request, response: Response) {
     try {
       const tenantList = await this.tenantRepository.find({
         where: {
@@ -536,7 +529,7 @@ export class UserController {
 
       return responseGenerator(response, 200, "ok", result);
 
-    } catch(err) {
+    } catch (err) {
 
       console.error(err);
       return responseGenerator(response, 500, "unknown-error");
@@ -592,7 +585,7 @@ export class UserController {
         }
 
         await this.visitorRepository.save(updatedVisitor);
-      } else if(user.role === UserRole.TENANT){
+      } else if (user.role === UserRole.TENANT) {
         const tenant = await this.tenantRepository.findOne({
           where: {
             userId: user

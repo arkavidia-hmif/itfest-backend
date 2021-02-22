@@ -75,10 +75,10 @@ export default (): Router => {
   router.post("/register/tenant", [
     checkJWT,
     limitAccess([UserRole.ADMIN]),
-    emailCheck().optional(),
-    passwordCheck(),
     usernameCheck(),
-    nameCheck(),
+    passwordCheck(),
+    emailCheck().optional(),
+    nameCheck().optional(),
     pointCheck().optional(),
     checkParam,
   ], uc.registerTenant.bind(uc));
@@ -90,7 +90,7 @@ export default (): Router => {
     ...paginationCheck,
     checkParam,
   ], ic.getItemByUsername.bind(ic));
-  
+
   router.get("/tenant/live", [
   ], uc.getLiveTenant.bind(uc));
 
