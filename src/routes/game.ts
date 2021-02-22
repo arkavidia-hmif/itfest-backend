@@ -23,11 +23,11 @@ export default () => {
   const sc = new ScoreboardController();
 
   const nameCheck = () => check("name").isAscii().withMessage("must not contain special character");
-  const tenantCheck = () => check("tenant").isInt({ min: 1 }).withMessage("must be valid id");
-  const problemCheck = () => check("owner").exists().withMessage("must be valid object");
+  const tenantCheck = () => check("tenantId").isInt({ min: 1 }).withMessage("must be valid id");
+  const problemCheck = () => check("problem").exists().withMessage("must be valid object");
   const answerCheck = () => check("answer").exists().withMessage("must be valid object");
   const typeCheck = () => check("type").isInt({ min: 1, max: 2 }).withMessage("must be valid type, 1 for quiz, 2 for crossword");
-  const diffCheck = () => check("difficulty").isInt({ min: 1 }).withMessage("must be valid difficulty");
+  const difficultyCheck = () => check("difficulty").isInt({ min: 1 }).withMessage("must be valid difficulty");
 
   router.get("/game",
     limitAccess([UserRole.ADMIN]),
@@ -38,7 +38,7 @@ export default () => {
     nameCheck(),
     tenantCheck().optional(),
     typeCheck(),
-    diffCheck(),
+    difficultyCheck(),
     problemCheck(),
     answerCheck(),
     checkParam
@@ -68,7 +68,7 @@ export default () => {
   router.put("/game/:id([0-9]+)", [
     limitAccess([UserRole.ADMIN, UserRole.TENANT]),
     nameCheck().optional(),
-    diffCheck().optional(),
+    difficultyCheck().optional(),
     problemCheck().optional(),
     answerCheck().optional(),
     checkParam,
