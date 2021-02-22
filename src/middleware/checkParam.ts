@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import { validationResult } from "express-validator";
+import { ValidationError, validationResult } from "express-validator";
 import { responseGenerator } from "../utils/responseGenerator";
 
-export function checkParam(request: Request, response: Response, next: NextFunction) {
+export function checkParam(request: Request, response: Response, next: NextFunction): void {
   const errors = validationResult(request);
   if (errors.isEmpty()) {
     return next();
@@ -12,11 +12,11 @@ export function checkParam(request: Request, response: Response, next: NextFunct
 
     for (const data of errorArray) {
       if (data.param === "_error") {
-        const nestedErrors = (data as any).nestedErrors;
+        const nestedErrors = data.nestedErrors as Array<ValidationError>;
         nestedErrors.forEach((error) => {
           errorResult.push({
             part: error.param,
-            message: error.msg,
+            message: error.msg
           });
         });
       } else {
