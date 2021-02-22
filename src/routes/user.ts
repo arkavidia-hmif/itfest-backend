@@ -86,14 +86,6 @@ export default (): Router => {
   router.get("/visitor/count", [
   ], uc.countVisitor.bind(uc));
 
-  router.get("/tenant/:username([a-zA-Z0-9]+)/item", [
-    ...paginationCheck,
-    checkParam,
-  ], ic.getItemByUsername.bind(ic));
-
-  router.get("/tenant/live", [
-  ], uc.getLiveTenant.bind(uc));
-
   // User endpoint
   router.use("/user", checkJWT);
 

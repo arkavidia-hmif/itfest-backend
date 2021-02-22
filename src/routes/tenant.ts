@@ -2,42 +2,22 @@ import { Router } from "express";
 import { check } from "express-validator";
 
 import { GameController } from "../controller/GameController";
+import { InventoryController } from "../controller/InventoryController";
+import { UserController } from "../controller/UserController";
 import { UserRole } from "../entity/User";
 import { checkJWT } from "../middleware/checkJWT";
 import { checkParam } from "../middleware/checkParam";
 import { limitAccess } from "../middleware/limitAccess";
+import { paginationCheck } from "../middleware/paginationCheck";
 
 export default () => {
   const router = Router();
 
   const gc = new GameController();
-
-  const nameCheck = () => check("name")
-    .isLength({ min: 5 }).withMessage("must be >= 5 characters")
-    .matches(/^[a-z0-9 ]+$/i).withMessage("must be alphanumeric or space");
-  const difficultyCheck = () => check("difficulty")
-    .isInt({ min: 1, max: 3 }).withMessage("must be an integer between 1 to 3");
+  const uc = new UserController();
+  const ic = new InventoryController();
 
   router.use(checkJWT);
-
-  
-  // router.get("/game", [limitAccess([UserRole.ADMIN, UserRole.TENANT])], gc.listGame.bind(gc));
-  // router.post("/game", [
-  //   limitAccess([UserRole.ADMIN, UserRole.TENANT]),
-  //   nameCheck(),
-  //   difficultyCheck(),
-  //   checkParam,
-  // ], gc.registerGame.bind(gc));
-  // router.get("/game/:id([0-9]+)", [limitAccess([UserRole.ADMIN, UserRole.TENANT])], gc.getGame.bind(gc));
-  // router.put("/game/:id([0-9]+)", [
-  //   limitAccess([UserRole.ADMIN, UserRole.TENANT]),
-  //   nameCheck().optional(),
-  //   difficultyCheck().optional(),
-  //   checkParam,
-  // ], gc.updateGame.bind(gc));
-  // router.delete("/game/:id([0-9]+)", [limitAccess([UserRole.ADMIN, UserRole.TENANT])], gc.deleteGame.bind(gc));
-
-
 
   // giveFeedback not yet been implemented 
 
@@ -49,9 +29,14 @@ export default () => {
     checkParam,
   ], gc.giveFeedback.bind(gc));
 
-  // router.get("/tenant/:id([0-9]+)/review", [
-  //   limitAccess([UserRole.ADMIN, UserRole.TENANT]),
-  // ], gc.getFeedback.bind(gc));
+  router.get("/tenant/live", [
+  ], uc.getLiveTenant.bind(uc));
+
+  router.get("/tenant/:username([a-zA-Z0-9]+)/item", [
+    ...paginationCheck,
+    checkParam,
+  ], ic.getItemByUsername.bind(ic));
+
 
   return router;
 };
