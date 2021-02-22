@@ -40,7 +40,8 @@ export default () => {
     typeCheck(),
     diffCheck(),
     problemCheck(),
-    answerCheck()
+    answerCheck(),
+    checkParam
   ], gc.addGame.bind(gc));
 
   router.get("/game/:id([0-9]+)", [
