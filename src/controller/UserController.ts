@@ -507,7 +507,7 @@ export class UserController {
         .select("COUNT(DISTINCT(score)) AS total")
         .getRawOne();
 
-      return responseGenerator(response, 200, "ok", { score, rank, total: totalCount });
+      return responseGenerator(response, 200, "ok", { score, rank, total: totalCount.total });
 
     } catch (err) {
       console.error(err);
