@@ -475,7 +475,7 @@ export class UserController {
     }
   }
 
-  async getRankAndPoint(request: Request, response: Response) {
+  async getRankAndPoint(request: Request, response: Response): Promise<void> {
     try {
       const id = +response.locals.auth.id;
 
@@ -496,15 +496,20 @@ export class UserController {
           }
         });
 
+
         if (scoreboardData) {
           rank = scoreboardData.length + 1;
         }
       }
 
-      return responseGenerator(response, 200, "ok", { score, rank } as any);
+      const totalCount = await this.globalScoreboardRepository
+        .createQueryBuilder("leaderboard")
+        .select("COUNT(DISTINCT(score)) AS total")
+        .getRawOne();
+
+      return responseGenerator(response, 200, "ok", { score, rank, total: totalCount });
 
     } catch (err) {
-
       console.error(err);
       return responseGenerator(response, 500, "unknown-error");
     }
