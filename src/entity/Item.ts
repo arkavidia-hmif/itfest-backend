@@ -12,7 +12,7 @@ import {
 import { User } from "./User";
 
 @Entity()
-@Check(`(price >= 0)`)
+@Check("(price >= 0)")
 export class Item {
 
   @PrimaryGeneratedColumn()
@@ -21,12 +21,9 @@ export class Item {
   @Column()
   name: string;
 
-  @ManyToOne((type) => User)
+  @ManyToOne(() => User)
   @JoinColumn({ name: "ownerId" })
   owner: User;
-
-  // @Column({ nullable: false })
-  // ownerId: number;
 
   @Column()
   price: number;
