@@ -39,5 +39,12 @@ export async function sendEmail(target: string, subject: string, body: string, t
     html: html // html body
   };
 
-  await transporter.sendMail(mailOptions);
+  if (process.env.NODE_ENV === "development") {
+    // eslint-disable-next-line no-console
+    console.log("Dev env, not sending email");
+    // eslint-disable-next-line no-console
+    console.log(mailOptions);
+  } else {
+    await transporter.sendMail(mailOptions);
+  }
 }
