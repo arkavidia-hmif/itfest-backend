@@ -515,7 +515,7 @@ export class UserController {
     }
   }
 
-  async getLiveTenant(request: Request, response: Response) {
+  async getLiveTenant(request: Request, response: Response): Promise<void> {
     try {
       const tenantList = await this.tenantRepository.find({
         where: {
@@ -524,12 +524,12 @@ export class UserController {
         relations: ["userId"]
       });
 
-      const result = [];
-      tenantList.map(el => {
-        result.push({
-          name: el.userId.username,
+      const result = tenantList.map(el => {
+        return {
+          id: el.userId.id,
+          slug: el.userId.username,
           liveURL: el.liveURL
-        });
+        };
       });
 
       return responseGenerator(response, 200, "ok", result);
