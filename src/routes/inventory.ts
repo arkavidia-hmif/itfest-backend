@@ -17,6 +17,8 @@ export default () => {
   const priceCheck = () => check("price").isInt({ min: 0 }).withMessage("must be >=0");
   const ownerCheck = () => check("owner").isInt({ min: 0 }).withMessage("must be valid id");
   const qtyCheck = () => check("qty").isInt({ min: 0 }).withMessage("must be >= 0");
+  const imageUrlCheck = () => check("imageUrl").isURL().withMessage("must be valid url");
+  const hasPhysicalCheck = () => check("hasPhysical").isBoolean().withMessage("must be boolean");
 
   router.use(checkJWT);
   router.get("/item", [...paginationCheck, checkParam], ic.listItem.bind(ic));
@@ -31,6 +33,8 @@ export default () => {
     priceCheck(),
     ownerCheck().optional(),
     qtyCheck(),
+    imageUrlCheck(),
+    hasPhysicalCheck(),
     checkParam,
   ], ic.createItem.bind(ic));
 
