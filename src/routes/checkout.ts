@@ -28,8 +28,8 @@ export default () => {
 
   router.post("/checkout", [
     limitAccess([UserRole.VISITOR]),
-    lineCheck(),
-    waCheck(),
+    lineCheck().optional(),
+    waCheck().optional(),
     addressCheck().optional(),
     itemCheck(),
     itemContainIdCheck(),

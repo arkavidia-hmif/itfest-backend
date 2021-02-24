@@ -43,21 +43,11 @@ export class CheckoutController {
     return responseGenerator(response, 200, "ok", checkout);
   }
 
-  async createCheckout(request: Request, response: Response) {
-    const { waContact, lineContact, address, isSent } = request.body;
-    const items = request.body.items;
+  async createCheckout(request: Request, response: Response): Promise<void> {
+    const { waContact, lineContact, address, items: orderItems } = request.body;
     const id = response.locals.auth.id;
 
-    // items = [{
-    //     item: id,
-    //     quantity
-    // }]
-
-    if (!waContact && !lineContact) {
-      return responseGenerator(response, 400, "no-fill-contact");
-    }
-
-    if (!items || items.length === 0) {
+    if (orderItems.length === 0) {
       return responseGenerator(response, 400, "no-item-selected");
     }
 
@@ -69,63 +59,69 @@ export class CheckoutController {
         const tmVisitorRepository = transactionManager.getRepository(Visitor);
         const tmInventoryRepository = transactionManager.getRepository(Inventory);
 
-        let price = 0;
-        let hasPhysical = false;
         const visitor = await tmVisitorRepository.findOne(id, { relations: ["userId"] });
 
-        for (let i = 0; i < items.length; i++) {
-          const item = await tmItemRepository.findOne(items[i].id);
-          const invItem = await tmInventoryRepository.findOne({
-            where: {
-              item
-            }
-          });
+        const inventoryFromDb = await tmInventoryRepository.find({
+          where: [
+            ...orderItems.map(el => ({ item: el.id }))
+          ], relations: ["item"]
+        });
 
-          if (!item || !invItem) {
-            throw "item-not-found";
-          }
+        if (inventoryFromDb.length !== orderItems.length) {
+          return responseGenerator(response, 404, "item-not-found");
+        }
 
-          // TODO: check & kurangi Inventory Item
-          if (invItem.qty < items[i].quantity) {
-            throw "insufficient-quantity";
-          }
+        const itemFromDb = inventoryFromDb.map(el => el.item);
+        const hasPhysical = itemFromDb.some(el => el.hasPhysical);
 
-          await transactionManager.decrement(Inventory, { item: item }, "qty", items[i].quantity);
+        if (hasPhysical && !(waContact && lineContact)) {
+          return responseGenerator(response, 404, "incomplete-contact");
+        }
 
-          price += item.price * items[i].quantity;
+        const inventoryMap: Record<number, Inventory> = {};
+        for (const entry of inventoryFromDb) {
+          inventoryMap[entry.item.id] = entry;
+        }
 
-          if (!hasPhysical) {
-            hasPhysical = item.hasPhysical;
+        let totalPrice = 0;
+
+        for (const order of orderItems) {
+          totalPrice += order.qty * inventoryMap[order.id].item.price;
+
+          if (order.qty > inventoryMap[order.id].qty) {
+            return responseGenerator(response, 400, "insufficient-quantity");
           }
         }
 
-        if (price > visitor.point) {
-          throw "insufficient-point";
+        if (totalPrice > visitor.point) {
+          return responseGenerator(response, 400, "insufficient-point");
         }
 
-        await transactionManager.decrement(Visitor, { userId: id }, "point", price);
-
+        // Start processing
         const checkout = await tmCheckoutRepository.save({
           waContact,
           lineContact,
           address,
-          isSent,
-          totalPrice: price
+          totalPrice
         });
 
-        items.forEach(async item => {
+        for (const order of orderItems) {
+          await transactionManager.decrement(
+            Inventory,
+            { item: inventoryMap[order.id].item },
+            "qty",
+            order.qty
+          );
           await tmCheckoutItemRepository.save({
             checkout: checkout,
-            item: item,
-            quantity: +item.quantity
+            item: inventoryMap[order.id].item,
+            quantity: order.qty
           });
-        });
-
-        if (!hasPhysical) {
-          return responseGenerator(response, 200, "ok", { message: "item(s) being send by email" });
-        } else {
-          return responseGenerator(response, 200, "ok", { message: "item(s) being prepared" });
         }
+
+        await transactionManager.decrement(Visitor, { userId: id }, "point", totalPrice);
+
+        return responseGenerator(response, 200, "ok");
       });
     } catch (error) {
       if (typeof error === "string") {
