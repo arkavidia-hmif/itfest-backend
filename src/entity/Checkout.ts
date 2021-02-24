@@ -15,10 +15,10 @@ export class Checkout {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   lineContact: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   waContact: string;
 
   @Column({ nullable: true })
