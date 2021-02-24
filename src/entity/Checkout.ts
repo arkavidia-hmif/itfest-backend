@@ -4,7 +4,6 @@ import {
   Column,
   Entity,
   PrimaryGeneratedColumn,
-  PrimaryColumn,
   ManyToOne,
   OneToMany,
   JoinColumn
@@ -12,43 +11,40 @@ import {
 import { Item } from "./Item";
 
 @Entity()
-export class Checkout{
-    @PrimaryGeneratedColumn()
-    id: number;
+export class Checkout {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column({ default: "-" })
-    lineContact: string;
+  @Column({ nullable: false })
+  lineContact: string;
 
-    @Column({ default: "-" })
-    waContact: string;
+  @Column({ nullable: false })
+  waContact: string;
 
-    @Column({ default: false })
-    isSent: boolean;
+  @Column({ nullable: true })
+  address: string;
 
-    @Column({ default: "-" })
-    address: string;
+  @Column({ default: 0 })
+  totalPrice: number;
 
-    @Column({ default: 0 })
-    totalPrice: number;
-
-    @OneToMany(() => CheckoutItem, checkoutItem => checkoutItem.checkout)
-    @JoinColumn({ name: "items" })
-    items: CheckoutItem[];
+  @OneToMany(() => CheckoutItem, checkoutItem => checkoutItem.checkout)
+  @JoinColumn({ name: "items" })
+  items: CheckoutItem[];
 }
 
 @Entity()
-@Check(`(quantity >= 0)`)
+@Check("(quantity >= 0)")
 export class CheckoutItem {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne((type) => Checkout, (checkout) => checkout.id, { nullable: false, onDelete: "CASCADE" })
+  @ManyToOne(() => Checkout, (checkout) => checkout.id, { nullable: false, onDelete: "CASCADE" })
   checkout: Checkout;
 
-  @ManyToOne((type) => Item, { nullable: false })
+  @ManyToOne(() => Item, { nullable: false })
   item: Item;
 
-  @Column({nullable: false})
+  @Column({ nullable: false })
   @IsPositive()
   quantity: number;
 }
