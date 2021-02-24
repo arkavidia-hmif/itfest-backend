@@ -17,7 +17,8 @@ export default () => {
   const waCheck = () => check("waContact").isString().isLength({ min: 10, max: 20 }).withMessage("must be >=10 and <=20 characters long");
   const addressCheck = () => check("address").isString().withMessage("must be valid address");
   const itemCheck = () => check("items").isArray().withMessage("items must be array");
-  const itemContainCheck = () => check("items.*").isInt().withMessage("must be item id");
+  const itemContainIdCheck = () => check("items.*.id").isInt().withMessage("must be item id");
+  const itemContainQtyCheck = () => check("items.*.qty").isInt({ min: 1 }).withMessage("must be >0");
 
   router.use(checkJWT);
 
@@ -31,7 +32,8 @@ export default () => {
     waCheck(),
     addressCheck().optional(),
     itemCheck(),
-    itemContainCheck(),
+    itemContainIdCheck(),
+    itemContainQtyCheck(),
     checkParam,
   ], cc.createCheckout.bind(cc));
 
