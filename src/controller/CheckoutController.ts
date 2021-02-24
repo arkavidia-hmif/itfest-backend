@@ -4,7 +4,6 @@ import { Request, Response } from "express";
 import { getConnection, getRepository } from "typeorm";
 
 import { Checkout, CheckoutItem } from "../entity/Checkout";
-import { Item } from "../entity/Item";
 import { Inventory } from "../entity/Inventory";
 import { responseGenerator } from "../utils/responseGenerator";
 import { UserRole, User, Visitor } from "../entity/User";
@@ -13,7 +12,7 @@ export class CheckoutController {
   private checkoutRepository = getRepository(Checkout);
   private userRepository = getRepository(User);
 
-  async getCheckout(request: Request, response: Response) {
+  async getCheckout(request: Request, response: Response): Promise<void> {
     const userId = response.locals.auth.id;
     const id = request.params.id;
 
@@ -55,7 +54,6 @@ export class CheckoutController {
       await getConnection().transaction(async transactionManager => {
         const tmCheckoutRepository = transactionManager.getRepository(Checkout);
         const tmCheckoutItemRepository = transactionManager.getRepository(CheckoutItem);
-        const tmItemRepository = transactionManager.getRepository(Item);
         const tmVisitorRepository = transactionManager.getRepository(Visitor);
         const tmInventoryRepository = transactionManager.getRepository(Inventory);
 
