@@ -20,12 +20,12 @@ createConnection().then(async connection => {
   app.use(express.json());
   app.use(morgan("tiny"));
   app.use(cors());
+  app.use(tenantRoutes());
   app.use(userRoutes());
   app.use(scoreboardRoutes());
-  app.use(transactionRoutes());
-  app.use(inventoryRoutes());
-  app.use(tenantRoutes());
   app.use(gameRoutes());
+  app.use(inventoryRoutes());
+  app.use(transactionRoutes());
   app.use(checkoutRoutes());
 
   const server = http.createServer(app);
