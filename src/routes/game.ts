@@ -29,6 +29,8 @@ export default () => {
   const typeCheck = () => check("type").isInt({ min: 1, max: 2 }).withMessage("must be valid type, 1 for quiz, 2 for crossword");
   const difficultyCheck = () => check("difficulty").isInt({ min: 1 }).withMessage("must be valid difficulty");
 
+  router.use("/game", checkJWT);
+
   router.get("/game",
     limitAccess([UserRole.ADMIN]),
     gc.listGame.bind(gc));
