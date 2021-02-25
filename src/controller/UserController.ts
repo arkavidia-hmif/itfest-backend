@@ -502,12 +502,9 @@ export class UserController {
         }
       }
 
-      const totalCount = await this.globalScoreboardRepository
-        .createQueryBuilder("leaderboard")
-        .select("COUNT(DISTINCT(score)) AS total")
-        .getRawOne();
+      const totalCount = await this.globalScoreboardRepository.count();
 
-      return responseGenerator(response, 200, "ok", { score, rank, total: totalCount.total });
+      return responseGenerator(response, 200, "ok", { score, rank, total: totalCount });
 
     } catch (err) {
       console.error(err);
