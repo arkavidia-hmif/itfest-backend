@@ -17,11 +17,10 @@ export default () => {
   const uc = new UserController();
   const ic = new InventoryController();
 
-  router.use(checkJWT);
-
   // giveFeedback not yet been implemented 
 
   router.post("/tenant/:id([0-9]+)/review", [
+    checkJWT,
     limitAccess([UserRole.VISITOR]),
     check("score").isInt({ min: 0, max: 5 }).withMessage("must be an integer from 0 to 5"),
     check("praise").isArray().withMessage("must be an array"),
