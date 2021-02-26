@@ -19,7 +19,7 @@ export default (): Router => {
   const ic = new InventoryController();
 
   const emailCheck = () => check("email").isEmail().withMessage("must be a valid email address");
-  const nameCheck = () => check("name").matches(/^[a-zA-Z0-9 ]{1,64}$/i).withMessage("must only contain letter, number, or space");
+  const nameCheck = () => check("name").matches(/^[a-zA-Z0-9. ]{1,64}$/i).withMessage("must only contain letter, number, or space");
   const genderCheck = () => check("gender")
     .isInt({ min: 1, max: 2 })
     .withMessage("must be a valid gender (1=male, 2=female)");
