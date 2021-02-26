@@ -46,6 +46,7 @@ export default (): Router => {
     .isLength({ min: 1 }).withMessage("must be >= 1 character long");
   const pointCheck = () => check("point").isInt({ min: 0 }).withMessage("must be a positive integer");
   const tokenCheck = () => check("token").isAlphanumeric().isLength({ min: 6, max: 6 }).withMessage("muse be 6 alpanumeric character");
+  const liveUrlCheck = () => check("liveUrl").isURL().withMessage("must be valid url");
 
   // Public user endpoint
   router.post("/login", [
@@ -80,6 +81,7 @@ export default (): Router => {
     emailCheck().optional(),
     nameCheck().optional(),
     pointCheck().optional(),
+    liveUrlCheck().optional(),
     checkParam,
   ], uc.registerTenant.bind(uc));
 

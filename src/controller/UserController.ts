@@ -334,7 +334,7 @@ export class UserController {
   }
 
   async registerTenant(request: Request, response: Response): Promise<void> {
-    const { email, username, password, point } = request.body;
+    const { email, username, password, point, liveUrl } = request.body;
 
     const name = request.body.name || username;
 
@@ -368,7 +368,8 @@ export class UserController {
 
         await tmTenantRepository.save({
           userId: savedUser,
-          point: point || config.tenantInitial
+          point: point || config.tenantInitial,
+          liveURL: liveUrl
         });
 
         return responseGenerator(response, 200, "ok", { id: savedUser.id });
