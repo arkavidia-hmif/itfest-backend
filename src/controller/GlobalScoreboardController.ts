@@ -19,7 +19,7 @@ export class GlobalScoreboardController {
         .select(["point", "user.name"])
         .orderBy("point", "DESC")
         .skip(offset)
-        .take(limit)
+        .limit(limit)
         .getRawMany();
 
       return responseGenerator(res, 200, "ok", scoreboard);
