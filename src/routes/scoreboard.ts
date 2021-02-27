@@ -3,7 +3,7 @@ import { Router } from "express";
 import { ScoreboardController } from "../controller/ScoreboardController";
 import { GlobalScoreboardController } from "../controller/GlobalScoreboardController";
 
-export default() => {
+export default () => {
   const router = Router();
   const sc = new ScoreboardController();
   const gsc = new GlobalScoreboardController();
@@ -14,7 +14,7 @@ export default() => {
 
   router.get("/scoreboard/global", [
 
-  ], gsc.getScoreboard.bind(sc));
+  ], gsc.getScoreboard.bind(gsc));
 
   return router;
 };
