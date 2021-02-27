@@ -31,9 +31,9 @@ export class UserController {
   }
 
   async createUser(name: string, username: string, email: string, role: UserRole, password: string): Promise<void> {
-    const salt = bcrypt.genSaltSync(config.password.saltRounds);
+    const salt = await bcrypt.genSalt(config.password.saltRounds);
 
-    const encryptedHash = bcrypt.hashSync(password, salt);
+    const encryptedHash = await bcrypt.hash(password, salt);
 
     await this.userRepository.save({
       name,
@@ -144,9 +144,9 @@ export class UserController {
         return responseGenerator(response, 200, "ok");
 
       } else if (password !== "") {
-        const salt = bcrypt.genSaltSync(config.password.saltRounds);
+        const salt = await bcrypt.genSalt(config.password.saltRounds);
 
-        const encryptedHash = bcrypt.hashSync(password, salt);
+        const encryptedHash = await bcrypt.hash(password, salt);
 
         user.password = encryptedHash;
 
@@ -284,7 +284,7 @@ export class UserController {
       return responseGenerator(response, 404, "user-not-found");
     }
 
-    if (bcrypt.compareSync(password, user.password)) {
+    if ((await bcrypt.compare(password, user.password))) {
       const token = jwt.sign({
         id: user.id,
         username: user.username,
@@ -340,7 +340,7 @@ export class UserController {
 
     delete request.body.password;
 
-    const salt = bcrypt.genSaltSync(config.password.saltRounds);
+    const salt = await bcrypt.genSalt(config.password.saltRounds);
     const encryptedHash = await bcrypt.hash(password, salt);
 
     try {
@@ -393,9 +393,9 @@ export class UserController {
 
     const name = request.body.name || email;
 
-    const salt = bcrypt.genSaltSync(config.password.saltRounds);
+    const salt = await bcrypt.genSalt(config.password.saltRounds);
 
-    const encryptedHash = bcrypt.hashSync(password, salt);
+    const encryptedHash = await bcrypt.hash(password, salt);
 
     const voucher = request.body.voucher;
 
