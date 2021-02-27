@@ -43,8 +43,8 @@ export class CheckoutController {
   }
 
   async createCheckout(request: Request, response: Response): Promise<void> {
-    const { waContact, lineContact, address, items: orderItems } = request.body;
     const id = response.locals.auth.id;
+    const { waContact = id, lineContact, address, items: orderItems } = request.body;
 
     if (orderItems.length === 0) {
       return responseGenerator(response, 400, "no-item-selected");
