@@ -480,32 +480,15 @@ export class UserController {
     try {
       const id = +response.locals.auth.id;
 
-      const userScoreBoard = await this.globalScoreboardRepository.findOne({
+      const scoreData = await this.visitorRepository.findOne({ where: { userId: id } });
+      const rankData = await this.visitorRepository.count({
         where: {
-          user: { id } as User
+          point: MoreThan(scoreData.point)
         }
       });
+      const totalCount = await this.visitorRepository.count();
 
-      let score = 0, rank = -1;
-      if (userScoreBoard) {
-        rank = 1;
-        score = userScoreBoard.score;
-
-        const scoreboardData = await this.globalScoreboardRepository.find({
-          where: {
-            score: MoreThan(score)
-          }
-        });
-
-
-        if (scoreboardData) {
-          rank = scoreboardData.length + 1;
-        }
-      }
-
-      const totalCount = await this.globalScoreboardRepository.count();
-
-      return responseGenerator(response, 200, "ok", { score, rank, total: totalCount });
+      return responseGenerator(response, 200, "ok", { score: scoreData.point, rank: rankData + 1, total: totalCount });
 
     } catch (err) {
       console.error(err);
